@@ -27,11 +27,11 @@ class MembershipController extends Controller
             'profession' => 'required|string|max:100',
             'country'    => 'required|string|max:100',
             'city'       => 'required|string|max:100',
-            'type'       => 'required|in:standard,gold,premium',
             'photo'      => 'nullable|image|max:3072',
         ]);
 
         $validated['member_number'] = 'FSL-' . strtoupper(Str::random(6));
+        $validated['type']          = 'standard';
         $validated['status']        = 'inactive';
 
         if ($request->hasFile('photo')) {
