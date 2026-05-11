@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --rose: #D91E6E;
+        --rose-light: #F2C4D8;
+        --rose-pale: #FDF0F5;
+        --gold: #C9A84C;
+        --gold-light: #F0E0B0;
+        --gold-dark: #9A7A30;
+        --dark: #1A0A10;
+        --gray: #6B7280;
+        --white: #FDFAF9;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        font-family: 'DM Sans', sans-serif;
+        color: var(--dark);
+        background-color: var(--white);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5 {
+        font-family: 'Playfair Display', serif;
+    }
+}
+
+@layer components {
+    .btn-rose {
+        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium text-white transition-all duration-300;
+        background: var(--rose);
+    }
+    .btn-rose:hover {
+        background: #b8185c;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(217, 30, 110, 0.35);
+    }
+
+    .btn-gold {
+        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all duration-300;
+        border: 2px solid var(--gold);
+        color: var(--gold);
+    }
+    .btn-gold:hover {
+        background: var(--gold);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-rose {
+        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all duration-300;
+        border: 2px solid var(--rose);
+        color: var(--rose);
+    }
+    .btn-outline-rose:hover {
+        background: var(--rose);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .gold-divider {
+        @apply w-16 h-0.5 mx-auto my-6;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .section-title {
+        @apply text-4xl md:text-5xl font-bold text-center mb-4;
+        color: var(--dark);
+        font-family: 'Playfair Display', serif;
+    }
+
+    .section-subtitle {
+        @apply text-lg text-center max-w-2xl mx-auto;
+        color: var(--gray);
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .card-pillar {
+        @apply bg-white rounded-2xl p-8 transition-all duration-300 cursor-default;
+        border: 1px solid #F0E0B0;
+        box-shadow: 0 2px 16px rgba(201, 168, 76, 0.08);
+    }
+    .card-pillar:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(217, 30, 110, 0.12);
+        border-color: var(--rose-light);
+    }
+
+    .nav-link {
+        @apply relative text-sm font-medium transition-colors duration-200;
+        color: var(--dark);
+    }
+    .nav-link::after {
+        content: '';
+        @apply absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300;
+        background: var(--rose);
+    }
+    .nav-link:hover::after,
+    .nav-link.active::after {
+        @apply w-full;
+    }
+    .nav-link:hover { color: var(--rose); }
+
+    .badge-standard {
+        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+        background: #F3F4F6;
+        color: #374151;
+    }
+    .badge-gold {
+        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+        background: #FEF3C7;
+        color: #92400E;
+    }
+    .badge-premium {
+        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+        background: #FCE7F3;
+        color: #9D174D;
+    }
+
+    .admin-card {
+        @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100;
+    }
+
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl border border-gray-200 text-sm transition-all duration-200 outline-none;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .form-input:focus {
+        border-color: var(--rose);
+        box-shadow: 0 0 0 3px rgba(217, 30, 110, 0.1);
+    }
+
+    .form-label {
+        @apply block text-sm font-medium mb-2;
+        color: var(--dark);
+    }
+
+    /* Animations */
+    .fade-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
