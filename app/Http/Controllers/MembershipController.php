@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\MemberCardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MembershipController extends Controller
 {
@@ -21,14 +22,27 @@ class MembershipController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name'       => 'required|string|max:100',
-            'email'      => 'required|email|unique:members,email',
-            'profession' => 'required|string|max:100',
-            'country'    => 'required|string|max:100',
-            'city'       => 'required|string|max:100',
-            'photo'      => 'nullable|image|max:3072',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name'       => 'required|string|max:100',
+                'email'      => 'required|email|unique:members,email',
+                'profession' => 'required|string|max:100',
+                'country'    => 'required|string|max:100',
+                'city'       => 'required|string|max:100',
+                'photo'      => 'nullable|image|max:3072',
+            ], [], [
+                'name'       => 'nom complet',
+                'email'      => 'email',
+                'profession' => 'profession',
+                'country'    => 'pays',
+                'city'       => 'ville',
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('modal', 'join');
+        }
 
         $validated['member_number'] = 'FSL-' . strtoupper(Str::random(6));
         $validated['type']          = 'standard';

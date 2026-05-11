@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,149 +6,163 @@
 
 @layer base {
     :root {
-        --rose: #D91E6E;
+        --rose:       #D91E6E;
+        --rose-pale:  #FDF0F5;
+        --rose-mid:   #F5B8D4;
+        --gold:       #C9A84C;
+        --gold-pale:  #FBF6E8;
+        --gold-dark:  #9A7A30;
+        --dark:       #0F0A0C;
+        --charcoal:   #1A1218;
+        --gray:       #6B6570;
+        --gray-light: #9CA3A8;
+        --warm:       #FAF8F5;
+        --border:     #EDE8E4;
+        --white:      #FFFFFF;
         --rose-light: #F2C4D8;
-        --rose-pale: #FDF0F5;
-        --gold: #C9A84C;
         --gold-light: #F0E0B0;
-        --gold-dark: #9A7A30;
-        --dark: #1A0A10;
-        --gray: #6B7280;
-        --white: #FDFAF9;
     }
 
+    *, *::before, *::after { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-
     body {
-        font-family: 'DM Sans', sans-serif;
-        color: var(--dark);
-        background-color: var(--white);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: var(--charcoal);
+        background: var(--white);
         -webkit-font-smoothing: antialiased;
     }
-
-    h1, h2, h3, h4, h5 {
-        font-family: 'Playfair Display', serif;
-    }
+    h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; }
+    img { max-width: 100%; height: auto; }
 }
 
 @layer components {
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200 cursor-pointer select-none;
+    }
     .btn-rose {
-        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium text-white transition-all duration-300;
+        @apply btn px-6 py-3 text-sm text-white;
         background: var(--rose);
     }
-    .btn-rose:hover {
-        background: #b8185c;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(217, 30, 110, 0.35);
+    .btn-rose:hover { background: #b8175d; box-shadow: 0 6px 20px rgba(217,30,110,0.3); transform: translateY(-1px); }
+    .btn-rose:active { transform: translateY(0); box-shadow: none; }
+
+    .btn-dark {
+        @apply btn px-6 py-3 text-sm text-white;
+        background: var(--dark);
     }
+    .btn-dark:hover { background: var(--charcoal); transform: translateY(-1px); }
 
     .btn-gold {
-        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all duration-300;
-        border: 2px solid var(--gold);
-        color: var(--gold);
-    }
-    .btn-gold:hover {
+        @apply btn px-6 py-3 text-sm text-white;
         background: var(--gold);
-        color: white;
-        transform: translateY(-2px);
     }
+    .btn-gold:hover { background: var(--gold-dark); transform: translateY(-1px); }
+
+    .btn-outline {
+        @apply btn px-6 py-3 text-sm;
+        border: 1.5px solid var(--dark);
+        color: var(--dark);
+    }
+    .btn-outline:hover { background: var(--dark); color: white; }
 
     .btn-outline-rose {
-        @apply inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all duration-300;
-        border: 2px solid var(--rose);
+        @apply btn px-6 py-3 text-sm;
+        border: 1.5px solid var(--rose);
         color: var(--rose);
     }
-    .btn-outline-rose:hover {
-        background: var(--rose);
-        color: white;
-        transform: translateY(-2px);
-    }
+    .btn-outline-rose:hover { background: var(--rose); color: white; }
 
-    .gold-divider {
-        @apply w-16 h-0.5 mx-auto my-6;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    }
-
-    .section-title {
-        @apply text-4xl md:text-5xl font-bold text-center mb-4;
-        color: var(--dark);
-        font-family: 'Playfair Display', serif;
-    }
-
-    .section-subtitle {
-        @apply text-lg text-center max-w-2xl mx-auto;
+    /* ── Nav ─────────────────────────────────────── */
+    .nav-link {
+        @apply text-sm font-medium transition-colors duration-150;
         color: var(--gray);
-        font-family: 'DM Sans', sans-serif;
     }
+    .nav-link:hover { color: var(--dark); }
+    .nav-link.active { color: var(--dark); font-weight: 600; }
 
+    /* ── Cards ───────────────────────────────────── */
+    .card {
+        @apply bg-white rounded-2xl;
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+    }
+    .card-hover {
+        @apply card transition-all duration-300;
+    }
+    .card-hover:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
     .card-pillar {
-        @apply bg-white rounded-2xl p-8 transition-all duration-300 cursor-default;
-        border: 1px solid #F0E0B0;
-        box-shadow: 0 2px 16px rgba(201, 168, 76, 0.08);
+        @apply bg-white rounded-2xl p-7 transition-all duration-300;
+        border: 1px solid var(--border);
     }
     .card-pillar:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(217, 30, 110, 0.12);
-        border-color: var(--rose-light);
+        border-color: var(--rose-mid);
+        box-shadow: 0 8px 32px rgba(217,30,110,0.08);
+        transform: translateY(-4px);
     }
 
-    .nav-link {
-        @apply relative text-sm font-medium transition-colors duration-200;
-        color: var(--dark);
+    /* ── Forms ───────────────────────────────────── */
+    .form-label {
+        @apply block text-sm font-medium mb-1.5;
+        color: var(--charcoal);
     }
-    .nav-link::after {
-        content: '';
-        @apply absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300;
-        background: var(--rose);
-    }
-    .nav-link:hover::after,
-    .nav-link.active::after {
-        @apply w-full;
-    }
-    .nav-link:hover { color: var(--rose); }
-
-    .badge-standard {
-        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
-        background: #F3F4F6;
-        color: #374151;
-    }
-    .badge-gold {
-        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
-        background: #FEF3C7;
-        color: #92400E;
-    }
-    .badge-premium {
-        @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
-        background: #FCE7F3;
-        color: #9D174D;
-    }
-
-    .admin-card {
-        @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100;
-    }
-
     .form-input {
-        @apply w-full px-4 py-3 rounded-xl border border-gray-200 text-sm transition-all duration-200 outline-none;
-        font-family: 'DM Sans', sans-serif;
+        @apply w-full rounded-xl border px-4 py-3 text-sm outline-none transition-all duration-150;
+        border-color: var(--border);
+        background: var(--white);
+        color: var(--charcoal);
     }
     .form-input:focus {
         border-color: var(--rose);
-        box-shadow: 0 0 0 3px rgba(217, 30, 110, 0.1);
+        box-shadow: 0 0 0 3px rgba(217,30,110,0.08);
+    }
+    .form-input::placeholder { color: #BFB9BC; }
+    .form-error { @apply text-xs mt-1; color: #dc2626; }
+
+    /* ── Modal ───────────────────────────────────── */
+    .modal-overlay {
+        @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(6px);
+        padding: 0;
+    }
+    @media (min-width: 640px) {
+        .modal-overlay { padding: 1rem; }
+    }
+    .modal-box {
+        @apply bg-white w-full sm:rounded-2xl shadow-2xl overflow-hidden;
+        max-height: 96vh;
+        overflow-y: auto;
+        max-width: 520px;
     }
 
-    .form-label {
-        @apply block text-sm font-medium mb-2;
-        color: var(--dark);
+    /* ── Badges ──────────────────────────────────── */
+    .badge-standard { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; background: #F3F4F6; color: #374151; }
+    .badge-gold     { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; background: #FEF3C7; color: #92400E; }
+    .badge-premium  { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; background: #FCE7F3; color: #9D174D; }
+
+    /* ── Divider ─────────────────────────────────── */
+    .gold-divider { width: 40px; height: 2px; background: var(--gold); display: block; }
+
+    /* ── Section helpers ─────────────────────────── */
+    .section-label {
+        @apply text-xs font-bold uppercase tracking-[0.14em];
+        color: var(--rose);
     }
 
-    /* Animations */
+    /* ── Admin ───────────────────────────────────── */
+    .admin-card { @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100; }
+    .admin-sidebar { background: #0F0A0C; }
+
+    /* ── Animations ──────────────────────────────── */
     .fade-up {
         opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transform: translateY(28px);
+        transition: opacity 0.65s ease, transform 0.65s ease;
     }
-    .fade-up.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
 }

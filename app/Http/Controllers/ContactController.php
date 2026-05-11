@@ -20,7 +20,6 @@ class ContactController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        // Message logged (configure mail later)
         \Log::info('Contact form submission', $request->only('name', 'email', 'subject', 'message'));
 
         return back()->with('success', 'Votre message a bien été envoyé. Nous vous répondrons sous 48h.');
