@@ -18,9 +18,12 @@ class MemberController extends Controller
         $members = Member::when($request->search, fn($q) => $q->where('name', 'like', '%'.$request->search.'%')
             ->orWhere('email', 'like', '%'.$request->search.'%'))
             ->when($request->type, fn($q) => $q->where('type', $request->type))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
             ->latest()->paginate(20)->withQueryString();
 
-        return view('admin.members.index', compact('members'));
+        $pendingCount = Member::where('status', 'inactive')->count();
+
+        return view('admin.members.index', compact('members', 'pendingCount'));
     }
 
     public function create()
@@ -114,6 +117,15 @@ class MemberController extends Controller
             $member->card_path,
             'carte-membre-'.Str::slug($member->name).'.png'
         );
+    }
+
+    public function activate(Member $member)
+    {
+        $member->update(['status' => 'active']);
+
+        \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+
+        return back()->with('success', $member->name.' est maintenant active. Sa carte lui a été envoyée par email.');
     }
 
     public function sendCard(Member $member)

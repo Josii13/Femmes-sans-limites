@@ -30,7 +30,7 @@
             </p>
 
             <div class="flex flex-wrap gap-4">
-                <a href="{{ route('events.index') }}" class="btn-rose">
+                <a href="{{ route('membership.join') }}" class="btn-rose">
                     Rejoindre la communauté
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
@@ -269,12 +269,12 @@
             Rejoins une communauté de femmes qui se soutiennent, s'élèvent et grandissent ensemble. Ton voyage commence ici.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="{{ route('events.index') }}" class="btn-rose text-base px-10 py-4">
-                Voir les événements
+            <a href="{{ route('membership.join') }}" class="btn-rose text-base px-10 py-4">
+                Rejoindre la communauté
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>
-            <a href="{{ route('contact') }}" class="btn-gold text-base px-10 py-4">
-                Nous contacter
+            <a href="{{ route('events.index') }}" class="btn-gold text-base px-10 py-4">
+                Voir les événements
             </a>
         </div>
     </div>

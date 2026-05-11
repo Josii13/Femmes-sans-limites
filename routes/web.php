@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\ScannerController;
+use App\Http\Controllers\MembershipController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -18,6 +19,9 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 Route::get('/evenements', [EventController::class, 'index'])->name('events.index');
 Route::get('/evenements/{slug}', [EventController::class, 'show'])->name('events.show');
 Route::post('/evenements/{slug}/inscription', [EventController::class, 'register'])->name('events.register');
+Route::get('/rejoindre', [MembershipController::class, 'index'])->name('membership.join');
+Route::post('/rejoindre', [MembershipController::class, 'store'])->name('membership.store');
+Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->name('membership.success');
 
 // Breeze auth routes
 require __DIR__.'/auth.php';
@@ -30,6 +34,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('members', MemberController::class);
     Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
     Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
+    Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
 
     // Events
     Route::resource('events', AdminEventController::class);
