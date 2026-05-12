@@ -146,7 +146,7 @@
                     Depuis 2020, FSL rassemble des femmes ambitieuses décidées à transformer leur vie et leur milieu. Pas de compétition toxique — juste de la solidarité, de l'exigence et de la joie partagée.
                 </p>
                 <ul class="space-y-3 mb-10">
-                    @foreach(['Événements et forums exclusifs','Mentorat et coaching personnalisé','Réseau de 500+ femmes leaders','Formations pratiques et actionables']) as $item)
+                    @foreach(['Événements et forums exclusifs','Mentorat et coaching personnalisé','Réseau de 500+ femmes leaders','Formations pratiques et actionables'] as $item)
                     <li class="flex items-center gap-3 text-sm font-medium" style="color:var(--dark);">
                         <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--rose-pale);">
                             <svg class="w-3 h-3" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>

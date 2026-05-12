@@ -76,7 +76,7 @@
                 <h3 class="text-xl font-bold mb-1" style="color:var(--dark);font-family:'Playfair Display',serif;">Standard</h3>
                 <p class="text-xs mb-6" style="color:var(--gray);">Point d'entrée dans la communauté</p>
                 <ul class="space-y-2.5 text-sm" style="color:var(--gray);">
-                    @foreach(['Accès aux événements publics', 'Carte de membre FSL', 'Communauté en ligne', 'Newsletter exclusive']) as $item)
+                    @foreach(['Accès aux événements publics', 'Carte de membre FSL', 'Communauté en ligne', 'Newsletter exclusive'] as $item)
                     <li class="flex items-center gap-2">
                         <svg class="w-4 h-4 flex-shrink-0" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         {{ $item }}
@@ -96,7 +96,7 @@
                 <h3 class="text-xl font-bold mb-1" style="color:var(--dark);font-family:'Playfair Display',serif;">Gold</h3>
                 <p class="text-xs mb-6" style="color:var(--gray);">Pour les ambitieuses engagées</p>
                 <ul class="space-y-2.5 text-sm" style="color:var(--gray);">
-                    @foreach(['Tout le Standard', 'Accès prioritaire aux événements', 'Sessions de mentorat mensuel', 'Masterclasses exclusives', 'Groupe privé Gold']) as $item)
+                    @foreach(['Tout le Standard', 'Accès prioritaire aux événements', 'Sessions de mentorat mensuel', 'Masterclasses exclusives', 'Groupe privé Gold'] as $item)
                     <li class="flex items-center gap-2">
                         <svg class="w-4 h-4 flex-shrink-0" style="color:var(--gold-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         {{ $item }}
@@ -113,7 +113,7 @@
                 <h3 class="text-xl font-bold mb-1 text-white" style="font-family:'Playfair Display',serif;">Premium</h3>
                 <p class="text-xs mb-6" style="color:rgba(255,255,255,0.4);">L'expérience FSL complète</p>
                 <ul class="space-y-2.5 text-sm" style="color:rgba(255,255,255,0.7);">
-                    @foreach(['Tout le Gold', 'Coaching individuel mensuel', 'Accès VIP tous événements', 'Programme leadership avancé', 'Réseau C-Suite & investisseurs']) as $item)
+                    @foreach(['Tout le Gold', 'Coaching individuel mensuel', 'Accès VIP tous événements', 'Programme leadership avancé', 'Réseau C-Suite & investisseurs'] as $item)
                     <li class="flex items-center gap-2">
                         <svg class="w-4 h-4 flex-shrink-0" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         {{ $item }}

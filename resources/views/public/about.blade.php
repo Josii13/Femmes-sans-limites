@@ -189,7 +189,7 @@
                 </p>
                 {{-- Métriques --}}
                 <div class="grid grid-cols-3 gap-5 pt-6" style="border-top:1px solid var(--border);">
-                    @foreach([['15 ans','d\'expérience'],['1 000+','femmes coachées'],['30+','pays visités']]) as [$n,$l])
+                    @foreach([['15 ans','d\'expérience'],['1 000+','femmes coachées'],['30+','pays visités']] as [$n,$l])
                     <div>
                         <p class="text-2xl font-bold" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $n }}</p>
                         <p class="text-xs mt-1" style="color:var(--gray);">{{ $l }}</p>
@@ -207,7 +207,7 @@
         <span class="section-label">Notre communauté</span>
     </div>
     <div class="flex gap-4 px-5 lg:px-8 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
-        @foreach(['photo_02_2.png','photo_01_1.png','photo_03_3.png','photo_01_2.png','photo_03_4.png','photo_02_1.png']) as $img)
+        @foreach(['photo_02_2.png','photo_01_1.png','photo_03_3.png','photo_01_2.png','photo_03_4.png','photo_02_1.png'] as $img)
         <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden" style="width:280px;height:200px;">
             <img src="{{ asset('images/'.$img) }}" alt="FSL community" class="w-full h-full object-cover">
         </div>
