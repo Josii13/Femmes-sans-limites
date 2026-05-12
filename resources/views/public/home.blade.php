@@ -10,18 +10,23 @@
     {{-- Fond diagonal warm (visible desktop) --}}
     <div class="absolute top-0 right-0 bottom-0 hidden lg:block pointer-events-none" style="width:48%;background:var(--warm);clip-path:polygon(18% 0,100% 0,100% 100%,0% 100%);"></div>
 
+    {{-- Titre mobile uniquement (avant l'image) --}}
+    <div class="lg:hidden relative px-5 pt-24 pb-4">
+        <h1 class="font-bold fade-up" style="font-family:'Playfair Display',serif;color:var(--dark);font-size:clamp(2.6rem,10vw,3.5rem);line-height:1.08;letter-spacing:-0.02em;">
+            Révèle ta<br>
+            <em style="color:var(--rose);">puissance</em><br>
+            intérieure.
+        </h1>
+    </div>
+
     <div class="relative max-w-7xl mx-auto px-5 lg:px-8 w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 items-center" style="min-height:92vh;padding-top:5rem;padding-bottom:3rem;">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 items-center" style="min-height:92vh;padding-top:0;padding-bottom:3rem;">
 
             {{-- Gauche : texte éditorial --}}
-            <div class="relative z-10 lg:pr-14 order-2 lg:order-1">
+            <div class="relative z-10 lg:pr-14 order-2 lg:order-1 lg:pt-20">
 
-                <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 fade-up" style="background:white;border:1.5px solid var(--border);box-shadow:0 2px 16px rgba(0,0,0,0.07);">
-                    <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--rose);box-shadow:0 0 0 4px rgba(217,30,110,0.18);"></span>
-                    <span class="text-xs font-bold tracking-widest uppercase" style="color:var(--rose);">Communauté active · 15+ pays</span>
-                </div>
-
-                <h1 class="font-bold mb-8 fade-up" style="font-family:'Playfair Display',serif;color:var(--dark);font-size:clamp(2.8rem,5.5vw,5rem);line-height:1.08;letter-spacing:-0.02em;">
+                {{-- Titre desktop uniquement --}}
+                <h1 class="hidden lg:block font-bold mb-8 fade-up" style="font-family:'Playfair Display',serif;color:var(--dark);font-size:clamp(2.8rem,5.5vw,5rem);line-height:1.08;letter-spacing:-0.02em;">
                     Révèle ta<br>
                     <em style="color:var(--rose);">puissance</em><br>
                     intérieure.
@@ -52,7 +57,7 @@
             </div>
 
             {{-- Droite : collage photo --}}
-            <div class="relative fade-up mt-4 lg:mt-0 order-1 lg:order-2" style="height:560px;">
+            <div class="relative fade-up lg:mt-0 order-1 lg:order-2" style="height:560px;">
 
                 {{-- Cercles déco --}}
                 <div class="absolute rounded-full pointer-events-none" style="top:8px;right:8px;width:260px;height:260px;background:var(--gold-pale);z-index:0;"></div>
