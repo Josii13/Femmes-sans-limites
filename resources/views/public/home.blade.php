@@ -14,7 +14,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 items-center" style="min-height:92vh;padding-top:5rem;padding-bottom:3rem;">
 
             {{-- Gauche : texte éditorial --}}
-            <div class="relative z-10 lg:pr-14">
+            <div class="relative z-10 lg:pr-14 order-2 lg:order-1">
 
                 <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 fade-up" style="background:white;border:1.5px solid var(--border);box-shadow:0 2px 16px rgba(0,0,0,0.07);">
                     <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--rose);box-shadow:0 0 0 4px rgba(217,30,110,0.18);"></span>
@@ -52,7 +52,7 @@
             </div>
 
             {{-- Droite : collage photo --}}
-            <div class="relative fade-up mt-4 lg:mt-0" style="height:560px;">
+            <div class="relative fade-up mt-4 lg:mt-0 order-1 lg:order-2" style="height:560px;">
 
                 {{-- Cercles déco --}}
                 <div class="absolute rounded-full pointer-events-none" style="top:8px;right:8px;width:260px;height:260px;background:var(--gold-pale);z-index:0;"></div>
@@ -123,7 +123,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {{-- Photo groupe --}}
-            <div class="relative fade-up order-2 lg:order-1">
+            <div class="relative fade-up order-1">
                 <div class="rounded-3xl overflow-hidden shadow-xl" style="aspect-ratio:4/3;">
                     <img src="{{ asset('images/photo_02_2.png') }}" alt="Communauté FSL" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(217,30,110,0.12),transparent 60%);"></div>
@@ -136,7 +136,7 @@
             </div>
 
             {{-- Texte --}}
-            <div class="order-1 lg:order-2 fade-up">
+            <div class="order-2 fade-up">
                 <span class="section-label">Notre ADN</span>
                 <h2 class="text-4xl lg:text-5xl font-bold mt-4 mb-8 leading-tight" style="color:var(--dark);font-family:'Playfair Display',serif;">
                     Plus qu'une communauté.<br>

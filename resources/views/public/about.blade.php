@@ -14,7 +14,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 items-center" style="min-height:72vh;padding-top:6rem;padding-bottom:3rem;">
 
             {{-- Texte --}}
-            <div class="relative z-10 lg:pr-12">
+            <div class="relative z-10 lg:pr-12 order-2 lg:order-1">
                 <span class="section-label fade-up">Notre histoire</span>
                 <h1 class="text-5xl lg:text-6xl font-bold mt-4 mb-6 leading-tight fade-up" style="color:var(--dark);font-family:'Playfair Display',serif;">
                     Nées pour<br>
@@ -30,7 +30,7 @@
             </div>
 
             {{-- Photos --}}
-            <div class="relative fade-up" style="height:480px;">
+            <div class="relative fade-up order-1 lg:order-2" style="height:480px;">
                 {{-- Déco --}}
                 <div class="absolute rounded-full pointer-events-none" style="top:0;right:0;width:220px;height:220px;background:var(--gold-pale);z-index:0;"></div>
 
