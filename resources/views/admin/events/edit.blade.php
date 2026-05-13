@@ -30,6 +30,14 @@
                     <input type="datetime-local" name="event_date" value="{{ old('event_date', $event->event_date->format('Y-m-d\TH:i')) }}" class="form-input">
                 </div>
                 <div>
+                    <label class="form-label">Clôture des inscriptions</label>
+                    <input type="datetime-local" name="registration_closes_at" value="{{ old('registration_closes_at', $event->registration_closes_at?->format('Y-m-d\TH:i')) }}" class="form-input">
+                    <p class="text-xs text-gray-400 mt-1">Optionnel — ferme automatiquement les inscriptions.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
                     <label class="form-label">Capacité max</label>
                     <input type="number" name="capacity" value="{{ old('capacity', $event->capacity) }}" class="form-input" min="1">
                 </div>

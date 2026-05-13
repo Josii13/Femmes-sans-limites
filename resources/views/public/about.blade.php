@@ -14,39 +14,39 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 items-center" style="min-height:72vh;padding-top:6rem;padding-bottom:3rem;">
 
             {{-- Texte --}}
-            <div class="relative z-10 lg:pr-12 order-2 lg:order-1">
-                <span class="section-label fade-up">Notre histoire</span>
-                <h1 class="text-5xl lg:text-6xl font-bold mt-4 mb-6 leading-tight fade-up" style="color:var(--dark);font-family:'Playfair Display',serif;">
+            <div class="relative z-10 lg:pr-12 order-2 lg:order-1 fade-left">
+                <span class="section-label">Notre histoire</span>
+                <h1 class="text-5xl lg:text-6xl font-bold mt-4 mb-6 leading-tight" style="color:var(--dark);font-family:'Playfair Display',serif;">
                     Nées pour<br>
                     <em style="color:var(--rose);">briser les limites</em>
                 </h1>
-                <p class="text-xl leading-relaxed mb-8 fade-up" style="color:var(--gray);max-width:520px;">
+                <p class="text-xl leading-relaxed mb-8" style="color:var(--gray);max-width:520px;">
                     FSL est bien plus qu'une association. C'est un mouvement de femmes décidées à transformer leur vie, leur carrière et leur impact sur le monde.
                 </p>
-                <div class="flex flex-wrap gap-4 fade-up">
+                <div class="flex flex-wrap gap-4">
                     <button @click="$store.modal.join = true" class="btn-rose px-8 py-3.5">Rejoindre le mouvement</button>
                     <a href="{{ route('events.index') }}" class="btn-outline px-8 py-3.5">Nos événements</a>
                 </div>
             </div>
 
             {{-- Photos --}}
-            <div class="relative fade-up order-1 lg:order-2" style="height:480px;">
+            <div class="relative scale-up order-1 lg:order-2" style="height:480px;">
                 {{-- Déco --}}
                 <div class="absolute rounded-full pointer-events-none" style="top:0;right:0;width:220px;height:220px;background:var(--gold-pale);z-index:0;"></div>
 
                 {{-- Photo principale --}}
-                <div class="absolute rounded-3xl overflow-hidden shadow-2xl" style="top:0;right:0;left:50px;bottom:80px;z-index:1;">
+                <div class="absolute rounded-3xl overflow-hidden shadow-2xl img-reveal" style="top:0;right:0;left:50px;bottom:80px;z-index:1;">
                     <img src="{{ asset('images/photo_01_3.png') }}" alt="Femme FSL" class="w-full h-full object-cover object-top">
                     <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,10,12,0.4) 0%,transparent 50%);"></div>
                 </div>
 
                 {{-- Photo secondaire --}}
-                <div class="absolute rounded-2xl overflow-hidden shadow-xl" style="bottom:0;left:0;width:42%;height:46%;z-index:2;border:4px solid white;">
+                <div class="absolute rounded-2xl overflow-hidden shadow-xl img-reveal" style="bottom:0;left:0;width:42%;height:46%;z-index:2;border:4px solid white;" data-delay="300">
                     <img src="{{ asset('images/photo_03_1.png') }}" alt="Membre FSL" class="w-full h-full object-cover object-top">
                 </div>
 
                 {{-- Badge fondation --}}
-                <div class="absolute bg-white rounded-2xl px-4 py-3 shadow-xl" style="top:16px;left:0;z-index:3;border:1px solid var(--border);">
+                <div class="float-badge absolute bg-white rounded-2xl px-4 py-3 shadow-xl" style="top:16px;left:0;z-index:3;border:1px solid var(--border);">
                     <p class="text-xs font-bold uppercase tracking-widest" style="color:var(--rose);">Fondée en 2020</p>
                     <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">5 ans d'impact</p>
                 </div>
@@ -58,7 +58,7 @@
 {{-- ══════════════════ HISTOIRE ══════════════════ --}}
 <section class="py-24 lg:py-32" style="background:var(--warm);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div class="fade-up">
+        <div class="fade-left">
             <span class="section-label">Depuis 2020</span>
             <h2 class="text-4xl font-bold mt-3 mb-8" style="color:var(--dark);font-family:'Playfair Display',serif;">Une conviction devenue mouvement</h2>
             <div class="space-y-5" style="color:var(--gray);">
@@ -69,7 +69,7 @@
         </div>
 
         {{-- Timeline --}}
-        <div class="fade-up">
+        <div class="fade-right">
             <div class="space-y-0">
                 @foreach([
                     ['2020','Fondation de FSL','Premier cercle de 12 femmes entrepreneurs à Abidjan. Le mouvement prend naissance.'],
@@ -103,7 +103,7 @@
             <span class="section-label">Ce qui nous guide</span>
             <h2 class="text-4xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Mission & Vision</h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-stagger="150">
             <div class="card-hover p-8 fade-up">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background:var(--rose-pale);">
                     <svg class="w-6 h-6" style="color:var(--rose);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
@@ -129,7 +129,7 @@
             <span class="section-label">Ce en quoi nous croyons</span>
             <h2 class="text-4xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Nos valeurs fondamentales</h2>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-stagger="120">
             @foreach([
                 ['Authenticité','Être pleinement et courageusement soi-même, sans masque ni concession sur ses valeurs.','#D91E6E','var(--rose-pale)','✦'],
                 ['Excellence','Viser toujours le meilleur de soi — dans son travail, ses relations et son impact.','#C9A84C','var(--gold-pale)','★'],
@@ -156,20 +156,20 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {{-- Photo fondatrice --}}
-            <div class="flex justify-center fade-up">
+            <div class="flex justify-center fade-left">
                 <div class="relative">
                     {{-- Déco --}}
                     <div class="absolute -top-5 -left-5 w-32 h-32 rounded-full pointer-events-none" style="background:var(--rose-pale);z-index:0;"></div>
                     <div class="absolute -bottom-5 -right-5 w-24 h-24 rounded-full pointer-events-none" style="background:var(--gold-pale);z-index:0;"></div>
 
                     {{-- Photo --}}
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl" style="width:340px;height:400px;z-index:1;">
-                        <img src="{{ asset('images/photo_03_2.png') }}" alt="Fondatrice FSL" class="w-full h-full object-cover object-top">
+                    <div class="relative rounded-3xl overflow-hidden shadow-2xl img-reveal" style="width:340px;height:400px;z-index:1;">
+                        <img src="{{ asset('images/photo_03_2.jpeg') }}" alt="Fondatrice FSL" class="w-full h-full object-cover object-top">
                         <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,10,12,0.3),transparent 60%);"></div>
                     </div>
 
                     {{-- Badge --}}
-                    <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-5 py-3.5 shadow-xl text-center" style="border:1px solid var(--border);z-index:2;white-space:nowrap;">
+                    <div class="float-badge2 absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-5 py-3.5 shadow-xl text-center" style="border:1px solid var(--border);z-index:2;white-space:nowrap;">
                         <p class="text-xs font-semibold" style="color:var(--rose);">Fondatrice & CEO</p>
                         <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">Femmes Sans Limites</p>
                     </div>
@@ -177,7 +177,7 @@
             </div>
 
             {{-- Bio --}}
-            <div class="fade-up">
+            <div class="fade-right">
                 <blockquote class="text-xl italic font-medium mb-8 leading-relaxed" style="color:var(--dark);font-family:'Playfair Display',serif;border-left:3px solid var(--rose);padding-left:1.5rem;">
                     « J'ai créé FSL parce que j'ai été cette femme qui se cherche — brillante mais bridée. Je sais qu'avec le bon entourage, les bonnes ressources et la bonne énergie, chaque femme peut dépasser ses peurs et vivre sa version la plus grande. »
                 </blockquote>
@@ -189,9 +189,9 @@
                 </p>
                 {{-- Métriques --}}
                 <div class="grid grid-cols-3 gap-5 pt-6" style="border-top:1px solid var(--border);">
-                    @foreach([['15 ans','d\'expérience'],['1 000+','femmes coachées'],['30+','pays visités']] as [$n,$l])
+                    @foreach([['15','ans','d\'expérience'],['1000','+','femmes coachées'],['30','+','pays visités']] as [$target,$suffix,$l])
                     <div>
-                        <p class="text-2xl font-bold" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $n }}</p>
+                        <p class="text-2xl font-bold counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
                         <p class="text-xs mt-1" style="color:var(--gray);">{{ $l }}</p>
                     </div>
                     @endforeach
@@ -216,27 +216,27 @@
 </section>
 
 {{-- ══════════════════ IMPACT ══════════════════ --}}
-<section class="py-20" style="background:var(--dark);">
+<!-- <section class="py-20" style="background:var(--dark);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
         <div class="text-center mb-12 fade-up">
             <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--gold);">Nos résultats</span>
             <h2 class="text-3xl font-bold mt-2 text-white" style="font-family:'Playfair Display',serif;">L'impact en chiffres</h2>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8" data-stagger="120">
             @foreach([
-                ['500+','Femmes accompagnées'],
-                ['15+','Pays représentés'],
-                ['50+','Événements organisés'],
-                ['1 000+','Heures de formation'],
-            ] as [$n,$l])
+                ['500', '+', 'Femmes accompagnées'],
+                ['15',  '+', 'Pays représentés'],
+                ['50',  '+', 'Événements organisés'],
+                ['1000','+', 'Heures de formation'],
+            ] as [$target,$suffix,$l])
             <div class="text-center fade-up">
-                <p class="text-4xl font-bold mb-1" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $n }}</p>
+                <p class="text-4xl font-bold mb-1 counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
                 <p class="text-sm" style="color:rgba(255,255,255,0.5);">{{ $l }}</p>
             </div>
             @endforeach
         </div>
     </div>
-</section>
+</section> -->
 
 {{-- ══════════════════ CTA ══════════════════ --}}
 <section class="py-24 bg-white">
@@ -253,9 +253,3 @@
 
 @endsection
 
-@push('scripts')
-<style>
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-</style>
-@endpush

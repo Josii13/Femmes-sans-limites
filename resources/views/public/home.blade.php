@@ -46,26 +46,26 @@
                 </div>
 
                 {{-- Stats --}}
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 fade-up">
+                <!-- <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 fade-up">
                     @foreach([['500+','Membres'],['15+','Pays'],['50+','Événements'],['5 ans','D\'impact']] as [$n,$l])
                     <div>
                         <p class="text-3xl font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">{{ $n }}</p>
                         <p class="text-xs mt-1" style="color:var(--gray);">{{ $l }}</p>
                     </div>
                     @endforeach
-                </div>
+                </div> -->
             </div>
 
             {{-- Droite : collage photo --}}
-            <div class="relative fade-up lg:mt-0 order-1 lg:order-2" style="height:560px;">
+            <div class="relative scale-up lg:mt-0 order-1 lg:order-2" style="height:560px;">
 
-                {{-- Cercles déco --}}
-                <div class="absolute rounded-full pointer-events-none" style="top:8px;right:8px;width:260px;height:260px;background:var(--gold-pale);z-index:0;"></div>
+                {{-- Cercles déco animés --}}
+                <div class="absolute rounded-full pointer-events-none spin-slow" style="top:8px;right:8px;width:260px;height:260px;background:conic-gradient(var(--gold-pale),var(--rose-pale),var(--gold-pale));opacity:0.6;z-index:0;"></div>
                 <div class="absolute rounded-full pointer-events-none" style="bottom:60px;left:4px;width:110px;height:110px;background:var(--rose-pale);z-index:0;"></div>
 
-                {{-- Photo principale --}}
-                <div class="absolute rounded-3xl overflow-hidden shadow-2xl" style="top:0;right:0;left:55px;bottom:95px;z-index:1;">
-                    <img src="{{ asset('images/photo_01_1.png') }}" alt="Leader FSL" class="w-full h-full object-cover object-top">
+                {{-- Photo principale avec parallax --}}
+                <div class="absolute rounded-3xl overflow-hidden shadow-2xl img-reveal" style="top:0;right:0;left:55px;bottom:95px;z-index:1;">
+                    <img src="{{ asset('images/photo_01_1.png') }}" alt="Leader FSL" class="w-full h-full object-cover object-top" data-parallax="0.08">
                     <div class="absolute inset-x-0 bottom-0 h-2/5" style="background:linear-gradient(to top,rgba(15,10,12,0.55),transparent);"></div>
                     <div class="absolute bottom-5 left-5">
                         <p class="text-xs font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(255,255,255,0.65);">Membre FSL</p>
@@ -74,12 +74,12 @@
                 </div>
 
                 {{-- Photo secondaire --}}
-                <div class="absolute rounded-2xl overflow-hidden shadow-xl" style="bottom:0;left:0;width:44%;height:48%;z-index:2;border:4px solid white;">
+                <div class="absolute rounded-2xl overflow-hidden shadow-xl img-reveal" style="bottom:0;left:0;width:44%;height:48%;z-index:2;border:4px solid white;" data-delay="200">
                     <img src="{{ asset('images/photo_03_3.png') }}" alt="Membre FSL" class="w-full h-full object-cover object-top">
                 </div>
 
-                {{-- Badge membres --}}
-                <div class="absolute bg-white rounded-2xl shadow-xl px-4 py-3" style="top:12px;left:0;z-index:3;border:1px solid var(--border);">
+                {{-- Badge membres flottant --}}
+                <!-- <div class="float-badge absolute bg-white rounded-2xl shadow-xl px-4 py-3" style="top:12px;left:0;z-index:3;border:1px solid var(--border);">
                     <div class="flex items-center gap-3">
                         <div class="flex -space-x-2">
                             <img src="{{ asset('images/photo_01_2.png') }}" class="w-8 h-8 rounded-full object-cover object-top border-2 border-white" alt="">
@@ -91,36 +91,36 @@
                             <p class="text-xs" style="color:var(--rose);">actives ce mois ✦</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
-                {{-- Badge pays --}}
-                <div class="absolute bg-white rounded-xl shadow-lg px-3 py-2.5" style="z-index:3;border:1px solid var(--border);bottom:46%;right:0;transform:translateY(50%);">
+                {{-- Badge pays flottant --}}
+                <!-- <div class="float-badge2 absolute bg-white rounded-xl shadow-lg px-3 py-2.5" style="z-index:3;border:1px solid var(--border);bottom:46%;right:0;transform:translateY(50%);">
                     <p class="text-sm font-bold" style="color:var(--rose);font-family:'Playfair Display',serif;">15+</p>
                     <p class="text-xs" style="color:var(--gray);">pays représentés</p>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
 </section>
 
 {{-- ══════════════════ BANDE CHIFFRES ══════════════════ --}}
-<section class="py-14" style="background:var(--dark);">
+<!-- <section class="py-14" style="background:var(--dark);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8" data-stagger="120">
             @foreach([
-                ['500+','Femmes accompagnées','var(--rose)'],
-                ['15+', 'Pays d\'Afrique & diaspora','var(--gold)'],
-                ['50+', 'Événements organisés','var(--rose)'],
-                ['1 000+','Heures de formation','var(--gold)'],
-            ] as [$n,$l,$c])
+                ['500', '+', 'Femmes accompagnées','var(--rose)'],
+                ['15',  '+', 'Pays d\'Afrique & diaspora','var(--gold)'],
+                ['50',  '+', 'Événements organisés','var(--rose)'],
+                ['1000','+', 'Heures de formation','var(--gold)'],
+            ] as [$target,$suffix,$l,$c])
             <div class="text-center fade-up">
-                <p class="text-4xl font-bold mb-2" style="color:{{ $c }};font-family:'Playfair Display',serif;">{{ $n }}</p>
+                <p class="text-4xl font-bold mb-2 counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:{{ $c }};font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
                 <p class="text-sm" style="color:rgba(255,255,255,0.45);">{{ $l }}</p>
             </div>
             @endforeach
         </div>
     </div>
-</section>
+</section> -->
 
 {{-- ══════════════════ COMMUNAUTÉ ══════════════════ --}}
 <section class="py-20 lg:py-28 overflow-hidden" style="background:var(--warm);">
@@ -128,12 +128,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {{-- Photo groupe --}}
-            <div class="relative fade-up order-1">
-                <div class="rounded-3xl overflow-hidden shadow-xl" style="aspect-ratio:4/3;">
+            <div class="relative fade-left order-1">
+                <div class="rounded-3xl overflow-hidden shadow-xl img-reveal" style="aspect-ratio:4/3;">
                     <img src="{{ asset('images/photo_02_2.png') }}" alt="Communauté FSL" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(217,30,110,0.12),transparent 60%);"></div>
                 </div>
-                <div class="absolute -bottom-5 -right-4 lg:-right-6 bg-white rounded-2xl px-5 py-4 shadow-xl" style="border:1px solid var(--border);z-index:2;">
+                <div class="float-badge2 absolute -bottom-5 -right-4 lg:-right-6 bg-white rounded-2xl px-5 py-4 shadow-xl" style="border:1px solid var(--border);z-index:2;">
                     <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--rose);">La force du collectif</p>
                     <p class="text-lg font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">S'élever ensemble</p>
                 </div>
@@ -141,7 +141,7 @@
             </div>
 
             {{-- Texte --}}
-            <div class="order-2 fade-up">
+            <div class="order-2 fade-right">
                 <span class="section-label">Notre ADN</span>
                 <h2 class="text-4xl lg:text-5xl font-bold mt-4 mb-8 leading-tight" style="color:var(--dark);font-family:'Playfair Display',serif;">
                     Plus qu'une communauté.<br>
@@ -176,7 +176,7 @@
             <span class="section-label">Ce que nous offrons</span>
             <h2 class="text-4xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">4 piliers de transformation</h2>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-stagger="150">
             @foreach([
                 ['Éducation','Masterclasses, ateliers et formations conçus par des experts pour ton développement réel.','var(--rose-pale)','var(--rose)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'],
                 ['Networking','Connecte-toi avec des femmes leaders, entrepreneurs et professionnelles dans 15+ pays.','var(--gold-pale)','var(--gold)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>'],
@@ -202,7 +202,7 @@
             <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--gold);">Ce qu'elles disent</span>
             <h2 class="text-4xl font-bold mt-3 text-white" style="font-family:'Playfair Display',serif;">La parole aux membres</h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-stagger="120">
             @foreach([
                 ['photo_03_3.png','Khadija Mbaye','Entrepreneur · Dakar','FSL a transformé ma façon de voir les affaires. J\'ai rencontré mes deux associées actuelles lors du Forum 2023. Ce réseau est une vraie chance — des femmes qui se soutiennent vraiment, sans jalousie.'],
                 ['photo_01_2.png','Dr. Aminata Sow','Médecin · Abidjan','J\'hésitais à me lancer en parallèle à ma carrière médicale. Le mentorat FSL m\'a donné les outils et la confiance. Aujourd\'hui mon cabinet attire 3× plus de patientes grâce à ma visibilité.'],
@@ -235,10 +235,10 @@
             </div>
             <a href="{{ route('events.index') }}" class="btn-outline text-sm whitespace-nowrap self-start sm:self-auto">Voir tout →</a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-stagger="100">
             @foreach($events->take(3) as $event)
             <article class="card-hover flex flex-col fade-up overflow-hidden group">
-                <div class="h-48 relative overflow-hidden flex-shrink-0">
+                <div class="h-48 relative overflow-hidden flex-shrink-0 img-reveal">
                     @if($event->image)
                     <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
@@ -279,7 +279,7 @@
             <span class="section-label">Le parcours</span>
             <h2 class="text-4xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Rejoindre FSL en 3 étapes</h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" data-stagger="150">
             @foreach([
                 ['01','Tu postules','Remplis le formulaire en 2 minutes. Aucun document requis.'],
                 ['02','On valide','Notre équipe active ton compte sous 48h. Tu reçois ta carte de membre FSL.'],

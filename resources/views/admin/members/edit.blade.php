@@ -23,6 +23,11 @@
             </div>
 
             <div>
+                <label class="form-label">Téléphone <span class="font-normal text-gray-400">(optionnel)</span></label>
+                <input type="tel" name="phone" value="{{ old('phone', $member->phone) }}" class="form-input" placeholder="+225 07 00 00 00 00">
+            </div>
+
+            <div>
                 <label class="form-label">Profession *</label>
                 <input type="text" name="profession" value="{{ old('profession', $member->profession) }}" class="form-input">
             </div>

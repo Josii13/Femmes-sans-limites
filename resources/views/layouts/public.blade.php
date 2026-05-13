@@ -26,11 +26,10 @@
     :class="scrolled ? 'shadow-sm' : ''"
     style="border-bottom:1px solid var(--border);">
 
-    <div class="max-w-7xl mx-auto px-5 lg:px-8 flex h-16 items-center justify-between">
+    <div class="max-w-7xl mx-auto px-5 lg:px-8 flex h-20 items-center justify-between">
 
-        <a href="{{ route('home') }}" class="flex items-center gap-2.5 flex-shrink-0">
-            <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-9 w-auto">
-            <span class="hidden sm:block text-sm font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">Femmes Sans Limites</span>
+        <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0 rounded-2xl py-1 px-1.5 -ml-1.5 transition-all duration-200 hover:scale-105" style="background:rgba(253,240,245,0.7);">
+            <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-12 w-auto" style="filter:drop-shadow(0 1px 4px rgba(217,30,110,0.18));">
         </a>
 
         <nav class="hidden lg:flex items-center gap-8">
@@ -59,7 +58,7 @@
          x-transition:enter-end="translate-y-0 opacity-100"
          x-transition:leave="transition duration-150 ease-in"
          x-transition:leave-end="opacity-0"
-         class="lg:hidden bg-white" style="border-top:1px solid var(--border);" style="display:none;">
+         class="lg:hidden bg-white" style="border-top:1px solid var(--border);display:none;">
         <div class="px-5 py-4 space-y-1">
             <a href="{{ route('home') }}"         @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Accueil</a>
             <a href="{{ route('about') }}"        @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">À propos</a>
@@ -75,7 +74,7 @@
 </header>
 
 {{-- ══════════════════ CONTENT ══════════════════ --}}
-<main class="pt-16">
+<main class="pt-20">
     @if(session('success') && !in_array(session('modal'), ['join','contact']))
     <div class="max-w-3xl mx-auto px-5 pt-5">
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm" style="background:#D1FAE5;color:#065F46;">
@@ -93,7 +92,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
 
             <div class="sm:col-span-2 lg:col-span-1">
-                <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-10 mb-4" style="filter:brightness(0) invert(1) opacity(0.85);">
+                <a href="{{ route('home') }}" class="inline-flex rounded-2xl p-2 mb-4 hover:opacity-90 transition-opacity" style="background:rgba(253,240,245,0.95);">
+                    <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-14 w-auto" style="filter:drop-shadow(0 1px 4px rgba(217,30,110,0.18));">
+                </a>
                 <p class="text-sm leading-relaxed mb-6" style="color:rgba(255,255,255,0.45);">Plateforme de transformation féminine dédiée à révéler la puissance intérieure de chaque femme.</p>
                 <div class="flex items-center gap-3">
                     {{-- Facebook --}}
@@ -253,10 +254,76 @@
 @stack('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+    /* ── Scroll reveal (fade-up, fade-left, fade-right, scale-up, img-reveal) ── */
+    const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            const delay = parseInt(e.target.dataset.delay || 0);
+            setTimeout(() => e.target.classList.add('visible'), delay);
+            revealObs.unobserve(e.target);
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -44px 0px' });
+    document.querySelectorAll('.fade-up,.fade-left,.fade-right,.scale-up,.img-reveal').forEach(el => revealObs.observe(el));
+
+    /* ── Auto-stagger : ajoute data-delay aux enfants d'un conteneur [data-stagger] ── */
+    document.querySelectorAll('[data-stagger]').forEach(parent => {
+        const step = parseInt(parent.dataset.stagger) || 130;
+        [...parent.children].forEach((child, i) => {
+            const animated = child.classList.contains('fade-up') || child.classList.contains('scale-up') || child.classList.contains('fade-left') || child.classList.contains('fade-right');
+            if (animated) child.dataset.delay = i * step;
+        });
+    });
+
+    /* ── Counter animation ── */
+    const counterObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            const el = e.target;
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1800;
+            const t0 = Date.now();
+            const tick = () => {
+                const p = Math.min((Date.now() - t0) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = (Number.isInteger(target) ? Math.round(eased * target) : (eased * target).toFixed(1)) + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+            counterObs.unobserve(el);
+        });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('[data-target]').forEach(el => counterObs.observe(el));
+
+    /* ── Parallax hero ── */
+    const parallaxEls = document.querySelectorAll('[data-parallax]');
+    if (parallaxEls.length) {
+        const onScroll = () => parallaxEls.forEach(el => {
+            el.style.transform = `translateY(${window.scrollY * parseFloat(el.dataset.parallax || 0.12)}px)`;
+        });
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    /* ── Magnetic buttons ── */
+    document.querySelectorAll('.btn-rose,.btn-outline,.btn-dark').forEach(btn => {
+        btn.addEventListener('mousemove', e => {
+            const r = btn.getBoundingClientRect();
+            const x = (e.clientX - r.left - r.width / 2) * 0.15;
+            const y = (e.clientY - r.top  - r.height / 2) * 0.2;
+            btn.style.transform = `translateY(-1px) translate(${x}px,${y}px)`;
+        });
+        btn.addEventListener('mouseleave', () => btn.style.transform = '');
+    });
+
+    /* ── Nav shrink on scroll ── */
+    const header = document.querySelector('header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            header.style.height = window.scrollY > 40 ? '64px' : '';
+        }, { passive: true });
+    }
+
 });
 </script>
 </body>

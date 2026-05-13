@@ -3,13 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Member extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'member_number', 'name', 'email', 'profession',
+        'member_number', 'name', 'email', 'phone', 'profession',
         'country', 'city', 'photo', 'type', 'status', 'card_path',
     ];
+
+    public function registrations()
+    {
+        return $this->hasMany(\App\Models\Registration::class, 'email', 'email');
+    }
 
     public function getBadgeColorAttribute(): string
     {

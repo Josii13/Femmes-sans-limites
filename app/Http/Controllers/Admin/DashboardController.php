@@ -29,8 +29,12 @@ class DashboardController extends Controller
             ->withCount(['registrations' => fn($q) => $q->whereNotIn('status', ['cancelled'])])
             ->get();
 
-        $recentMembers = Member::latest()->limit(5)->get();
+        $stats['pending'] = Member::where('status', 'inactive')->count();
+        $stats['active']  = Member::where('status', 'active')->count();
 
-        return view('admin.dashboard', compact('stats', 'upcoming', 'recentMembers'));
+        $recentMembers  = Member::latest()->limit(6)->get();
+        $pendingMembers = Member::where('status', 'inactive')->latest()->limit(5)->get();
+
+        return view('admin.dashboard', compact('stats', 'upcoming', 'recentMembers', 'pendingMembers'));
     }
 }

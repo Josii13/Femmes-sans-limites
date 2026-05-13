@@ -6,12 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::withCount('registrations')->latest()->paginate(20);
+        $query = Event::withCount('registrations');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('location', 'like', '%' . $request->search . '%')
+                  ->orWhere('city', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $sortBy  = in_array($request->sort, ['event_date', 'title', 'registrations_count', 'created_at']) ? $request->sort : 'created_at';
+        $sortDir = $request->dir === 'asc' ? 'asc' : 'desc';
+
+        $events = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
+
         return view('admin.events.index', compact('events'));
     }
 
@@ -23,19 +42,20 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'             => 'required|string|max:200',
-            'description'       => 'required|string',
-            'short_description' => 'nullable|string|max:300',
-            'event_date'        => 'required|date|after:now',
-            'location'          => 'required|string|max:200',
-            'city'              => 'nullable|string|max:100',
-            'capacity'          => 'nullable|integer|min:1',
-            'is_paid'           => 'boolean',
-            'price'             => 'nullable|numeric|min:0',
-            'currency'          => 'nullable|string|max:20',
-            'payment_link'      => 'nullable|url|max:500',
-            'status'            => 'required|in:draft,published,cancelled',
-            'image'             => 'nullable|image|max:5120',
+            'title'                  => 'required|string|max:200',
+            'description'            => 'required|string',
+            'short_description'      => 'nullable|string|max:300',
+            'event_date'             => 'required|date|after:now',
+            'registration_closes_at' => 'nullable|date|before:event_date',
+            'location'               => 'required|string|max:200',
+            'city'                   => 'nullable|string|max:100',
+            'capacity'               => 'nullable|integer|min:1',
+            'is_paid'                => 'boolean',
+            'price'                  => 'nullable|numeric|min:0',
+            'currency'               => 'nullable|string|max:20',
+            'payment_link'           => 'nullable|url|max:500',
+            'status'                 => 'required|in:draft,published,cancelled',
+            'image'                  => 'nullable|image|max:5120',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -52,7 +72,12 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->loadCount(['registrations', 'registrations as paid_count' => fn($q) => $q->where('status', 'paid')]);
+        $event->loadCount([
+            'registrations',
+            'registrations as paid_count'     => fn($q) => $q->where('status', 'paid'),
+            'registrations as pending_count'  => fn($q) => $q->where('status', 'pending'),
+            'registrations as attended_count' => fn($q) => $q->where('status', 'attended'),
+        ]);
         return view('admin.events.show', compact('event'));
     }
 
@@ -64,19 +89,20 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
-            'title'             => 'required|string|max:200',
-            'description'       => 'required|string',
-            'short_description' => 'nullable|string|max:300',
-            'event_date'        => 'required|date',
-            'location'          => 'required|string|max:200',
-            'city'              => 'nullable|string|max:100',
-            'capacity'          => 'nullable|integer|min:1',
-            'is_paid'           => 'boolean',
-            'price'             => 'nullable|numeric|min:0',
-            'currency'          => 'nullable|string|max:20',
-            'payment_link'      => 'nullable|url|max:500',
-            'status'            => 'required|in:draft,published,cancelled,completed',
-            'image'             => 'nullable|image|max:5120',
+            'title'                  => 'required|string|max:200',
+            'description'            => 'required|string',
+            'short_description'      => 'nullable|string|max:300',
+            'event_date'             => 'required|date|after_or_equal:today',
+            'registration_closes_at' => 'nullable|date|before:event_date',
+            'location'               => 'required|string|max:200',
+            'city'                   => 'nullable|string|max:100',
+            'capacity'               => 'nullable|integer|min:1',
+            'is_paid'                => 'boolean',
+            'price'                  => 'nullable|numeric|min:0',
+            'currency'               => 'nullable|string|max:20',
+            'payment_link'           => 'nullable|url|max:500',
+            'status'                 => 'required|in:draft,published,cancelled,completed',
+            'image'                  => 'nullable|image|max:5120',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -97,5 +123,17 @@ class EventController extends Controller
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Événement supprimé.');
+    }
+
+    public function duplicate(Event $event)
+    {
+        $clone = $event->replicate(['slug', 'image']);
+        $clone->title  = $event->title . ' (copie)';
+        $clone->slug   = Str::slug($clone->title) . '-' . Str::random(5);
+        $clone->status = 'draft';
+        $clone->save();
+
+        return redirect()->route('admin.events.edit', $clone)
+            ->with('success', 'Événement dupliqué. Modifiez les détails avant de publier.');
     }
 }

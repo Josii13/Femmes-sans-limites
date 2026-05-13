@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Registration extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'event_id', 'first_name', 'last_name', 'email', 'phone',
         'status', 'qr_token', 'qr_code_path',

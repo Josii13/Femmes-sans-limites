@@ -15,11 +15,31 @@ class MemberController extends Controller
 
     public function index(Request $request)
     {
-        $members = Member::when($request->search, fn($q) => $q->where('name', 'like', '%'.$request->search.'%')
-            ->orWhere('email', 'like', '%'.$request->search.'%'))
-            ->when($request->type, fn($q) => $q->where('type', $request->type))
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->latest()->paginate(20)->withQueryString();
+        $query = Member::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('member_number', 'like', '%' . $search . '%')
+                  ->orWhere('profession', 'like', '%' . $search . '%')
+                  ->orWhere('city', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $sortBy  = in_array($request->sort, ['name', 'created_at', 'type', 'member_number']) ? $request->sort : 'created_at';
+        $sortDir = $request->dir === 'asc' ? 'asc' : 'desc';
+
+        $members = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
 
         $pendingCount = Member::where('status', 'inactive')->count();
 
@@ -36,6 +56,7 @@ class MemberController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
             'email'      => 'required|email|unique:members,email',
+            'phone'      => 'nullable|string|max:30',
             'profession' => 'required|string|max:100',
             'country'    => 'required|string|max:100',
             'city'       => 'required|string|max:100',
@@ -54,12 +75,15 @@ class MemberController extends Controller
         $cardPath = $this->cardService->generate($member);
         $member->update(['card_path' => $cardPath]);
 
+        \App\Models\ActivityLog::record('member.created', $member);
+
         return redirect()->route('admin.members.show', $member)
             ->with('success', 'Membre créé et carte générée avec succès.');
     }
 
     public function show(Member $member)
     {
+        $member->load(['registrations.event' => fn($q) => $q->latest('event_date')]);
         return view('admin.members.show', compact('member'));
     }
 
@@ -72,7 +96,8 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
-            'email'      => 'required|email|unique:members,email,'.$member->id,
+            'email'      => 'required|email|unique:members,email,' . $member->id,
+            'phone'      => 'nullable|string|max:30',
             'profession' => 'required|string|max:100',
             'country'    => 'required|string|max:100',
             'city'       => 'required|string|max:100',
@@ -101,6 +126,8 @@ class MemberController extends Controller
     {
         if ($member->photo) Storage::disk('public')->delete($member->photo);
         if ($member->card_path) Storage::disk('public')->delete($member->card_path);
+
+        \App\Models\ActivityLog::record('member.deleted', $member);
         $member->delete();
 
         return redirect()->route('admin.members.index')->with('success', 'Membre supprimé.');
@@ -115,7 +142,7 @@ class MemberController extends Controller
 
         return Storage::disk('public')->download(
             $member->card_path,
-            'carte-membre-'.Str::slug($member->name).'.png'
+            'carte-membre-' . Str::slug($member->name) . '.png'
         );
     }
 
@@ -125,7 +152,9 @@ class MemberController extends Controller
 
         \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
 
-        return back()->with('success', $member->name.' est maintenant active. Sa carte lui a été envoyée par email.');
+        \App\Models\ActivityLog::record('member.activated', $member);
+
+        return back()->with('success', $member->name . ' est maintenant active. Sa carte lui a été envoyée par email.');
     }
 
     public function sendCard(Member $member)
@@ -137,6 +166,85 @@ class MemberController extends Controller
 
         \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
 
-        return back()->with('success', 'Carte envoyée à '.$member->email);
+        return back()->with('success', 'Carte envoyée à ' . $member->email);
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action'  => 'required|in:activate,delete',
+            'ids'     => 'required|array|min:1',
+            'ids.*'   => 'integer|exists:members,id',
+        ]);
+
+        $members = Member::whereIn('id', $request->ids)->get();
+
+        if ($request->action === 'activate') {
+            foreach ($members as $member) {
+                if ($member->status !== 'active') {
+                    $member->update(['status' => 'active']);
+                    \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+                }
+            }
+            return back()->with('success', $members->count() . ' membre(s) activé(s).');
+        }
+
+        if ($request->action === 'delete') {
+            foreach ($members as $member) {
+                if ($member->photo) Storage::disk('public')->delete($member->photo);
+                if ($member->card_path) Storage::disk('public')->delete($member->card_path);
+                $member->delete();
+            }
+            return back()->with('success', $members->count() . ' membre(s) supprimé(s).');
+        }
+
+        return back();
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $query = Member::query();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $members  = $query->latest()->get();
+        $filename = 'membres-fsl-' . now()->format('Ymd') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($members) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+
+            fputcsv($handle, ['N° Membre', 'Nom', 'Email', 'Téléphone', 'Profession', 'Ville', 'Pays', 'Type', 'Statut', 'Inscrit le'], ';');
+
+            foreach ($members as $m) {
+                fputcsv($handle, [
+                    $m->member_number,
+                    $m->name,
+                    $m->email,
+                    $m->phone ?? '',
+                    $m->profession,
+                    $m->city,
+                    $m->country,
+                    ucfirst($m->type),
+                    $m->status === 'active' ? 'Actif' : 'En attente',
+                    $m->created_at->format('d/m/Y'),
+                ], ';');
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

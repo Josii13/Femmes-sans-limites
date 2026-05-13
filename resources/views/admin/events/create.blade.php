@@ -32,6 +32,14 @@
                     @error('event_date')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
+                    <label class="form-label">Clôture des inscriptions</label>
+                    <input type="datetime-local" name="registration_closes_at" value="{{ old('registration_closes_at') }}" class="form-input" placeholder="Laisser vide si pas de limite">
+                    <p class="text-xs text-gray-400 mt-1">Optionnel — les inscriptions ferment automatiquement à cette date.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
                     <label class="form-label">Capacité max</label>
                     <input type="number" name="capacity" value="{{ old('capacity') }}" class="form-input" placeholder="Illimité si vide" min="1">
                 </div>

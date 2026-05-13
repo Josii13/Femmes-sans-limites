@@ -23,6 +23,11 @@
             </div>
 
             <div>
+                <label class="form-label">Téléphone <span class="font-normal text-gray-400">(optionnel)</span></label>
+                <input type="tel" name="phone" value="{{ old('phone') }}" class="form-input" placeholder="+225 07 00 00 00 00">
+            </div>
+
+            <div>
                 <label class="form-label">Profession *</label>
                 <input type="text" name="profession" value="{{ old('profession') }}" class="form-input @error('profession') border-red-400 @enderror" placeholder="Entrepreneur, Médecin, Ingénieure...">
                 @error('profession')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror

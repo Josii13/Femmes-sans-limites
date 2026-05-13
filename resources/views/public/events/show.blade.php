@@ -104,18 +104,36 @@
                 </div>
                 @endif
 
+                {{-- Registration closing date notice --}}
+                @if($event->registration_closes_at && !$event->is_sold_out)
+                <div class="rounded-xl px-4 py-2.5 text-sm mb-3" style="background:var(--gold-pale);border:1px solid var(--gold-light);">
+                    <p style="color:var(--gold-dark);">⏳ Inscriptions closes le <strong>{{ $event->registration_closes_at->isoFormat('D MMMM YYYY [à] HH[h]mm') }}</strong></p>
+                </div>
+                @endif
+
                 {{-- CTA --}}
                 @if($event->is_sold_out)
                 <div class="rounded-2xl p-4 text-center" style="background:#F3F4F6;">
                     <p class="font-semibold text-gray-500">Cet événement affiche complet.</p>
-                    <p class="text-sm text-gray-400 mt-1">Rejoins la communauté pour être notifiée des prochains événements.</p>
-                    <button @click="$store.modal.join = true" class="btn-rose mt-4 text-sm">Rejoindre FSL</button>
+                    <p class="text-sm text-gray-400 mt-1">Inscris-toi sur la liste d'attente pour être prévenue si une place se libère.</p>
+                    <a href="#liste-attente" class="btn-rose mt-4 text-sm">Liste d'attente</a>
+                </div>
+                @elseif($event->registration_closes_at && now()->gt($event->registration_closes_at))
+                <div class="rounded-2xl p-4 text-center" style="background:#F3F4F6;">
+                    <p class="font-semibold text-gray-500">Les inscriptions sont closes.</p>
+                    <p class="text-sm text-gray-400 mt-1">La date limite d'inscription est passée.</p>
                 </div>
                 @else
-                <a href="#inscription" class="btn-rose w-full justify-center text-base py-4">
-                    S'inscrire à cet événement
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </a>
+                <div class="flex flex-col gap-3">
+                    <a href="#inscription" class="btn-rose w-full justify-center text-base py-4">
+                        S'inscrire à cet événement
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                    <a href="{{ route('events.ical', $event->slug) }}" class="btn-outline w-full justify-center text-sm py-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Ajouter à mon calendrier (.ics)
+                    </a>
+                </div>
                 @endif
             </div>
         </div>
@@ -148,7 +166,7 @@
             @endif
         </div>
 
-        <div class="card p-8 fade-up" x-data="{ submitted: {{ session('success') ? 'true' : 'false' }} }">
+        <div class="card p-8 fade-up">
 
             @if(session('success'))
             <div class="flex flex-col items-center text-center py-8">
@@ -212,6 +230,62 @@
                 <p class="text-xs text-center" style="color:var(--gray);">
                     En vous inscrivant, vous acceptez d'être contactée par l'équipe FSL concernant cet événement.
                 </p>
+            </form>
+            @endif
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- Waiting list form (sold-out events) --}}
+@if($event->is_sold_out)
+<section class="py-16 lg:py-20 bg-white" id="liste-attente">
+    <div class="max-w-2xl mx-auto px-5 lg:px-8">
+        <div class="text-center mb-10 fade-up">
+            <span class="section-label">Liste d'attente</span>
+            <h2 class="text-3xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Être notifiée si une place se libère</h2>
+            <p class="text-sm mt-3" style="color:var(--gray);">L'événement est complet. Laisse tes coordonnées et nous te contacterons en priorité.</p>
+        </div>
+
+        <div class="card p-8 fade-up">
+            @if(session('success'))
+            <div class="flex flex-col items-center text-center py-8">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:var(--gold-pale);">
+                    <svg class="w-8 h-8" style="color:var(--gold);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2" style="color:var(--dark);font-family:'Playfair Display',serif;">Inscription enregistrée !</h3>
+                <p class="text-sm" style="color:var(--gray);">{{ session('success') }}</p>
+            </div>
+            @else
+            @if(session('error'))
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm mb-6" style="background:#FEE2E2;color:#991B1B;">
+                {{ session('error') }}
+            </div>
+            @endif
+            <form action="{{ route('events.waiting-list', $event->slug) }}" method="POST" class="space-y-5">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">Prénom <span style="color:var(--rose);">*</span></label>
+                        <input type="text" name="first_name" value="{{ old('first_name') }}" class="form-input" placeholder="Marie">
+                    </div>
+                    <div>
+                        <label class="form-label">Nom <span style="color:var(--rose);">*</span></label>
+                        <input type="text" name="last_name" value="{{ old('last_name') }}" class="form-input" placeholder="Koné">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Email <span style="color:var(--rose);">*</span></label>
+                    <input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="marie@exemple.com">
+                </div>
+                <div>
+                    <label class="form-label">Téléphone <span class="font-normal" style="color:var(--gray);">(optionnel)</span></label>
+                    <input type="tel" name="phone" value="{{ old('phone') }}" class="form-input" placeholder="+225 07 00 00 00 00">
+                </div>
+                <button type="submit" class="btn-gold w-full justify-center text-base py-4">
+                    Rejoindre la liste d'attente
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
             </form>
             @endif
         </div>

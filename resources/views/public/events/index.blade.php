@@ -43,8 +43,9 @@
                     @if($event->image)
                     <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
-                    <div class="w-full h-full" style="background:linear-gradient(135deg,var(--rose-pale) 0%,var(--gold-pale) 100%);"></div>
-                    <img src="{{ asset('logo_FSL.png') }}" alt="" class="absolute inset-0 m-auto w-16 opacity-15 pointer-events-none">
+                    <div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg,var(--rose-pale) 0%,var(--gold-pale) 100%);">
+                        <img src="{{ asset('logo_FSL.png') }}" alt="" class="w-16 h-auto opacity-15 pointer-events-none">
+                    </div>
                     @endif
 
                     {{-- Badges --}}

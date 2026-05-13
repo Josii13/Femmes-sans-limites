@@ -19,6 +19,8 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 Route::get('/evenements', [EventController::class, 'index'])->name('events.index');
 Route::get('/evenements/{slug}', [EventController::class, 'show'])->name('events.show');
 Route::post('/evenements/{slug}/inscription', [EventController::class, 'register'])->name('events.register');
+Route::post('/evenements/{slug}/liste-attente', [EventController::class, 'joinWaitingList'])->name('events.waiting-list');
+Route::get('/evenements/{slug}/ical', [EventController::class, 'ical'])->name('events.ical');
 Route::get('/rejoindre', [MembershipController::class, 'index'])->name('membership.join');
 Route::post('/rejoindre', [MembershipController::class, 'store'])->name('membership.store');
 Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->name('membership.success');
@@ -31,6 +33,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Members
+    Route::post('members/bulk-action', [MemberController::class, 'bulkAction'])->name('members.bulk-action');
+    Route::get('members/export-csv', [MemberController::class, 'exportCsv'])->name('members.export-csv');
     Route::resource('members', MemberController::class);
     Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
     Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
@@ -38,9 +42,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Events
     Route::resource('events', AdminEventController::class);
+    Route::post('events/{event}/duplicate', [AdminEventController::class, 'duplicate'])->name('events.duplicate');
 
     // Registrations
     Route::get('events/{event}/registrations', [RegistrationController::class, 'index'])->name('registrations.index');
+    Route::get('events/{event}/registrations/export', [RegistrationController::class, 'exportCsv'])->name('registrations.export-csv');
     Route::post('registrations/{registration}/send-payment', [RegistrationController::class, 'sendPaymentLink'])->name('registrations.send-payment');
     Route::post('registrations/{registration}/confirm-payment', [RegistrationController::class, 'confirmPayment'])->name('registrations.confirm-payment');
     Route::post('registrations/{registration}/cancel', [RegistrationController::class, 'cancel'])->name('registrations.cancel');
@@ -48,4 +54,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // QR Code Scanner
     Route::get('scanner/{event}', [ScannerController::class, 'index'])->name('scanner.index');
     Route::post('scanner/verify', [ScannerController::class, 'verify'])->name('scanner.verify');
+
+    // Waiting list per event
+    Route::get('events/{event}/waiting-list', function (\App\Models\Event $event) {
+        $waitingList = $event->waitingList()->latest()->get();
+        return view('admin.events.waiting-list', compact('event', 'waitingList'));
+    })->name('events.waiting-list-admin');
+
+    // Activity log
+    Route::get('activity', function () {
+        $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
+        return view('admin.activity', compact('logs'));
+    })->name('activity');
 });
