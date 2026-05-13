@@ -28,8 +28,8 @@
 
     <div class="max-w-7xl mx-auto px-5 lg:px-8 flex h-20 items-center justify-between">
 
-        <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0 rounded-2xl py-1 px-1.5 -ml-1.5 transition-all duration-200 hover:scale-105" style="background:rgba(253,240,245,0.7);">
-            <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-12 w-auto" style="filter:drop-shadow(0 1px 4px rgba(217,30,110,0.18));">
+        <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0 rounded-2xl py-1 px-2 -ml-2 transition-opacity hover:opacity-80" style="background:#FDF0F5;">
+            <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-11 w-auto">
         </a>
 
         <nav class="hidden lg:flex items-center gap-8">
@@ -94,8 +94,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
 
             <div class="sm:col-span-2 lg:col-span-1">
-                <a href="{{ route('home') }}" class="inline-flex rounded-2xl p-2 mb-4 hover:opacity-90 transition-opacity" style="background:rgba(253,240,245,0.95);">
-                    <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-14 w-auto" style="filter:drop-shadow(0 1px 4px rgba(217,30,110,0.18));">
+                <a href="{{ route('home') }}" class="inline-flex rounded-2xl p-2 mb-4 hover:opacity-80 transition-opacity" style="background:#FDF0F5;">
+                    <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-14 w-auto">
                 </a>
                 <p class="text-sm leading-relaxed mb-6" style="color:rgba(255,255,255,0.45);">Plateforme de transformation féminine dédiée à révéler la puissance intérieure de chaque femme.</p>
                 <div class="flex items-center gap-3">
@@ -197,12 +197,68 @@
             <form method="POST" action="{{ route('membership.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="form-label">Nom complet <span style="color:var(--rose)">*</span></label><input type="text" name="name" value="{{ old('name') }}" class="form-input" placeholder="Marie Koné" required></div>
-                    <div><label class="form-label">Email <span style="color:var(--rose)">*</span></label><input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="marie@email.com" required></div>
-                    <div><label class="form-label">Profession <span style="color:var(--rose)">*</span></label><input type="text" name="profession" value="{{ old('profession') }}" class="form-input" placeholder="Entrepreneur, Médecin..." required></div>
-                    <div><label class="form-label">Pays <span style="color:var(--rose)">*</span></label><input type="text" name="country" value="{{ old('country') }}" class="form-input" placeholder="Côte d'Ivoire" required></div>
-                    <div class="sm:col-span-2"><label class="form-label">Ville <span style="color:var(--rose)">*</span></label><input type="text" name="city" value="{{ old('city') }}" class="form-input" placeholder="Abidjan" required></div>
-                    <div class="sm:col-span-2"><label class="form-label">Photo <span class="font-normal" style="color:var(--gray)">(optionnel, max 3 Mo)</span></label><input type="file" name="photo" accept="image/*" class="form-input py-2 cursor-pointer text-sm"></div>
+                    <div>
+                        <label class="form-label">Nom complet <span style="color:var(--rose)">*</span></label>
+                        <input type="text" name="name" value="{{ old('name') }}" class="form-input" placeholder="Marie Koné" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Email <span style="color:var(--rose)">*</span></label>
+                        <input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="marie@email.com" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Téléphone <span class="font-normal" style="color:var(--gray)">(optionnel)</span></label>
+                        <input type="tel" name="phone" value="{{ old('phone') }}" class="form-input" placeholder="+225 07 00 00 00 00">
+                    </div>
+                    <div>
+                        <label class="form-label">Profession <span style="color:var(--rose)">*</span></label>
+                        <select name="profession" class="form-input" required>
+                            <option value="" disabled {{ old('profession') ? '' : 'selected' }}>Sélectionne ta profession</option>
+                            @foreach([
+                                'Entrepreneur / Cheffe d\'entreprise',
+                                'Dirigeante / PDG',
+                                'Manager / Cadre supérieure',
+                                'Ingénieure',
+                                'Médecin / Chirurgienne',
+                                'Pharmacienne',
+                                'Infirmière / Sage-femme',
+                                'Avocate / Juriste',
+                                'Magistrate / Notaire',
+                                'Comptable / Auditrice',
+                                'Banquière / Finance',
+                                'Consultante / Conseil',
+                                'Architecte',
+                                'Enseignante / Formatrice',
+                                'Chercheuse / Scientifique',
+                                'Journaliste / Communicante',
+                                'Marketing / Relations publiques',
+                                'Développeuse / Tech',
+                                'Designer / Créatrice',
+                                'Styliste / Mode & Beauté',
+                                'Logisticienne / Supply chain',
+                                'RH / Recrutement',
+                                'Coach / Mentore',
+                                'ONG / Humanitaire',
+                                'Fonctionnaire / Administration',
+                                'Artiste / Culturelle',
+                                'Étudiante',
+                                'Autre',
+                            ] as $p)
+                            <option value="{{ $p }}" {{ old('profession') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Pays <span style="color:var(--rose)">*</span></label>
+                        <input type="text" name="country" value="{{ old('country') }}" class="form-input" placeholder="Côte d'Ivoire" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Ville <span style="color:var(--rose)">*</span></label>
+                        <input type="text" name="city" value="{{ old('city') }}" class="form-input" placeholder="Abidjan" required>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="form-label">Photo <span class="font-normal" style="color:var(--gray)">(optionnel, max 3 Mo)</span></label>
+                        <input type="file" name="photo" accept="image/*" class="form-input py-2 cursor-pointer text-sm">
+                    </div>
                 </div>
                 <p class="text-xs leading-relaxed" style="color:var(--gray);">Ton adhésion démarre au niveau <strong>Standard</strong>. Notre équipe te contactera sous 48h ouvrées pour valider ta candidature.</p>
                 <button type="submit" class="btn-rose w-full py-3.5">

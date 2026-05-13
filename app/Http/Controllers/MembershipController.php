@@ -26,6 +26,7 @@ class MembershipController extends Controller
             $validated = $request->validate([
                 'name'       => 'required|string|max:100',
                 'email'      => 'required|email|unique:members,email',
+                'phone'      => 'nullable|string|max:30',
                 'profession' => 'required|string|max:100',
                 'country'    => 'required|string|max:100',
                 'city'       => 'required|string|max:100',
@@ -33,6 +34,7 @@ class MembershipController extends Controller
             ], [], [
                 'name'       => 'nom complet',
                 'email'      => 'email',
+                'phone'      => 'téléphone',
                 'profession' => 'profession',
                 'country'    => 'pays',
                 'city'       => 'ville',
