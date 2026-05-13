@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewEventMail;
 use App\Models\Event;
+use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -66,6 +69,10 @@ class EventController extends Controller
 
         $event = Event::create($validated);
 
+        if ($event->status === 'published') {
+            $this->sendNewsletterForEvent($event);
+        }
+
         return redirect()->route('admin.events.show', $event)
             ->with('success', 'Événement créé avec succès.');
     }
@@ -107,12 +114,18 @@ class EventController extends Controller
 
         $validated['is_paid'] = $request->boolean('is_paid');
 
+        $wasPublished = $event->status === 'published';
+
         if ($request->hasFile('image')) {
             if ($event->image) Storage::disk('public')->delete($event->image);
             $validated['image'] = $request->file('image')->store('events', 'public');
         }
 
         $event->update($validated);
+
+        if (!$wasPublished && $event->status === 'published') {
+            $this->sendNewsletterForEvent($event);
+        }
 
         return redirect()->route('admin.events.show', $event)->with('success', 'Événement mis à jour.');
     }
@@ -135,5 +148,16 @@ class EventController extends Controller
 
         return redirect()->route('admin.events.edit', $clone)
             ->with('success', 'Événement dupliqué. Modifiez les détails avant de publier.');
+    }
+
+    private function sendNewsletterForEvent(Event $event): void
+    {
+        NewsletterSubscriber::all()->each(function ($subscriber) use ($event) {
+            try {
+                Mail::to($subscriber->email)->send(new NewEventMail($event, $subscriber));
+            } catch (\Throwable) {
+                // fail silently per subscriber
+            }
+        });
     }
 }

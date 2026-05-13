@@ -137,21 +137,29 @@
                 </ul>
             </div>
 
-            <div>
+            <div x-data="{ subscribed: {{ session('newsletter_success') ? 'true' : 'false' }} }">
                 <p class="text-xs font-bold uppercase tracking-widest mb-5" style="color:rgba(255,255,255,0.3);">Newsletter</p>
                 <p class="text-sm mb-4" style="color:rgba(255,255,255,0.45);">Reçois nos actualités et invitations en avant-première.</p>
-                <div class="flex flex-col gap-2">
-                    <input type="email" placeholder="ton@email.com" class="w-full rounded-xl px-4 py-2.5 text-sm outline-none" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:white;" onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
-                    <button class="btn-rose py-2.5 text-sm w-full">S'abonner</button>
+                <div x-show="subscribed" class="flex items-center gap-2 text-sm py-2.5 px-3 rounded-xl" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);">
+                    <svg class="w-4 h-4 flex-shrink-0" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Inscription confirmée !
                 </div>
+                <form x-show="!subscribed" method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col gap-2">
+                    @csrf
+                    <input type="email" name="email" placeholder="ton@email.com" required
+                           class="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
+                           style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:white;"
+                           onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <button type="submit" class="btn-rose py-2.5 text-sm w-full">S'abonner</button>
+                </form>
             </div>
         </div>
 
         <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3" style="border-top:1px solid rgba(255,255,255,0.07);">
             <p class="text-xs" style="color:rgba(255,255,255,0.25);">© {{ date('Y') }} Femmes Sans Limites. Tous droits réservés.</p>
             <div class="flex items-center gap-5">
-                <a href="#" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Confidentialité</a>
-                <a href="#" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Mentions légales</a>
+                <a href="{{ route('legal.cgu') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">CGU</a>
+                <a href="{{ route('legal.mentions') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Mentions légales</a>
             </div>
         </div>
     </div>

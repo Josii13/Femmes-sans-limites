@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- Hero --}}
-<section class="pt-28 pb-16 bg-white relative overflow-hidden">
+<section class="pt-28 pb-14 bg-white relative overflow-hidden">
     <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at 70% 50%,var(--rose-pale) 0%,transparent 55%),radial-gradient(ellipse at 20% 80%,var(--gold-pale) 0%,transparent 50%);"></div>
     <div class="max-w-7xl mx-auto px-5 lg:px-8 relative">
         <div class="max-w-2xl">
@@ -20,19 +20,19 @@
     </div>
 </section>
 
-{{-- Filters by category --}}
+{{-- Filtres par catégorie --}}
 @if($categories->isNotEmpty())
-<div class="bg-white border-b" style="border-color:var(--border);">
+<div class="bg-white sticky top-16 z-20" style="border-bottom:1px solid var(--border);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
-        <div class="flex items-center gap-2 py-4 overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-2 py-3 overflow-x-auto no-scrollbar">
             <a href="{{ route('ebooks.index') }}"
-               class="flex-shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-all {{ !request('categorie') ? 'text-white' : 'hover:bg-gray-50' }}"
+               class="flex-shrink-0 text-sm font-semibold px-4 py-1.5 rounded-full transition-all {{ !request('categorie') ? 'text-white' : 'hover:bg-gray-50' }}"
                style="{{ !request('categorie') ? 'background:var(--rose);' : 'color:var(--gray);' }}">
                 Tous
             </a>
             @foreach($categories as $cat)
             <a href="{{ route('ebooks.index', ['categorie' => $cat]) }}"
-               class="flex-shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-all {{ request('categorie') === $cat ? 'text-white' : 'hover:bg-gray-50' }}"
+               class="flex-shrink-0 text-sm font-semibold px-4 py-1.5 rounded-full transition-all {{ request('categorie') === $cat ? 'text-white' : 'hover:bg-gray-50' }}"
                style="{{ request('categorie') === $cat ? 'background:var(--rose);' : 'color:var(--gray);' }}">
                 {{ $cat }}
             </a>
@@ -42,7 +42,7 @@
 </div>
 @endif
 
-{{-- Ebooks grid --}}
+{{-- Grille ebooks --}}
 <section class="py-16 lg:py-20" style="background:var(--warm);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
 
@@ -57,63 +57,53 @@
         </div>
 
         @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 lg:gap-6">
             @foreach($ebooks as $ebook)
-            <article class="card-hover flex flex-col fade-up group overflow-hidden">
+            <a href="{{ route('ebooks.show', $ebook->slug) }}" class="group flex flex-col fade-up overflow-hidden rounded-2xl bg-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1" style="border:1px solid var(--border);">
 
                 {{-- Cover --}}
-                <div class="relative flex-shrink-0 overflow-hidden" style="aspect-ratio:3/4;">
+                <div class="relative flex-shrink-0 overflow-hidden rounded-t-2xl" style="aspect-ratio:3/4;">
                     @if($ebook->image)
                     <img src="{{ asset('storage/'.$ebook->image) }}"
                          alt="{{ $ebook->title }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
-                    <div class="w-full h-full flex flex-col items-center justify-center gap-3 p-6"
+                    <div class="w-full h-full flex flex-col items-center justify-center gap-2 p-4"
                          style="background:linear-gradient(145deg,var(--rose-pale) 0%,var(--gold-pale) 100%);">
-                        <svg class="w-12 h-12 opacity-30" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 opacity-30" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                         </svg>
-                        <p class="text-center text-sm font-semibold opacity-50" style="color:var(--dark);">{{ $ebook->title }}</p>
+                        <p class="text-center text-xs font-semibold opacity-40 leading-snug" style="color:var(--dark);">{{ $ebook->title }}</p>
                     </div>
                     @endif
 
                     {{-- Category badge --}}
-                    <div class="absolute top-3 left-3">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background:rgba(217,30,110,0.9);color:white;">{{ $ebook->category }}</span>
+                    <div class="absolute top-2.5 left-2.5">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:rgba(217,30,110,0.88);color:white;">{{ $ebook->category }}</span>
+                    </div>
+
+                    {{-- Hover overlay --}}
+                    <div class="absolute inset-0 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background:linear-gradient(to top, rgba(217,30,110,0.8) 0%, transparent 50%);">
+                        <span class="text-white text-xs font-semibold flex items-center gap-1">
+                            Voir l'ebook
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </span>
                     </div>
                 </div>
 
-                {{-- Content --}}
-                <div class="p-5 flex flex-col flex-1">
-                    <h3 class="text-base font-bold mb-2 leading-snug" style="color:var(--dark);font-family:'Playfair Display',serif;">
+                {{-- Titre + label CTA --}}
+                <div class="p-3.5 flex flex-col gap-1">
+                    <h3 class="text-sm font-bold leading-snug line-clamp-2" style="color:var(--dark);font-family:'Playfair Display',serif;">
                         {{ $ebook->title }}
                     </h3>
-
-                    <p class="text-sm leading-relaxed mb-4 flex-1" style="color:var(--gray);">
-                        {{ Str::limit($ebook->description, 120) }}
-                    </p>
-
-                    {{-- Mot de l'autrice --}}
-                    @if($ebook->author_note)
-                    <blockquote class="rounded-xl p-3 mb-4 italic text-xs leading-relaxed" style="background:var(--rose-pale);color:var(--rose);border-left:3px solid var(--rose);">
-                        « {{ Str::limit($ebook->author_note, 100) }} »
-                    </blockquote>
-                    @endif
-
-                    {{-- CTA --}}
-                    <a href="{{ $ebook->cta_url }}" target="_blank" rel="noopener noreferrer"
-                       class="btn-rose w-full justify-center text-sm py-3 mt-auto">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        {{ $ebook->cta_label }}
-                    </a>
+                    <p class="text-xs font-medium" style="color:var(--rose);">{{ $ebook->cta_label }}</p>
                 </div>
-            </article>
+
+            </a>
             @endforeach
         </div>
 
-        {{-- Bottom CTA --}}
+        {{-- CTA bottom --}}
         <div class="text-center mt-16 fade-up">
             <p class="text-sm mb-4" style="color:var(--gray);">Tu veux être informée des nouveaux ebooks en avant-première ?</p>
             <button @click="$store.modal.join = true" class="btn-rose text-sm px-8 py-3">

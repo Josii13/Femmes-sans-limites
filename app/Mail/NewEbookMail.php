@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Mail;
+
+use App\Models\Ebook;
+use App\Models\NewsletterSubscriber;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class NewEbookMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public function __construct(
+        public Ebook $ebook,
+        public NewsletterSubscriber $subscriber
+    ) {}
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: '📚 Nouvel ebook FSL : ' . $this->ebook->title,
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            markdown: 'emails.new-ebook',
+        );
+    }
+
+    public function attachments(): array
+    {
+        return [];
+    }
+}

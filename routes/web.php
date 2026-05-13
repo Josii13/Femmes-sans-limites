@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\NewsletterController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -24,9 +25,18 @@ Route::post('/evenements/{slug}/inscription', [EventController::class, 'register
 Route::post('/evenements/{slug}/liste-attente', [EventController::class, 'joinWaitingList'])->name('events.waiting-list');
 Route::get('/evenements/{slug}/ical', [EventController::class, 'ical'])->name('events.ical');
 Route::get('/ebooks', [EbookController::class, 'index'])->name('ebooks.index');
+Route::get('/ebooks/{slug}', [EbookController::class, 'show'])->name('ebooks.show');
 Route::get('/rejoindre', [MembershipController::class, 'index'])->name('membership.join');
 Route::post('/rejoindre', [MembershipController::class, 'store'])->name('membership.store');
 Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->name('membership.success');
+
+// Newsletter
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Pages légales
+Route::get('/mentions-legales', fn() => view('public.legal.mentions-legales'))->name('legal.mentions');
+Route::get('/conditions-generales-utilisation', fn() => view('public.legal.cgu'))->name('legal.cgu');
 
 // Breeze auth routes
 require __DIR__.'/auth.php';

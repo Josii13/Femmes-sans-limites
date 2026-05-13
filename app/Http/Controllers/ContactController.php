@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ContactController extends Controller
 {
@@ -13,15 +15,23 @@ class ContactController extends Controller
 
     public function send(Request $request)
     {
-        $request->validate([
-            'name'    => 'required|string|max:100',
-            'email'   => 'required|email',
-            'subject' => 'required|string|max:200',
-            'message' => 'required|string|max:2000',
-        ]);
+        try {
+            $request->validate([
+                'name'    => 'required|string|max:100',
+                'email'   => 'required|email',
+                'subject' => 'required|string|max:200',
+                'message' => 'required|string|max:2000',
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('modal', 'contact');
+        }
 
-        \Log::info('Contact form submission', $request->only('name', 'email', 'subject', 'message'));
+        Log::info('Contact form submission', $request->only('name', 'email', 'subject', 'message'));
 
-        return back()->with('success', 'Votre message a bien été envoyé. Nous vous répondrons sous 48h.');
+        return back()->with('success', 'Votre message a bien été envoyé. Nous vous répondrons sous 48h.')
+                     ->with('modal', 'contact');
     }
 }

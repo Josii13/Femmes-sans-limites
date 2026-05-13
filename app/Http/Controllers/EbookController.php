@@ -17,8 +17,24 @@ class EbookController extends Controller
 
         $ebooks = $query->get();
 
-        $categories = Ebook::where('status', 'published')->distinct()->pluck('category')->sort()->values();
+        $categories = Ebook::where('status', 'published')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values();
 
         return view('public.ebooks.index', compact('ebooks', 'categories'));
+    }
+
+    public function show(string $slug)
+    {
+        $ebook = Ebook::where('slug', $slug)->where('status', 'published')->firstOrFail();
+
+        $others = Ebook::published()
+            ->where('id', '!=', $ebook->id)
+            ->limit(4)
+            ->get();
+
+        return view('public.ebooks.show', compact('ebook', 'others'));
     }
 }

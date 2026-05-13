@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewEbookMail;
 use App\Models\Ebook;
+use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class EbookController extends Controller
@@ -56,8 +59,12 @@ class EbookController extends Controller
 
         \App\Models\ActivityLog::record('ebook.created', $ebook);
 
+        if ($ebook->status === 'published') {
+            $this->sendNewsletterForEbook($ebook);
+        }
+
         return redirect()->route('admin.ebooks.index')
-            ->with('success', 'Ebook « ' . $ebook->title . ' » publié avec succès.');
+            ->with('success', 'Ebook « ' . $ebook->title . ' » créé avec succès.');
     }
 
     public function edit(Ebook $ebook)
@@ -79,6 +86,8 @@ class EbookController extends Controller
             'sort_order'  => 'nullable|integer|min:0',
         ]);
 
+        $wasPublished = $ebook->status === 'published';
+
         if ($request->hasFile('image')) {
             if ($ebook->image) Storage::disk('public')->delete($ebook->image);
             $validated['image'] = $request->file('image')->store('ebooks', 'public');
@@ -87,6 +96,11 @@ class EbookController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? $ebook->sort_order;
 
         $ebook->update($validated);
+
+        // Envoyer la newsletter uniquement si on passe de draft → published
+        if (!$wasPublished && $ebook->status === 'published') {
+            $this->sendNewsletterForEbook($ebook);
+        }
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook mis à jour.');
@@ -99,5 +113,16 @@ class EbookController extends Controller
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook supprimé.');
+    }
+
+    private function sendNewsletterForEbook(Ebook $ebook): void
+    {
+        NewsletterSubscriber::all()->each(function ($subscriber) use ($ebook) {
+            try {
+                Mail::to($subscriber->email)->send(new NewEbookMail($ebook, $subscriber));
+            } catch (\Throwable) {
+                // fail silently per subscriber
+            }
+        });
     }
 }
