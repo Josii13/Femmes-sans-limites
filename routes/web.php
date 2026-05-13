@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EbookController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\EbookController as AdminEbookController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
@@ -21,6 +23,7 @@ Route::get('/evenements/{slug}', [EventController::class, 'show'])->name('events
 Route::post('/evenements/{slug}/inscription', [EventController::class, 'register'])->name('events.register');
 Route::post('/evenements/{slug}/liste-attente', [EventController::class, 'joinWaitingList'])->name('events.waiting-list');
 Route::get('/evenements/{slug}/ical', [EventController::class, 'ical'])->name('events.ical');
+Route::get('/ebooks', [EbookController::class, 'index'])->name('ebooks.index');
 Route::get('/rejoindre', [MembershipController::class, 'index'])->name('membership.join');
 Route::post('/rejoindre', [MembershipController::class, 'store'])->name('membership.store');
 Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->name('membership.success');
@@ -39,6 +42,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
     Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
     Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
+
+    // Ebooks
+    Route::resource('ebooks', AdminEbookController::class)->except(['show']);
 
     // Events
     Route::resource('events', AdminEventController::class);

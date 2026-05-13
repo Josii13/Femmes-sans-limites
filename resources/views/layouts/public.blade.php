@@ -33,10 +33,11 @@
         </a>
 
         <nav class="hidden lg:flex items-center gap-8">
-            <a href="{{ route('home') }}"         class="nav-link {{ request()->routeIs('home')     ? 'active' : '' }}">Accueil</a>
-            <a href="{{ route('about') }}"        class="nav-link {{ request()->routeIs('about')    ? 'active' : '' }}">À propos</a>
-            <a href="{{ route('events.index') }}" class="nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">Événements</a>
-            <a href="{{ route('contact') }}"      class="nav-link {{ request()->routeIs('contact')  ? 'active' : '' }}">Contact</a>
+            <a href="{{ route('home') }}"          class="nav-link {{ request()->routeIs('home')      ? 'active' : '' }}">Accueil</a>
+            <a href="{{ route('about') }}"         class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">À propos</a>
+            <a href="{{ route('events.index') }}"  class="nav-link {{ request()->routeIs('events.*')  ? 'active' : '' }}">Événements</a>
+            <a href="{{ route('ebooks.index') }}"  class="nav-link {{ request()->routeIs('ebooks.*')  ? 'active' : '' }}">Ebooks</a>
+            <a href="{{ route('contact') }}"       class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">Contact</a>
         </nav>
 
         <div class="flex items-center gap-3">
@@ -63,6 +64,7 @@
             <a href="{{ route('home') }}"         @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Accueil</a>
             <a href="{{ route('about') }}"        @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">À propos</a>
             <a href="{{ route('events.index') }}" @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Événements</a>
+            <a href="{{ route('ebooks.index') }}" @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Ebooks</a>
             <a href="{{ route('contact') }}"      @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Contact</a>
             <div class="pt-3 pb-1">
                 <button @click="open=false; $store.modal.join = true" class="btn-rose w-full py-3 text-sm">
