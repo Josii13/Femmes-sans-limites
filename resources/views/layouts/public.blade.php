@@ -19,47 +19,45 @@
 <body x-data class="antialiased">
 
 {{-- ══════════════════ HEADER ══════════════════ --}}
-<header
-    x-data="{ scrolled: false, open: false }"
-    @scroll.window="scrolled = window.scrollY > 20"
-    class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-white"
-    :class="scrolled ? 'shadow-sm' : ''"
-    style="border-bottom:1px solid var(--border);">
+<div x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-40">
 
-    <div class="max-w-7xl mx-auto px-5 lg:px-8 flex h-20 items-center justify-between">
+    {{-- Barre principale — hauteur fixe 64px --}}
+    <header class="h-16 bg-white flex items-center" style="border-bottom:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <div class="max-w-7xl mx-auto px-5 lg:px-8 w-full flex items-center justify-between">
 
-        <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0 rounded-2xl py-1 px-2 -ml-2 transition-opacity hover:opacity-80" style="background:#FDF0F5;">
-            <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-11 w-auto">
-        </a>
+            <a href="{{ route('home') }}" class="flex items-center flex-shrink-0 rounded-xl py-1 px-2 -ml-2 transition-opacity hover:opacity-80" style="background:#FDF0F5;">
+                <img src="{{ asset('logo_FSL.png') }}" alt="FSL" class="h-10 w-auto">
+            </a>
 
-        <nav class="hidden lg:flex items-center gap-8">
-            <a href="{{ route('home') }}"          class="nav-link {{ request()->routeIs('home')      ? 'active' : '' }}">Accueil</a>
-            <a href="{{ route('about') }}"         class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">À propos</a>
-            <a href="{{ route('events.index') }}"  class="nav-link {{ request()->routeIs('events.*')  ? 'active' : '' }}">Événements</a>
-            <a href="{{ route('ebooks.index') }}"  class="nav-link {{ request()->routeIs('ebooks.*')  ? 'active' : '' }}">Ebooks</a>
-            <a href="{{ route('contact') }}"       class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">Contact</a>
-        </nav>
+            <nav class="hidden lg:flex items-center gap-8">
+                <a href="{{ route('home') }}"          class="nav-link {{ request()->routeIs('home')      ? 'active' : '' }}">Accueil</a>
+                <a href="{{ route('about') }}"         class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">À propos</a>
+                <a href="{{ route('events.index') }}"  class="nav-link {{ request()->routeIs('events.*')  ? 'active' : '' }}">Événements</a>
+                <a href="{{ route('ebooks.index') }}"  class="nav-link {{ request()->routeIs('ebooks.*')  ? 'active' : '' }}">Ebooks</a>
+                <a href="{{ route('contact') }}"       class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">Contact</a>
+            </nav>
 
-        <div class="flex items-center gap-3">
-            <button @click="$store.modal.join = true" class="btn-rose text-sm px-5 py-2.5 hidden sm:inline-flex">
-                Rejoindre
-            </button>
-            <button @click="open = !open" class="lg:hidden flex flex-col gap-[5px] p-2 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Menu">
-                <span class="block w-5 h-0.5 transition-all duration-300 origin-center" style="background:var(--dark);" :class="open ? 'rotate-45 translate-y-[7px]' : ''"></span>
-                <span class="block w-5 h-0.5 transition-all duration-200" style="background:var(--dark);" :class="open ? 'opacity-0 scale-x-0' : ''"></span>
-                <span class="block w-5 h-0.5 transition-all duration-300 origin-center" style="background:var(--dark);" :class="open ? '-rotate-45 -translate-y-[7px]' : ''"></span>
-            </button>
+            <div class="flex items-center gap-3">
+                <button @click="$store.modal.join = true" class="btn-rose text-sm px-5 py-2 hidden sm:inline-flex">
+                    Rejoindre
+                </button>
+                <button @click="open = !open" class="lg:hidden flex flex-col gap-[5px] p-2 rounded-lg hover:bg-gray-50 transition-colors" aria-label="Menu">
+                    <span class="block w-5 h-0.5 transition-all duration-300 origin-center" style="background:var(--dark);" :class="open ? 'rotate-45 translate-y-[7px]' : ''"></span>
+                    <span class="block w-5 h-0.5 transition-all duration-200" style="background:var(--dark);" :class="open ? 'opacity-0 scale-x-0' : ''"></span>
+                    <span class="block w-5 h-0.5 transition-all duration-300 origin-center" style="background:var(--dark);" :class="open ? '-rotate-45 -translate-y-[7px]' : ''"></span>
+                </button>
+            </div>
         </div>
-    </div>
+    </header>
 
-    {{-- Mobile menu --}}
+    {{-- Menu mobile — hors du flux du header, positionné juste en dessous --}}
     <div x-show="open"
          x-transition:enter="transition duration-200 ease-out"
          x-transition:enter-start="-translate-y-2 opacity-0"
          x-transition:enter-end="translate-y-0 opacity-100"
          x-transition:leave="transition duration-150 ease-in"
-         x-transition:leave-end="opacity-0"
-         class="lg:hidden bg-white" style="border-top:1px solid var(--border);display:none;">
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="lg:hidden bg-white" style="border-bottom:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;">
         <div class="px-5 py-4 space-y-1">
             <a href="{{ route('home') }}"         @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">Accueil</a>
             <a href="{{ route('about') }}"        @click="open=false" class="flex px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors" style="color:var(--charcoal);">À propos</a>
@@ -73,10 +71,11 @@
             </div>
         </div>
     </div>
-</header>
+
+</div>
 
 {{-- ══════════════════ CONTENT ══════════════════ --}}
-<main class="pt-20">
+<main class="pt-16">
     @if(session('success') && !in_array(session('modal'), ['join','contact']))
     <div class="max-w-3xl mx-auto px-5 pt-5">
         <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm" style="background:#D1FAE5;color:#065F46;">
