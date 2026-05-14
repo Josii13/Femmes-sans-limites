@@ -106,20 +106,39 @@ class MemberController extends Controller
             'photo'      => 'nullable|image|max:3072',
         ]);
 
-        if ($request->hasFile('photo')) {
+        $typeChanged    = $request->type   !== $member->type;
+        $photoChanged   = $request->hasFile('photo');
+        $becomingActive = $member->status !== 'active' && $request->status === 'active';
+
+        if ($photoChanged) {
             if ($member->photo) Storage::disk('public')->delete($member->photo);
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
-        $typeChanged = $request->type !== $member->type;
         $member->update($validated);
 
-        if ($typeChanged || $request->hasFile('photo')) {
+        if ($typeChanged || $photoChanged) {
             $cardPath = $this->cardService->generate($member->fresh());
             $member->update(['card_path' => $cardPath]);
         }
 
-        return redirect()->route('admin.members.show', $member)->with('success', 'Membre mis à jour.');
+        $member->refresh();
+
+        $sendMail = $member->status === 'active' && ($typeChanged || $becomingActive);
+        if ($sendMail) {
+            if (!$member->card_path) {
+                $cardPath = $this->cardService->generate($member);
+                $member->update(['card_path' => $cardPath]);
+                $member->refresh();
+            }
+            \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+        }
+
+        $message = $sendMail
+            ? 'Membre mis à jour. Sa nouvelle carte lui a été envoyée par email.'
+            : 'Membre mis à jour.';
+
+        return redirect()->route('admin.members.show', $member)->with('success', $message);
     }
 
     public function destroy(Member $member)
@@ -150,11 +169,25 @@ class MemberController extends Controller
     {
         $member->update(['status' => 'active']);
 
+        if (!$member->card_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($member->card_path)) {
+            $cardPath = $this->cardService->generate($member);
+            $member->update(['card_path' => $cardPath]);
+            $member->refresh();
+        }
+
         \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
 
         \App\Models\ActivityLog::record('member.activated', $member);
 
         return back()->with('success', $member->name . ' est maintenant active. Sa carte lui a été envoyée par email.');
+    }
+
+    public function regenerateCard(Member $member)
+    {
+        $cardPath = $this->cardService->generate($member);
+        $member->update(['card_path' => $cardPath]);
+
+        return back()->with('success', 'Carte de ' . $member->name . ' régénérée avec succès.');
     }
 
     public function sendCard(Member $member)
@@ -183,10 +216,15 @@ class MemberController extends Controller
             foreach ($members as $member) {
                 if ($member->status !== 'active') {
                     $member->update(['status' => 'active']);
+                    if (!$member->card_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($member->card_path)) {
+                        $cardPath = $this->cardService->generate($member);
+                        $member->update(['card_path' => $cardPath]);
+                        $member->refresh();
+                    }
                     \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
                 }
             }
-            return back()->with('success', $members->count() . ' membre(s) activé(s).');
+            return back()->with('success', $members->count() . ' membre(s) activé(s). Cartes envoyées par email.');
         }
 
         if ($request->action === 'delete') {

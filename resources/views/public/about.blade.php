@@ -36,13 +36,13 @@
 
                 {{-- Photo principale --}}
                 <div class="absolute rounded-3xl overflow-hidden shadow-2xl img-reveal" style="top:0;right:0;left:50px;bottom:80px;z-index:1;">
-                    <img src="{{ asset('images/photo_01_3.png') }}" alt="Femme FSL" class="w-full h-full object-cover object-top">
+                    <img src="{{ asset('images/photo_01_3.png') }}" alt="Femme FSL — force et ambition" class="w-full h-full object-cover object-top">
                     <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,10,12,0.4) 0%,transparent 50%);"></div>
                 </div>
 
                 {{-- Photo secondaire --}}
                 <div class="absolute rounded-2xl overflow-hidden shadow-xl img-reveal" style="bottom:0;left:0;width:42%;height:46%;z-index:2;border:4px solid white;" data-delay="300">
-                    <img src="{{ asset('images/photo_03_1.png') }}" alt="Membre FSL" class="w-full h-full object-cover object-top">
+                    <img src="{{ asset('images/photo_03_1.png') }}" alt="Membre active de la communauté FSL" loading="lazy" class="w-full h-full object-cover object-top">
                 </div>
 
                 {{-- Badge fondation --}}
@@ -128,13 +128,17 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-stagger="120">
             @foreach([
-                ['Authenticité','Être pleinement et courageusement soi-même, sans masque ni concession sur ses valeurs.','#D91E6E','var(--rose-pale)','✦'],
-                ['Excellence','Viser toujours le meilleur de soi — dans son travail, ses relations et son impact.','#C9A84C','var(--gold-pale)','★'],
-                ['Solidarité','S\'élever ensemble. Le succès des unes renforce celui de toutes.','#D91E6E','var(--rose-pale)','❤'],
-                ['Impact','Agir concrètement, mesurer ses résultats et laisser une trace durable dans son milieu.','#C9A84C','var(--gold-pale)','◆'],
-            ] as [$val,$desc,$col,$bg,$icon])
+                ['Authenticité','Être pleinement et courageusement soi-même, sans masque ni concession sur ses valeurs.','#D91E6E','var(--rose-pale)','M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+                ['Excellence','Viser toujours le meilleur de soi — dans son travail, ses relations et son impact.','#C9A84C','var(--gold-pale)','M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
+                ['Solidarité','S\'élever ensemble. Le succès des unes renforce celui de toutes.','#D91E6E','var(--rose-pale)','M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'],
+                ['Impact','Agir concrètement, mesurer ses résultats et laisser une trace durable dans son milieu.','#C9A84C','var(--gold-pale)','M13 10V3L4 14h7v7l9-11h-7z'],
+            ] as [$val,$desc,$col,$bg,$iconPath])
             <div class="fade-up rounded-2xl p-7 bg-white" style="border:1px solid var(--border);">
-                <div class="text-2xl mb-4" style="color:{{ $col }};">{{ $icon }}</div>
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:{{ $bg }};">
+                    <svg class="w-5 h-5" style="color:{{ $col }};" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $iconPath }}"/>
+                    </svg>
+                </div>
                 <h3 class="text-xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">{{ $val }}</h3>
                 <p class="text-sm leading-relaxed" style="color:var(--gray);">{{ $desc }}</p>
             </div>
@@ -161,7 +165,7 @@
 
                     {{-- Photo --}}
                     <div class="relative rounded-3xl overflow-hidden shadow-2xl img-reveal" style="width:340px;height:400px;z-index:1;">
-                        <img src="{{ asset('images/photo_03_2.jpeg') }}" alt="Fondatrice FSL" class="w-full h-full object-cover object-top">
+                        <img src="{{ asset('images/photo_03_2.jpeg') }}" alt="Fondatrice de Femmes Sans Limites" loading="lazy" class="w-full h-full object-cover object-top">
                         <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,10,12,0.3),transparent 60%);"></div>
                     </div>
 
@@ -206,7 +210,7 @@
     <div class="flex gap-4 px-5 lg:px-8 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
         @foreach(['photo_02_2.png','photo_01_1.png','photo_03_3.png','photo_01_2.png','photo_03_4.png','photo_02_1.png'] as $img)
         <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden" style="width:280px;height:200px;">
-            <img src="{{ asset('images/'.$img) }}" alt="FSL community" class="w-full h-full object-cover">
+            <img src="{{ asset('images/'.$img) }}" alt="Moment de vie de la communauté Femmes Sans Limites" loading="lazy" class="w-full h-full object-cover">
         </div>
         @endforeach
     </div>

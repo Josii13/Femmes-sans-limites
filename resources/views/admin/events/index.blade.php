@@ -10,18 +10,20 @@
 
 {{-- Filters --}}
 <form method="GET" class="flex flex-wrap gap-3 mb-6">
-    <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher par titre, lieu..." class="form-input w-64">
-    <select name="status" class="form-input w-40">
-        <option value="">Tous les statuts</option>
-        <option value="published" @selected(request('status')=='published')>Publié</option>
-        <option value="draft"     @selected(request('status')=='draft')>Brouillon</option>
-        <option value="cancelled" @selected(request('status')=='cancelled')>Annulé</option>
-        <option value="completed" @selected(request('status')=='completed')>Terminé</option>
-    </select>
-    <button type="submit" class="btn-rose text-sm px-5 py-2">Filtrer</button>
-    @if(request()->anyFilled(['search','status']))
-    <a href="{{ route('admin.events.index') }}" class="btn-gold text-sm px-5 py-2">Réinitialiser</a>
-    @endif
+    <input type="text" name="search" value="{{ request('search') }}" placeholder="Titre, lieu..." class="form-input flex-1 min-w-[180px] sm:w-64 sm:flex-none">
+    <div class="flex gap-3 flex-wrap">
+        <select name="status" class="form-input w-36">
+            <option value="">Tous statuts</option>
+            <option value="published" @selected(request('status')=='published')>Publié</option>
+            <option value="draft"     @selected(request('status')=='draft')>Brouillon</option>
+            <option value="cancelled" @selected(request('status')=='cancelled')>Annulé</option>
+            <option value="completed" @selected(request('status')=='completed')>Terminé</option>
+        </select>
+        <button type="submit" class="btn-rose text-sm px-4 py-2">Filtrer</button>
+        @if(request()->anyFilled(['search','status']))
+        <a href="{{ route('admin.events.index') }}" class="btn-gold text-sm px-4 py-2">✕</a>
+        @endif
+    </div>
 </form>
 
 <div class="admin-card overflow-hidden p-0" x-data="{ confirm: null, confirmAction: '' }">
@@ -38,7 +40,8 @@
         </div>
     </div>
 
-    <table class="w-full text-sm">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
         <thead>
             <tr style="background:#F8F7F9;">
                 @php
@@ -67,8 +70,22 @@
             @php $colors = ['published'=>'#059669','draft'=>'#6B7280','cancelled'=>'#DC2626','completed'=>'#7C3AED']; @endphp
             <tr class="hover:bg-gray-50 transition-colors">
                 <td class="px-6 py-4">
-                    <p class="font-medium" style="color:var(--dark);">{{ $event->title }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">{{ $event->city ?? $event->location }}</p>
+                    <div class="flex items-center gap-3">
+                        @if($event->image)
+                        <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}"
+                             class="w-14 h-10 rounded-lg object-cover flex-shrink-0 shadow-sm" loading="lazy">
+                        @else
+                        <div class="w-14 h-10 rounded-lg flex-shrink-0 flex items-center justify-center" style="background:var(--rose-pale);">
+                            <svg class="w-5 h-5" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        @endif
+                        <div class="min-w-0">
+                            <p class="font-medium truncate" style="color:var(--dark);">{{ $event->title }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $event->city ?? $event->location }}</p>
+                        </div>
+                    </div>
                 </td>
                 <td class="px-6 py-4 text-gray-600">
                     {{ $event->event_date->format('d M Y') }}<br>
@@ -113,6 +130,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>{{-- /overflow-x-auto --}}
     @if($events->hasPages())<div class="px-6 py-4 border-t border-gray-50">{{ $events->links() }}</div>@endif
 </div>
 @endsection

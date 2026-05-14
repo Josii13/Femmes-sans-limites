@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\CampaignMail;
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
+use App\Models\CampaignTemplate;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -40,10 +41,12 @@ class CommunicationController extends Controller
         return view('admin.communication.index', compact('campaigns','statsMonth','statsYear','monthly'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $members = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
-        return view('admin.communication.create', compact('members'));
+        $members   = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
+        $templates = CampaignTemplate::orderBy('name')->get();
+        $prefill   = $request->template_id ? CampaignTemplate::find($request->template_id) : null;
+        return view('admin.communication.create', compact('members','templates','prefill'));
     }
 
     public function store(Request $request)
@@ -104,8 +107,9 @@ class CommunicationController extends Controller
             return redirect()->route('admin.communication.show', $campaign)
                 ->with('error', 'Une campagne déjà envoyée ne peut pas être modifiée.');
         }
-        $members = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
-        return view('admin.communication.edit', compact('campaign','members'));
+        $members   = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
+        $templates = CampaignTemplate::orderBy('name')->get();
+        return view('admin.communication.edit', compact('campaign','members','templates'));
     }
 
     public function update(Request $request, Campaign $campaign)
@@ -159,6 +163,39 @@ class CommunicationController extends Controller
         if ($campaign->image) Storage::disk('public')->delete($campaign->image);
         $campaign->delete();
         return redirect()->route('admin.communication.index')->with('success', 'Campagne supprimée.');
+    }
+
+    // Aperçu HTML du mail de campagne (rendu réel dans un nouvel onglet)
+    public function preview(Campaign $campaign)
+    {
+        $member = Member::where('status', 'active')->first();
+
+        $recipient = new CampaignRecipient([
+            'campaign_id' => $campaign->id,
+            'member_id'   => $member?->id,
+            'email'       => $member?->email ?? 'apercu@fsl.ci',
+            'name'        => $member?->name ?? 'Marie Koné',
+            'token'       => 'preview',
+        ]);
+
+        $fullName  = $member?->name ?? 'Marie Koné';
+        $firstName = mb_ucfirst(explode(' ', trim($fullName))[0]);
+
+        $vars = [
+            '{prenom}'     => $firstName,
+            '{nom}'        => $fullName,
+            '{numero}'     => $member?->member_number ?? 'FSL-APERCU',
+            '{type}'       => $member ? ucfirst($member->type) : 'Standard',
+            '{ville}'      => $member?->city ?? 'Abidjan',
+            '{pays}'       => $member?->country ?? 'Côte d\'Ivoire',
+            '{profession}' => $member?->profession ?? 'Entrepreneur',
+        ];
+
+        $resolvedBody = str_replace(array_keys($vars), array_values($vars), $campaign->body);
+
+        return response()
+            ->view('emails.campaign', compact('campaign', 'recipient', 'resolvedBody'))
+            ->header('X-Frame-Options', 'SAMEORIGIN');
     }
 
     // Envoi d'une campagne draft ou scheduled via bouton manuel

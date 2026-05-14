@@ -23,7 +23,7 @@
             <div class="fade-up">
                 <div class="relative rounded-2xl overflow-hidden shadow-2xl mx-auto max-w-xs lg:max-w-sm" style="aspect-ratio:3/4;">
                     @if($ebook->image)
-                    <img src="{{ asset('storage/'.$ebook->image) }}" alt="{{ $ebook->title }}" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/'.$ebook->image) }}" alt="Couverture de l'ebook : {{ $ebook->title }}" class="w-full h-full object-cover">
                     @else
                     <div class="w-full h-full flex flex-col items-center justify-center gap-4 p-8"
                          style="background:linear-gradient(145deg,var(--rose-pale) 0%,var(--gold-pale) 100%);">
@@ -86,7 +86,7 @@
             <a href="{{ route('ebooks.show', $other->slug) }}" class="card-hover group overflow-hidden block fade-up">
                 <div class="relative overflow-hidden rounded-xl" style="aspect-ratio:3/4;">
                     @if($other->image)
-                    <img src="{{ asset('storage/'.$other->image) }}" alt="{{ $other->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ asset('storage/'.$other->image) }}" alt="{{ $other->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
                     <div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(145deg,var(--rose-pale) 0%,var(--gold-pale) 100%);">
                         <svg class="w-10 h-10 opacity-25" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>

@@ -65,7 +65,7 @@
 
                 {{-- Photo principale avec parallax --}}
                 <div class="absolute rounded-3xl overflow-hidden shadow-2xl img-reveal" style="top:0;right:0;left:55px;bottom:95px;z-index:1;">
-                    <img src="{{ asset('images/photo_01_1.png') }}" alt="Leader FSL" class="w-full h-full object-cover object-top" data-parallax="0.08">
+                    <img src="{{ asset('images/photo_01_1.png') }}" alt="Membre FSL en pleine conférence" class="w-full h-full object-cover object-top" data-parallax="0.08">
                     <div class="absolute inset-x-0 bottom-0 h-2/5" style="background:linear-gradient(to top,rgba(15,10,12,0.55),transparent);"></div>
                     <div class="absolute bottom-5 left-5">
                         <p class="text-xs font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(255,255,255,0.65);">Membre FSL</p>
@@ -75,7 +75,7 @@
 
                 {{-- Photo secondaire --}}
                 <div class="absolute rounded-2xl overflow-hidden shadow-xl img-reveal" style="bottom:0;left:0;width:44%;height:48%;z-index:2;border:4px solid white;" data-delay="200">
-                    <img src="{{ asset('images/photo_03_3.png') }}" alt="Membre FSL" class="w-full h-full object-cover object-top">
+                    <img src="{{ asset('images/photo_03_3.png') }}" alt="Membre FSL — leader et entrepreneur" class="w-full h-full object-cover object-top">
                 </div>
 
                 {{-- Badge membres flottant --}}
@@ -130,7 +130,7 @@
             {{-- Photo groupe --}}
             <div class="relative fade-left order-1">
                 <div class="rounded-3xl overflow-hidden shadow-xl img-reveal" style="aspect-ratio:4/3;">
-                    <img src="{{ asset('images/photo_02_2.png') }}" alt="Communauté FSL" class="w-full h-full object-cover">
+                    <img src="{{ asset('images/photo_02_2.png') }}" alt="Femmes de la communauté FSL réunies" loading="lazy" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(217,30,110,0.12),transparent 60%);"></div>
                 </div>
                 <div class="float-badge2 absolute -bottom-5 -right-4 lg:-right-6 bg-white rounded-2xl px-5 py-4 shadow-xl" style="border:1px solid var(--border);z-index:2;">
@@ -212,7 +212,7 @@
                 <svg class="w-8 h-8 mb-5 flex-shrink-0" style="color:var(--rose);" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
                 <p class="text-sm leading-relaxed flex-1 mb-6" style="color:rgba(255,255,255,0.7);">{{ $quote }}</p>
                 <div class="flex items-center gap-3 pt-5" style="border-top:1px solid rgba(255,255,255,0.1);">
-                    <img src="{{ asset('images/'.$photo) }}" alt="{{ $name }}" class="w-11 h-11 rounded-full object-cover object-top flex-shrink-0">
+                    <img src="{{ asset('images/'.$photo) }}" alt="{{ $name }}" loading="lazy" class="w-11 h-11 rounded-full object-cover object-top flex-shrink-0">
                     <div>
                         <p class="text-sm font-bold text-white">{{ $name }}</p>
                         <p class="text-xs" style="color:rgba(255,255,255,0.4);">{{ $role }}</p>
@@ -240,7 +240,7 @@
             <article class="card-hover flex flex-col fade-up overflow-hidden group">
                 <div class="h-48 relative overflow-hidden flex-shrink-0 img-reveal">
                     @if($event->image)
-                    <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
                     <div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg,var(--rose-pale),var(--gold-pale));"><img src="{{ asset('logo_FSL.png') }}" alt="" class="w-16 opacity-15"></div>
                     @endif
@@ -303,7 +303,7 @@
 {{-- ══════════════════ CTA FINAL PHOTO ══════════════════ --}}
 <section class="relative overflow-hidden" style="min-height:500px;">
     <div class="absolute inset-0">
-        <img src="{{ asset('images/photo_02_2.png') }}" alt="Communauté FSL" class="w-full h-full object-cover object-center">
+        <img src="{{ asset('images/photo_02_2.png') }}" alt="Femmes FSL lors d'un événement communautaire" loading="lazy" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(15,10,12,0.85),rgba(217,30,110,0.45));"></div>
     </div>
     <div class="relative max-w-3xl mx-auto px-5 text-center py-28 fade-up">

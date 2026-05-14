@@ -12,22 +12,24 @@
 
 {{-- Filters --}}
 <form method="GET" class="flex flex-wrap gap-3 mb-6" id="filter-form">
-    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nom, email, n° membre, profession, ville..." class="form-input w-80">
-    <select name="type" class="form-input w-36">
-        <option value="">Tous types</option>
-        <option value="standard" @selected(request('type')=='standard')>Standard</option>
-        <option value="gold" @selected(request('type')=='gold')>Gold</option>
-        <option value="premium" @selected(request('type')=='premium')>Premium</option>
-    </select>
-    <select name="status" class="form-input w-40">
-        <option value="">Tous statuts</option>
-        <option value="active" @selected(request('status')=='active')>Actifs</option>
-        <option value="inactive" @selected(request('status')=='inactive')>En attente</option>
-    </select>
-    <button type="submit" class="btn-rose text-sm px-5 py-2">Filtrer</button>
-    @if(request()->anyFilled(['search','type','status']))
-    <a href="{{ route('admin.members.index') }}" class="btn-gold text-sm px-5 py-2">Réinitialiser</a>
-    @endif
+    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nom, email, n° membre..." class="form-input flex-1 min-w-[200px] sm:w-80 sm:flex-none">
+    <div class="flex gap-3 flex-wrap">
+        <select name="type" class="form-input w-32">
+            <option value="">Tous types</option>
+            <option value="standard" @selected(request('type')=='standard')>Standard</option>
+            <option value="gold" @selected(request('type')=='gold')>Gold</option>
+            <option value="premium" @selected(request('type')=='premium')>Premium</option>
+        </select>
+        <select name="status" class="form-input w-36">
+            <option value="">Tous statuts</option>
+            <option value="active" @selected(request('status')=='active')>Actifs</option>
+            <option value="inactive" @selected(request('status')=='inactive')>En attente</option>
+        </select>
+        <button type="submit" class="btn-rose text-sm px-4 py-2">Filtrer</button>
+        @if(request()->anyFilled(['search','type','status']))
+        <a href="{{ route('admin.members.index') }}" class="btn-gold text-sm px-4 py-2">✕</a>
+        @endif
+    </div>
 </form>
 
 <div x-data="bulkManager()" @keydown.escape.window="confirm = null">
@@ -64,7 +66,8 @@
     </form>
 
     <div class="admin-card overflow-hidden p-0">
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[700px]">
             <thead>
                 <tr style="background:#F8F7F9;">
                     <th class="px-6 py-3 w-10">
@@ -145,6 +148,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>{{-- /overflow-x-auto --}}
         @if($members->hasPages())
         <div class="px-6 py-4 border-t border-gray-50">{{ $members->links() }}</div>
         @endif

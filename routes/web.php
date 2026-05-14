@@ -15,6 +15,7 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Admin\CommunicationController;
+use App\Http\Controllers\Admin\CampaignTemplateController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -57,6 +58,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
     Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
     Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
+    Route::post('members/{member}/regenerate-card', [MemberController::class, 'regenerateCard'])->name('members.regenerate-card');
 
     // Ebooks
     Route::resource('ebooks', AdminEbookController::class)->except(['show']);
@@ -82,12 +84,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         return view('admin.events.waiting-list', compact('event', 'waitingList'));
     })->name('events.waiting-list-admin');
 
+    // Communication / Templates (doit être avant la resource communication pour éviter le conflit {campaign})
+    Route::prefix('communication')->name('communication.')->group(function () {
+        Route::get('templates', [CampaignTemplateController::class, 'index'])->name('templates.index');
+        Route::get('templates/create', [CampaignTemplateController::class, 'create'])->name('templates.create');
+        Route::post('templates', [CampaignTemplateController::class, 'store'])->name('templates.store');
+        Route::get('templates/{template}/edit', [CampaignTemplateController::class, 'edit'])->name('templates.edit');
+        Route::put('templates/{template}', [CampaignTemplateController::class, 'update'])->name('templates.update');
+        Route::delete('templates/{template}', [CampaignTemplateController::class, 'destroy'])->name('templates.destroy');
+        Route::get('templates/{template}/apply', [CampaignTemplateController::class, 'apply'])->name('templates.apply');
+    });
+
     // Communication / Campagnes
     Route::resource('communication', CommunicationController::class)
         ->except(['show'])
         ->parameters(['communication' => 'campaign']);
     Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
     Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
+    Route::get('communication/{campaign}/preview', [CommunicationController::class, 'preview'])->name('communication.preview');
 
     // Activity log
     Route::get('activity', function () {

@@ -24,7 +24,7 @@
                 <textarea name="description" rows="6" class="form-input resize-none">{{ old('description', $event->description) }}</textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Date et heure *</label>
                     <input type="datetime-local" name="event_date" value="{{ old('event_date', $event->event_date->format('Y-m-d\TH:i')) }}" class="form-input">
@@ -36,14 +36,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Capacité max</label>
                     <input type="number" name="capacity" value="{{ old('capacity', $event->capacity) }}" class="form-input" min="1">
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Lieu *</label>
                     <input type="text" name="location" value="{{ old('location', $event->location) }}" class="form-input">
@@ -65,7 +65,7 @@
                     </label>
                 </div>
                 <div id="payment-fields" class="{{ old('is_paid', $event->is_paid) ? '' : 'hidden' }} space-y-4">
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="col-span-2">
                             <label class="form-label">Prix</label>
                             <input type="number" name="price" value="{{ old('price', $event->price) }}" class="form-input" step="100" min="0">
@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Statut *</label>
                     <select name="status" class="form-input">

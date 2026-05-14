@@ -19,7 +19,7 @@
             </div>
             @endif
 
-            <div class="grid grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div class="col-span-2 sm:col-span-1">
                     <label class="form-label">Titre *</label>
                     <input type="text" name="title" value="{{ old('title', $ebook->title) }}" class="form-input @error('title') border-red-400 @enderror">
@@ -66,7 +66,7 @@
 
             <div class="rounded-xl border border-gray-100 p-5 space-y-4">
                 <p class="font-semibold text-sm" style="color:var(--dark);">Bouton d'action (CTA)</p>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">Label du bouton *</label>
                         <select name="cta_label" class="form-input">

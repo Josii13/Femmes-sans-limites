@@ -70,7 +70,8 @@
         <p class="text-sm" style="color:var(--gray);">Aucune campagne. Créez votre première communication.</p>
     </div>
     @else
-    <table class="w-full text-sm">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[640px]">
         <thead>
             <tr style="background:#FAFAFA;border-bottom:1px solid var(--border);">
                 <th class="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wide" style="color:var(--gray);">Campagne</th>
@@ -154,6 +155,7 @@
         @endforeach
         </tbody>
     </table>
+    </div>{{-- /overflow-x-auto --}}
 
     @if($campaigns->hasPages())
     <div class="px-6 py-4" style="border-top:1px solid var(--border);">

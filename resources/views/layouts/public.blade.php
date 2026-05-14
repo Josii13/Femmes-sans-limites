@@ -15,8 +15,15 @@
             })
         })
     </script>
+    <style>
+    #fsl-bar{position:fixed;top:0;left:0;height:3px;z-index:9999;width:0%;opacity:0;pointer-events:none;background:linear-gradient(90deg,#D91E6E,#F472B6,#D91E6E);background-size:200% 100%;transition:opacity .15s;}
+    #fsl-bar.active{opacity:1;animation:fsl-p 14s cubic-bezier(.05,.01,0,1) forwards,fsl-s 1.8s linear infinite;}
+    @keyframes fsl-p{from{width:0%}to{width:90%}}
+    @keyframes fsl-s{from{background-position:0% 0}to{background-position:-200% 0}}
+    </style>
 </head>
 <body x-data class="antialiased">
+<div id="fsl-bar" aria-hidden="true"></div>
 
 {{-- ══════════════════ HEADER ══════════════════ --}}
 <div x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-40">
@@ -259,6 +266,11 @@
                         <input type="file" name="photo" accept="image/*" class="form-input py-2 cursor-pointer text-sm">
                     </div>
                 </div>
+                <div>
+                    <label class="form-label">Pourquoi souhaites-tu intégrer le mouvement FSL ? <span style="color:var(--rose)">*</span></label>
+                    <textarea name="motivation" rows="4" class="form-input resize-none" placeholder="Partage ta motivation, tes objectifs, ce que tu espères apporter et recevoir au sein de la communauté…" required minlength="20" maxlength="1000">{{ old('motivation') }}</textarea>
+                    <p class="text-xs mt-1" style="color:var(--gray);">Minimum 20 caractères — cette réponse aide notre équipe à mieux te connaître.</p>
+                </div>
                 <p class="text-xs leading-relaxed" style="color:var(--gray);">Ton adhésion démarre au niveau <strong>Standard</strong>. Notre équipe te contactera sous 48h ouvrées pour valider ta candidature.</p>
                 <button type="submit" class="btn-rose w-full py-3.5">
                     Soumettre ma candidature
@@ -388,6 +400,30 @@ document.addEventListener('DOMContentLoaded', () => {
             header.style.height = window.scrollY > 40 ? '64px' : '';
         }, { passive: true });
     }
+
+    /* ── Page transition bar + form submit spinner ── */
+    const bar = document.getElementById('fsl-bar');
+    const spinSVG = '<svg class="w-4 h-4 animate-spin inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 12a8 8 0 018-8"/></svg>';
+
+    document.addEventListener('click', e => {
+        const a = e.target.closest('a[href]');
+        if (!a) return;
+        const href = a.getAttribute('href');
+        if (!href || /^(#|mailto:|tel:|javascript:)/.test(href) || a.target === '_blank' || a.hasAttribute('download')) return;
+        bar.classList.add('active');
+    });
+
+    document.addEventListener('submit', e => {
+        const btn = e.target.querySelector('button[type=submit], input[type=submit]');
+        if (!btn || btn.disabled) return;
+        btn.disabled = true;
+        btn.innerHTML = spinSVG + ' Un instant…';
+        bar.classList.add('active');
+    }, true);
+
+    window.addEventListener('pageshow', e => {
+        if (e.persisted) bar.classList.remove('active');
+    });
 
 });
 </script>

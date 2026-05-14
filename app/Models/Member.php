@@ -10,7 +10,7 @@ class Member extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'member_number', 'name', 'email', 'phone', 'profession',
+        'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
         'country', 'city', 'photo', 'type', 'status', 'card_path',
     ];
 

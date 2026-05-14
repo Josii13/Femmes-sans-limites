@@ -27,7 +27,7 @@
 @endif
 
 {{-- Status filter cards --}}
-<div class="grid grid-cols-5 gap-3 mb-6">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
     @foreach([
         ['pending',      'En attente',  $totals['pending'],      '#6B7280'],
         ['payment_sent', 'Lien envoyé', $totals['payment_sent'], '#C9A84C'],
@@ -68,7 +68,8 @@
         </div>
     </div>
 
-    <table class="w-full text-sm">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[600px]">
         <thead>
             <tr style="background:#F8F7F9;">
                 <th class="text-left px-5 py-3 font-semibold text-xs uppercase tracking-wider text-gray-500">Participant</th>
@@ -144,6 +145,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>{{-- /overflow-x-auto --}}
 
     @if($registrations->hasPages())
     <div class="px-5 py-4 border-t border-gray-50">{{ $registrations->links() }}</div>

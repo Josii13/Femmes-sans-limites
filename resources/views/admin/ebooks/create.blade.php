@@ -20,7 +20,7 @@
             @endif
 
             {{-- Titre & catégorie --}}
-            <div class="grid grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div class="col-span-2 sm:col-span-1">
                     <label class="form-label">Titre de l'ebook *</label>
                     <input type="text" name="title" value="{{ old('title') }}" class="form-input @error('title') border-red-400 @enderror" placeholder="Ex : Guide de leadership féminin">
@@ -81,7 +81,7 @@
                     <p class="font-semibold text-sm mb-1" style="color:var(--dark);">Bouton d'action (CTA)</p>
                     <p class="text-xs text-gray-400">Ce bouton redirige vers la page produit Charriow.</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">Label du bouton *</label>
                         <select name="cta_label" class="form-input @error('cta_label') border-red-400 @enderror">

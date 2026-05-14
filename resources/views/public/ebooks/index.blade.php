@@ -66,6 +66,7 @@
                     @if($ebook->image)
                     <img src="{{ asset('storage/'.$ebook->image) }}"
                          alt="{{ $ebook->title }}"
+                         loading="lazy"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
                     <div class="w-full h-full flex flex-col items-center justify-center gap-2 p-4"

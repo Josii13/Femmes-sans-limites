@@ -25,7 +25,7 @@
                 @error('description')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Date et heure *</label>
                     <input type="datetime-local" name="event_date" value="{{ old('event_date') }}" class="form-input @error('event_date') border-red-400 @enderror">
@@ -38,14 +38,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Capacité max</label>
                     <input type="number" name="capacity" value="{{ old('capacity') }}" class="form-input" placeholder="Illimité si vide" min="1">
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Lieu / Salle *</label>
                     <input type="text" name="location" value="{{ old('location') }}" class="form-input @error('location') border-red-400 @enderror" placeholder="Nom de la salle, adresse...">
@@ -71,7 +71,7 @@
                 </div>
 
                 <div id="payment-fields" class="{{ old('is_paid') ? '' : 'hidden' }} space-y-4">
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="col-span-2">
                             <label class="form-label">Prix *</label>
                             <input type="number" name="price" value="{{ old('price') }}" class="form-input" placeholder="5000" step="100" min="0">
@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Statut de publication *</label>
                     <select name="status" class="form-input">

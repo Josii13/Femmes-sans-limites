@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSL — Propositions de cartes membres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0608;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  min-height: 100vh;
+  padding: 60px 40px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+.page-header p {
+  color: #6B6570;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION LAYOUT
+═══════════════════════════════════════════════ */
+.card-section {
+  max-width: 1000px;
+  margin: 0 auto 90px;
+}
+.card-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+/* Card wrapper — scales the 900×560 design to 650px wide */
+.card-wrap {
+  width: 650px;
+  height: 406px; /* 650 × (560/900) */
+  position: relative;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ═══════════════════════════════════════════════
+   CARD 1 — STANDARD "Silhouette"
+   Fond sombre, bande gauche rose, épuré
+═══════════════════════════════════════════════ */
+#standard {
+  background: linear-gradient(135deg, #18101A 0%, #231529 55%, #1A0E1F 100%);
+}
+
+/* Bande latérale gauche rose */
+#standard .band-left {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #D91E6E 0%, #F054A0 50%, #D91E6E 100%);
+}
+
+/* Motif géométrique fond */
+#standard .bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 80% 50%, rgba(217,30,110,0.06) 0%, transparent 55%),
+    radial-gradient(circle at 15% 20%, rgba(217,30,110,0.04) 0%, transparent 35%);
+}
+
+/* Cercles décoratifs */
+#standard .deco-circle-1 {
+  position: absolute;
+  right: -40px; bottom: -60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(217,30,110,0.12);
+}
+#standard .deco-circle-2 {
+  position: absolute;
+  right: 20px; bottom: -90px;
+  width: 270px; height: 270px;
+  border-radius: 50%;
+  border: 1px solid rgba(217,30,110,0.07);
+}
+
+/* Logo zone */
+#standard .logo-zone {
+  position: absolute;
+  top: 32px; left: 32px;
+  display: flex; align-items: center; gap: 10px;
+}
+#standard .logo-mark {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: rgba(253,240,245,0.92);
+  display: flex; align-items: center; justify-content: center;
+}
+#standard .logo-mark img {
+  width: 28px; height: 28px; object-fit: contain;
+}
+#standard .logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.04em;
+}
+
+/* Badge type */
+#standard .badge {
+  position: absolute;
+  top: 32px; right: 32px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+}
+
+/* Photo circulaire */
+#standard .photo-zone {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+#standard .photo-ring {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+}
+#standard .photo-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2D1F26, #3D2533);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#standard .initials {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: #D91E6E;
+}
+
+/* Info membre */
+#standard .member-info {
+  position: absolute;
+  left: 32px;
+  bottom: 85px;
+}
+#standard .member-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  margin-bottom: 7px;
+}
+#standard .member-profession {
+  font-size: 12px;
+  font-weight: 500;
+  color: #D91E6E;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#standard .member-location {
+  font-size: 11px;
+  color: rgba(255,255,255,0.68);
+  margin-top: 4px;
+}
+
+/* Barre du bas */
+#standard .card-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 52px;
+  background: rgba(0,0,0,0.3);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center;
+  padding: 0 32px;
+  justify-content: space-between;
+}
+#standard .member-number {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.12em;
+  font-family: monospace;
+}
+#standard .member-since {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Citation fondatrice */
+#standard .founder-quote {
+  position: absolute;
+  right: 26px;
+  bottom: 62px;
+  text-align: right;
+  max-width: 170px;
+}
+#standard .founder-quote .quote-mark {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: rgba(217,30,110,0.75);
+  line-height: 1;
+  display: block;
+  margin-bottom: -6px;
+}
+#standard .founder-quote .quote-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.55;
+  display: block;
+}
+#standard .founder-quote .quote-author {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #D91E6E;
+  text-transform: uppercase;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Chips QR placeholder */
+#standard .qr-placeholder {
+  width: 42px; height: 42px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+  padding: 5px;
+  position: absolute;
+  right: 32px;
+  bottom: 5px;
+}
+#standard .qr-dot {
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+}
+
+/* ═══════════════════════════════════════════════
+   CARD 2 — GOLD "Prestige"
+   Fond noir profond, reflets or, luxe discret
+═══════════════════════════════════════════════ */
+#gold {
+  background: linear-gradient(135deg, #0C0805 0%, #1A1005 55%, #0C0805 100%);
+}
+
+/* Bande or en haut */
+#gold .band-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #8B6914, #F0D78A 30%, #C9A84C 55%, #F0D78A 75%, #8B6914);
+}
+
+/* Rayons lumineux or */
+#gold .gold-rays {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% -30%, rgba(201,168,76,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(201,168,76,0.08) 0%, transparent 45%),
+    radial-gradient(ellipse at 0% 100%, rgba(201,168,76,0.05) 0%, transparent 30%);
+}
+
+/* Motif diagonal discret */
+#gold .diagonal-lines {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 24px,
+    rgba(201,168,76,0.025) 24px,
+    rgba(201,168,76,0.025) 25px
+  );
+}
+
+/* Ornement coin bas-gauche */
+#gold .ornament {
+  position: absolute;
+  bottom: 14px; left: 22px;
+  width: 60px; height: 60px;
+  opacity: 0.12;
+}
+#gold .ornament::before,
+#gold .ornament::after {
+  content: '';
+  position: absolute;
+  border: 1px solid #C9A84C;
+  border-radius: 50%;
+}
+#gold .ornament::before { inset: 0; }
+#gold .ornament::after { inset: 10px; }
+
+/* Logo zone */
+#gold .logo-zone {
+  position: absolute;
+  top: 28px; left: 30px;
+  display: flex; align-items: center; gap: 10px;
+}
+#gold .logo-mark {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: rgba(253,240,245,0.92);
+  display: flex; align-items: center; justify-content: center;
+}
+#gold .logo-mark img {
+  width: 28px; height: 28px; object-fit: contain;
+}
+#gold .logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #F0D78A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.04em;
+}
+
+/* Badge GOLD */
+#gold .badge {
+  position: absolute;
+  top: 28px; right: 28px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #F0D78A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border-image: linear-gradient(135deg, #F0D78A, #8B6914) 1;
+  border-radius: 20px;
+}
+#gold .badge-wrap {
+  position: absolute;
+  top: 28px; right: 28px;
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 20px;
+  padding: 5px 16px;
+}
+#gold .badge-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #F0D78A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Photo circulaire or */
+#gold .photo-zone {
+  position: absolute;
+  right: 46px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+#gold .photo-ring {
+  width: 132px; height: 132px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #F0D78A, #8B6914, #F0D78A);
+}
+#gold .photo-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1C1408, #2A1C0A);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#gold .initials {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #F0D78A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Info membre */
+#gold .member-info {
+  position: absolute;
+  left: 30px;
+  bottom: 78px;
+}
+#gold .member-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F5EDD5;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  margin-bottom: 7px;
+}
+#gold .member-profession {
+  font-size: 11px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #F0D78A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+#gold .member-location {
+  font-size: 11px;
+  color: rgba(255,255,255,0.62);
+  margin-top: 4px;
+}
+
+/* Puce or */
+#gold .chip {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: -35px;
+  width: 44px; height: 34px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #E8CE5A, #B8941C, #E8CE5A);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+#gold .chip-lines {
+  width: 30px; height: 22px;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+}
+
+/* Citation fondatrice Gold */
+#gold .founder-quote {
+  position: absolute;
+  right: 26px;
+  bottom: 58px;
+  text-align: right;
+  max-width: 175px;
+}
+#gold .founder-quote .quote-mark {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  line-height: 1;
+  display: block;
+  margin-bottom: -6px;
+  color: #C9A84C;
+}
+#gold .founder-quote .quote-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(240,215,138,0.85);
+  line-height: 1.55;
+  display: block;
+}
+#gold .founder-quote .quote-author {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #C9A84C;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Barre du bas */
+#gold .card-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: linear-gradient(90deg, rgba(201,168,76,0.08), transparent 60%);
+  border-top: 1px solid rgba(201,168,76,0.15);
+  display: flex; align-items: center;
+  padding: 0 30px;
+  justify-content: space-between;
+}
+#gold .member-number {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(201,168,76,0.9);
+  letter-spacing: 0.15em;
+  font-family: monospace;
+}
+#gold .member-since {
+  font-size: 10px;
+  color: rgba(201,168,76,0.65);
+}
+
+/* ═══════════════════════════════════════════════
+   CARD 3 — PREMIUM "Signature"
+   Fond sombre, explosion rose, luxe maximal
+═══════════════════════════════════════════════ */
+#premium {
+  background: linear-gradient(135deg, #0D0509 0%, #1F061A 60%, #0D0509 100%);
+}
+
+/* Bande rose gauche large */
+#premium .band-left {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 8px;
+  background: linear-gradient(180deg, #FF5BAD 0%, #D91E6E 50%, #9B0046 100%);
+  box-shadow: 0 0 20px rgba(217,30,110,0.4);
+}
+
+/* Lumière rose fond */
+#premium .bg-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(217,30,110,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 10%, rgba(217,30,110,0.08) 0%, transparent 35%),
+    radial-gradient(ellipse at 75% 95%, rgba(217,30,110,0.06) 0%, transparent 25%);
+}
+
+/* Étoiles / points lumineux */
+#premium .stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+#premium .star {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,91,173,0.5);
+  animation: twinkle 3s infinite;
+}
+#premium .star:nth-child(2) { width: 2px; height: 2px; animation-delay: 1s; }
+#premium .star:nth-child(3) { width: 4px; height: 4px; animation-delay: 2s; }
+#premium .star:nth-child(4) { width: 2px; height: 2px; animation-delay: 0.5s; }
+#premium .star:nth-child(5) { width: 3px; height: 3px; animation-delay: 1.5s; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Motif hexagonal subtil */
+#premium .hex-pattern {
+  position: absolute;
+  right: 0; top: 0;
+  width: 280px; height: 100%;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(circle at center, #D91E6E 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Trait horizontal déco */
+#premium .h-line {
+  position: absolute;
+  left: 26px; right: 40%;
+  top: 76px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(217,30,110,0.5), transparent);
+}
+
+/* Logo zone */
+#premium .logo-zone {
+  position: absolute;
+  top: 26px; left: 26px;
+  display: flex; align-items: center; gap: 10px;
+}
+#premium .logo-mark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: rgba(253,240,245,0.95);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px rgba(217,30,110,0.25);
+}
+#premium .logo-mark img {
+  width: 30px; height: 30px; object-fit: contain;
+}
+#premium .logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.04em;
+}
+
+/* Badge PREMIUM */
+#premium .badge-wrap {
+  position: absolute;
+  top: 26px; right: 26px;
+  background: linear-gradient(135deg, #D91E6E, #9B0046);
+  border-radius: 20px;
+  padding: 6px 16px;
+  box-shadow: 0 4px 14px rgba(217,30,110,0.35);
+}
+#premium .badge-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Diamant décoratif */
+#premium .diamond {
+  position: absolute;
+  font-size: 10px;
+  color: rgba(217,30,110,0.5);
+}
+
+/* Photo circulaire rose */
+#premium .photo-zone {
+  position: absolute;
+  right: 44px;
+  top: 50%;
+  transform: translateY(-52%);
+}
+#premium .photo-ring-outer {
+  width: 144px; height: 144px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #FF5BAD, #D91E6E, #9B0046);
+  box-shadow: 0 0 30px rgba(217,30,110,0.35), 0 0 60px rgba(217,30,110,0.15);
+}
+#premium .photo-ring-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #1F061A, #0D0509);
+}
+#premium .photo-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2D0A20, #1F061A);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#premium .initials {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #FF5BAD, #D91E6E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Info membre */
+#premium .member-info {
+  position: absolute;
+  left: 26px;
+  bottom: 76px;
+}
+#premium .member-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+#premium .member-profession {
+  font-size: 11px;
+  font-weight: 600;
+  color: #FF5BAD;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+#premium .member-location {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 4px;
+}
+
+/* Signature trait */
+#premium .signature-line {
+  position: absolute;
+  bottom: 52px; left: 26px; right: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(217,30,110,0.5), transparent);
+}
+
+/* Barre du bas */
+#premium .card-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50px;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(217,30,110,0.12);
+  display: flex; align-items: center;
+  padding: 0 26px;
+  justify-content: space-between;
+}
+#premium .member-number {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(217,30,110,0.85);
+  letter-spacing: 0.15em;
+  font-family: monospace;
+}
+#premium .member-since {
+  font-size: 10px;
+  color: rgba(255,255,255,0.58);
+}
+
+/* Citation fondatrice Premium */
+#premium .founder-quote {
+  position: absolute;
+  left: 26px;
+  top: 88px;
+  max-width: 215px;
+}
+#premium .founder-quote .quote-mark {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  color: #FF5BAD;
+  line-height: 1;
+  display: block;
+  margin-bottom: -8px;
+}
+#premium .founder-quote .quote-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.55;
+  display: block;
+}
+#premium .founder-quote .quote-author {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #FF5BAD;
+  text-transform: uppercase;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Sceau premium */
+#premium .seal {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(217,30,110,0.7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: rgba(217,30,110,0.85);
+}
+
+/* ═══════════════════════════════════════════════
+   INFO PANEL sous chaque carte
+═══════════════════════════════════════════════ */
+.card-desc {
+  margin-top: 24px;
+  display: flex; align-items: flex-start; gap: 20px;
+  max-width: 650px;
+}
+.card-desc-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.card-desc h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 4px;
+}
+.card-desc p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.6;
+}
+
+/* Separator */
+hr.divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin: 0 0 90px;
+  max-width: 1000px;
+  margin-left: auto; margin-right: auto;
+}
+
+/* Footer note */
+.page-footer {
+  text-align: center;
+  padding: 40px 0 0;
+  color: rgba(255,255,255,0.15);
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Femmes Sans Limites</h1>
+  <p>Propositions de design — Cartes membres</p>
+</header>
+
+<!-- ══════════════════════════════════
+     CARTE 1 — STANDARD
+══════════════════════════════════ -->
+<section class="card-section">
+  <h2 style="color:#B0B8C0;">◦ Standard &nbsp;·&nbsp; "Silhouette"</h2>
+
+  <div class="card-wrap" id="standard">
+    <div class="bg-pattern"></div>
+    <div class="band-left"></div>
+    <div class="deco-circle-1"></div>
+    <div class="deco-circle-2"></div>
+
+    <div class="logo-zone">
+      <div class="logo-mark">
+        <img src="/logo_FSL.png" alt="FSL">
+      </div>
+      <span class="logo-text">Femmes Sans Limites</span>
+    </div>
+
+    <div class="badge">Standard</div>
+
+    <div class="photo-zone">
+      <div class="photo-ring">
+        <div class="photo-inner">
+          <span class="initials">AM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-info">
+      <div class="member-name">Amina Mbaye</div>
+      <div class="member-profession">Cheffe d'entreprise</div>
+      <div class="member-location">Abidjan, Côte d'Ivoire</div>
+    </div>
+
+    <div class="founder-quote">
+      <span class="quote-mark">"</span>
+      <span class="quote-text">Tu es sans limites.<br>Et le monde a besoin de toi.</span>
+      <span class="quote-author">— La Fondatrice</span>
+    </div>
+
+    <div class="card-footer">
+      <span class="member-number">FSL-STD-2026-00142</span>
+      <span class="member-since">Membre depuis Jan. 2026</span>
+    </div>
+  </div>
+
+  <div class="card-desc">
+    <div class="card-desc-dot" style="background:#8B96A0;"></div>
+    <div>
+      <h3>Élégance minimaliste</h3>
+      <p>Fond sombre velouté, fine bande rose verticale signature FSL, cercles décoratifs en arrière-plan. Photo circulaire avec anneau translucide. Typographie Playfair Display pour le nom, accentuation rose pour la profession.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════
+     CARTE 2 — GOLD
+══════════════════════════════════ -->
+<section class="card-section">
+  <h2 style="color:#C9A84C;">◦ Gold &nbsp;·&nbsp; "Prestige"</h2>
+
+  <div class="card-wrap" id="gold">
+    <div class="band-top"></div>
+    <div class="gold-rays"></div>
+    <div class="diagonal-lines"></div>
+    <div class="ornament"></div>
+
+    <div class="logo-zone">
+      <div class="logo-mark">
+        <img src="/logo_FSL.png" alt="FSL">
+      </div>
+      <span class="logo-text">Femmes Sans Limites</span>
+    </div>
+
+    <div class="badge-wrap">
+      <span class="badge-text">Gold</span>
+    </div>
+
+    <div class="chip">
+      <div class="chip-lines"></div>
+    </div>
+
+    <div class="photo-zone">
+      <div class="photo-ring">
+        <div class="photo-inner">
+          <span class="initials">KD</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-info" style="bottom: 72px;">
+      <div class="member-name">Khadija Diallo</div>
+      <div class="member-profession">Directrice Marketing</div>
+      <div class="member-location">Dakar, Sénégal</div>
+    </div>
+
+    <div class="founder-quote">
+      <span class="quote-mark">"</span>
+      <span class="quote-text">L'excellence est un choix<br>que tu fais chaque jour.</span>
+      <span class="quote-author">— La Fondatrice</span>
+    </div>
+
+    <div class="card-footer">
+      <span class="member-number">FSL-GLD-2025-00087</span>
+      <span class="member-since">Membre depuis Nov. 2025</span>
+    </div>
+  </div>
+
+  <div class="card-desc">
+    <div class="card-desc-dot" style="background:#C9A84C;"></div>
+    <div>
+      <h3>Luxe discret et métallique</h3>
+      <p>Fond noir profond réchauffé par des reflets or, fine bande or en haut façon fil doré, motif en diagonale très subtil. Puce dorée à gauche (comme les vraies cartes bancaires). Anneau photo en dégradé or. Texte du nom en ivoire chaud, profession en or.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════
+     CARTE 3 — PREMIUM
+══════════════════════════════════ -->
+<section class="card-section">
+  <h2 style="color:#D91E6E;">◦ Premium &nbsp;·&nbsp; "Signature"</h2>
+
+  <div class="card-wrap" id="premium">
+    <div class="bg-glow"></div>
+    <div class="band-left"></div>
+    <div class="hex-pattern"></div>
+
+    <!-- Étoiles animées -->
+    <div class="stars">
+      <div class="star" style="top:18%;left:38%;"></div>
+      <div class="star" style="top:65%;left:22%;"></div>
+      <div class="star" style="top:30%;left:55%;"></div>
+      <div class="star" style="top:80%;left:42%;"></div>
+      <div class="star" style="top:12%;left:70%;"></div>
+    </div>
+
+    <div class="founder-quote">
+      <span class="quote-mark">"</span>
+      <span class="quote-text">Vous n'êtes pas seulement membre —<br>vous êtes pionnière.</span>
+      <span class="quote-author">— La Fondatrice</span>
+    </div>
+
+    <div class="h-line"></div>
+
+    <div class="logo-zone">
+      <div class="logo-mark">
+        <img src="/logo_FSL.png" alt="FSL">
+      </div>
+      <span class="logo-text">Femmes Sans Limites</span>
+    </div>
+
+    <div class="badge-wrap">
+      <span class="badge-text">✦ Premium</span>
+    </div>
+
+    <div class="photo-zone">
+      <div class="photo-ring-outer">
+        <div class="photo-ring-inner">
+          <div class="photo-inner">
+            <span class="initials">FN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-info">
+      <div class="member-name">Fatou N'Diaye</div>
+      <div class="member-profession">Fondatrice & CEO</div>
+      <div class="member-location">Paris, France</div>
+    </div>
+
+    <div class="signature-line"></div>
+
+    <div class="card-footer">
+      <span class="member-number">FSL-PRM-2024-00003</span>
+      <span class="seal">✦</span>
+      <span class="member-since">Membre depuis Mar. 2024</span>
+    </div>
+  </div>
+
+  <div class="card-desc">
+    <div class="card-desc-dot" style="background:#D91E6E;"></div>
+    <div>
+      <h3>Rose Signature — le must</h3>
+      <p>Fond noir profond avec vignette lie-de-vin, épaisse bande rose lumineuse à gauche avec effet de lueur (glow). Micro-points animés façon nuit étoilée, motif alvéolaire très discret à droite. Double anneau rose autour de la photo avec halo lumineux. Badge premium plein rose. Le statut le plus fort visuellement.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="page-footer">
+  FSL Back Office — Propositions de design cartes membres · 2026
+</footer>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
+use App\Models\Member;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -26,7 +27,32 @@ class CampaignMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'emails.campaign');
+        $member    = $this->recipient->member ?? Member::find($this->recipient->member_id);
+        $fullName  = $this->recipient->name ?? ($member?->name ?? '');
+        $firstName = mb_ucfirst(explode(' ', trim($fullName))[0]);
+
+        $vars = [
+            '{prenom}'        => $firstName,
+            '{nom}'           => $fullName,
+            '{numero}'        => $member?->member_number ?? '',
+            '{type}'          => $member ? ucfirst($member->type) : '',
+            '{ville}'         => $member?->city ?? '',
+            '{pays}'          => $member?->country ?? '',
+            '{profession}'    => $member?->profession ?? '',
+            // variantes avec crochets (format alternatif)
+            '[prenom]'        => $firstName,
+            '[nom]'           => $fullName,
+            '[numero]'        => $member?->member_number ?? '',
+            '[type]'          => $member ? ucfirst($member->type) : '',
+            '[ville]'         => $member?->city ?? '',
+        ];
+
+        $body = str_replace(array_keys($vars), array_values($vars), $this->campaign->body);
+
+        return new Content(
+            view: 'emails.campaign',
+            with: ['resolvedBody' => $body]
+        );
     }
 
     public function attachments(): array
