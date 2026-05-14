@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\Admin\CommunicationController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -33,6 +35,9 @@ Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->na
 // Newsletter
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Tracking pixel email
+Route::get('/t/{token}.gif', [TrackingController::class, 'pixel'])->name('track.pixel');
 
 // Pages légales
 Route::get('/mentions-legales', fn() => view('public.legal.mentions-legales'))->name('legal.mentions');
@@ -76,6 +81,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         $waitingList = $event->waitingList()->latest()->get();
         return view('admin.events.waiting-list', compact('event', 'waitingList'));
     })->name('events.waiting-list-admin');
+
+    // Communication / Campagnes
+    Route::resource('communication', CommunicationController::class)
+        ->except(['show'])
+        ->parameters(['communication' => 'campaign']);
+    Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
+    Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
 
     // Activity log
     Route::get('activity', function () {

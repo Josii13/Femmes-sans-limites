@@ -62,6 +62,18 @@
             </a>
 
             <div class="pt-5 pb-1.5 px-3">
+                <p class="text-[10px] font-bold uppercase tracking-[0.13em]" style="color:rgba(255,255,255,0.25);">Communication</p>
+            </div>
+            <a href="{{ route('admin.communication.index') }}" class="admin-nav-link {{ request()->routeIs('admin.communication.*') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Campagnes
+            </a>
+            <a href="{{ route('admin.communication.create') }}" class="admin-nav-link {{ request()->routeIs('admin.communication.create') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v16m8-8H4"/></svg>
+                Nouvelle campagne
+            </a>
+
+            <div class="pt-5 pb-1.5 px-3">
                 <p class="text-[10px] font-bold uppercase tracking-[0.13em]" style="color:rgba(255,255,255,0.25);">Outils</p>
             </div>
             <a href="{{ route('admin.events.index') }}#scanner" class="admin-nav-link {{ request()->routeIs('admin.scanner*') ? 'active' : '' }}">

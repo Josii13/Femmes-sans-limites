@@ -48,7 +48,7 @@
                 {{-- Badge fondation --}}
                 <div class="float-badge absolute bg-white rounded-2xl px-4 py-3 shadow-xl" style="top:16px;left:0;z-index:3;border:1px solid var(--border);">
                     <p class="text-xs font-bold uppercase tracking-widest" style="color:var(--rose);">Fondée en 2020</p>
-                    <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">5 ans d'impact</p>
+                    <!-- <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">5 ans d'impact</p> -->
                 </div>
             </div>
         </div>
@@ -72,9 +72,6 @@
         <div class="fade-right">
             <div class="space-y-0">
                 @foreach([
-                    ['2020','Fondation de FSL','Premier cercle de 12 femmes entrepreneurs à Abidjan. Le mouvement prend naissance.'],
-                    ['2021','Premier Forum','Organisation du premier Forum des Femmes Leadères avec 150 participantes. Succès immédiat.'],
-                    ['2022','Expansion régionale','Ouverture de communautés au Sénégal, Mali et Burkina Faso. 200+ membres actives.'],
                     ['2023','Lancement digital','Plateforme en ligne, mentorat à distance et événements hybrides. La diaspora rejoint le mouvement.'],
                     ['2024','Programme Gold & Premium','Création des niveaux d\'adhésion avancés avec accompagnement personnalisé.'],
                     ['2025','Aujourd\'hui','500+ femmes, 15+ pays, 50+ événements. Le mouvement continue de grandir.'],
@@ -188,14 +185,14 @@
                     Elle a accompagné plus de 1 000 femmes à travers ses programmes, conférences et coachings individuels, et continue à porter haut la vision d'un monde où les femmes africaines prennent toute leur place.
                 </p>
                 {{-- Métriques --}}
-                <div class="grid grid-cols-3 gap-5 pt-6" style="border-top:1px solid var(--border);">
+                <!-- <div class="grid grid-cols-3 gap-5 pt-6" style="border-top:1px solid var(--border);">
                     @foreach([['15','ans','d\'expérience'],['1000','+','femmes coachées'],['30','+','pays visités']] as [$target,$suffix,$l])
                     <div>
                         <p class="text-2xl font-bold counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
                         <p class="text-xs mt-1" style="color:var(--gray);">{{ $l }}</p>
                     </div>
                     @endforeach
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
