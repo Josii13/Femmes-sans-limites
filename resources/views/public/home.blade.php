@@ -32,8 +32,11 @@
                     intérieure.
                 </h1>
 
+                <p class="text-base font-semibold italic mb-3 fade-up" style="color:var(--rose);max-width:460px;">
+                    Brise les barrières invisibles. Révèle pleinement ton potentiel.
+                </p>
                 <p class="text-lg leading-relaxed mb-10 fade-up" style="color:var(--gray);max-width:460px;">
-                    FSL connecte, forme et inspire les femmes d'Afrique et de la diaspora. Chaque femme porte en elle une puissance infinie — ensemble, on la révèle.
+                    Femme Sans Limites est une communauté de transformation qui accompagne les femmes afin de les aider à dépasser leurs limites intérieures et devenir la meilleure version d'elles-mêmes.
                 </p>
 
                 <div class="flex flex-wrap gap-4 mb-14 fade-up">
@@ -65,7 +68,7 @@
 
                 {{-- Photo principale avec parallax --}}
                 <div class="absolute rounded-3xl overflow-hidden shadow-2xl img-reveal" style="top:0;right:0;left:55px;bottom:95px;z-index:1;">
-                    <img src="{{ asset('images/photo_01_1.png') }}" alt="Membre FSL en pleine conférence" class="w-full h-full object-cover object-top" data-parallax="0.08">
+                    <img src="{{ site_img('home_hero_main') }}" alt="Membre FSL en pleine conférence" class="w-full h-full object-cover object-top" data-parallax="0.08">
                     <div class="absolute inset-x-0 bottom-0 h-2/5" style="background:linear-gradient(to top,rgba(15,10,12,0.55),transparent);"></div>
                     <div class="absolute bottom-5 left-5">
                         <p class="text-xs font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(255,255,255,0.65);">Membre FSL</p>
@@ -75,7 +78,7 @@
 
                 {{-- Photo secondaire --}}
                 <div class="absolute rounded-2xl overflow-hidden shadow-xl img-reveal" style="bottom:0;left:0;width:44%;height:48%;z-index:2;border:4px solid white;" data-delay="200">
-                    <img src="{{ asset('images/photo_03_3.png') }}" alt="Membre FSL — leader et entrepreneur" class="w-full h-full object-cover object-top">
+                    <img src="{{ site_img('home_hero_secondary') }}" alt="Membre FSL — leader et entrepreneur" class="w-full h-full object-cover object-top">
                 </div>
 
                 {{-- Badge membres flottant --}}
@@ -130,7 +133,7 @@
             {{-- Photo groupe --}}
             <div class="relative fade-left order-1">
                 <div class="rounded-3xl overflow-hidden shadow-xl img-reveal" style="aspect-ratio:4/3;">
-                    <img src="{{ asset('images/photo_02_2.png') }}" alt="Femmes de la communauté FSL réunies" loading="lazy" class="w-full h-full object-cover">
+                    <img src="{{ site_img('home_adn_group') }}" alt="Femmes de la communauté FSL réunies" loading="lazy" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(217,30,110,0.12),transparent 60%);"></div>
                 </div>
                 <div class="float-badge2 absolute -bottom-5 -right-4 lg:-right-6 bg-white rounded-2xl px-5 py-4 shadow-xl" style="border:1px solid var(--border);z-index:2;">
@@ -147,8 +150,11 @@
                     Plus qu'une communauté.<br>
                     <em style="color:var(--rose);">Un mouvement.</em>
                 </h2>
+                <p class="text-base font-semibold mb-3" style="color:var(--dark);">
+                    Plus qu'une communauté, nous sommes une famille.
+                </p>
                 <p class="text-base leading-relaxed mb-6" style="color:var(--gray);">
-                    Depuis 2020, FSL rassemble des femmes ambitieuses décidées à transformer leur vie et leur milieu. Pas de compétition toxique — juste de la solidarité, de l'exigence et de la joie partagée.
+                    Aujourd'hui, trouver un espace bienveillant où des femmes avancent ensemble, sans jalousie ni compétition malsaine, est devenu rare. Avec Femme Sans Limites, chaque femme a l'opportunité de grandir, apprendre, se reconstruire et se challenger aux côtés d'autres femmes dans un environnement sain, inspirant et motivant. Ici, nous croyons qu'une femme élevée peut élever une autre.
                 </p>
                 <ul class="space-y-3 mb-10">
                     @foreach(['Événements et forums exclusifs','Mentorat et coaching personnalisé','Réseau de 500+ femmes leaders','Formations pratiques et actionables'] as $item)
@@ -178,10 +184,10 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-stagger="150">
             @foreach([
-                ['Éducation','Masterclasses, ateliers et formations conçus par des experts pour ton développement réel.','var(--rose-pale)','var(--rose)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'],
-                ['Networking','Connecte-toi avec des femmes leaders, entrepreneurs et professionnelles dans 15+ pays.','var(--gold-pale)','var(--gold)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>'],
-                ['Mentorat','Un accompagnement individuel ou collectif par des coaches certifiées et expérimentées.','var(--rose-pale)','var(--rose)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>'],
-                ['Impact','Agis concrètement dans ton milieu et laisse une trace durable à travers notre réseau.','var(--gold-pale)','var(--gold)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>'],
+                ['Développement personnel','Construire des femmes fortes, conscientes et mentalement solides.','var(--rose-pale)','var(--rose)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>'],
+                ['Formation & Compétences','Donner des outils concrets pour évoluer professionnellement.','var(--gold-pale)','var(--gold)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>'],
+                ['Leadership & Indépendance','Former des femmes influentes, capables de diriger et créer leur liberté.','var(--rose-pale)','var(--rose)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>'],
+                ['Bien-être & Selfcare','Aider les femmes à prendre soin d\'elles-mêmes afin de préserver leur équilibre, leur paix intérieure et leur épanouissement personnel.','var(--gold-pale)','var(--gold)','<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>'],
             ] as [$title,$desc,$bg,$color,$icon])
             <div class="card-pillar fade-up">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background:{{ $bg }};">
@@ -204,15 +210,15 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-stagger="120">
             @foreach([
-                ['photo_03_3.png','Khadija Mbaye','Entrepreneur · Dakar','FSL a transformé ma façon de voir les affaires. J\'ai rencontré mes deux associées actuelles lors du Forum 2023. Ce réseau est une vraie chance — des femmes qui se soutiennent vraiment, sans jalousie.'],
-                ['photo_01_2.png','Dr. Aminata Sow','Médecin · Abidjan','J\'hésitais à me lancer en parallèle à ma carrière médicale. Le mentorat FSL m\'a donné les outils et la confiance. Aujourd\'hui mon cabinet attire 3× plus de patientes grâce à ma visibilité.'],
-                ['photo_03_4.png','Bintou Diarra','Cadre finance · Paris','Être dans la diaspora et rester connectée à l\'Afrique, c\'est possible avec FSL. J\'ai trouvé une communauté qui me comprend et m\'inspire à rester ambitieuse, peu importe où je vis.'],
-            ] as [$photo,$name,$role,$quote])
+                ['home_temoignage_1','Khadija Mbaye','Entrepreneur · Dakar','FSL a transformé ma façon de voir les affaires. J\'ai rencontré mes deux associées actuelles lors du Forum 2023. Ce réseau est une vraie chance — des femmes qui se soutiennent vraiment, sans jalousie.'],
+                ['home_temoignage_2','Dr. Aminata Sow','Médecin · Abidjan','J\'hésitais à me lancer en parallèle à ma carrière médicale. Le mentorat FSL m\'a donné les outils et la confiance. Aujourd\'hui mon cabinet attire 3× plus de patientes grâce à ma visibilité.'],
+                ['home_temoignage_3','Bintou Diarra','Cadre finance · Paris','Être dans la diaspora et rester connectée à l\'Afrique, c\'est possible avec FSL. J\'ai trouvé une communauté qui me comprend et m\'inspire à rester ambitieuse, peu importe où je vis.'],
+            ] as [$photoKey,$name,$role,$quote])
             <div class="rounded-2xl p-7 flex flex-col fade-up" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
                 <svg class="w-8 h-8 mb-5 flex-shrink-0" style="color:var(--rose);" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
                 <p class="text-sm leading-relaxed flex-1 mb-6" style="color:rgba(255,255,255,0.7);">{{ $quote }}</p>
                 <div class="flex items-center gap-3 pt-5" style="border-top:1px solid rgba(255,255,255,0.1);">
-                    <img src="{{ asset('images/'.$photo) }}" alt="{{ $name }}" loading="lazy" class="w-11 h-11 rounded-full object-cover object-top flex-shrink-0">
+                    <img src="{{ site_img($photoKey) }}" alt="{{ $name }}" loading="lazy" class="w-11 h-11 rounded-full object-cover object-top flex-shrink-0">
                     <div>
                         <p class="text-sm font-bold text-white">{{ $name }}</p>
                         <p class="text-xs" style="color:rgba(255,255,255,0.4);">{{ $role }}</p>
@@ -303,16 +309,16 @@
 {{-- ══════════════════ CTA FINAL PHOTO ══════════════════ --}}
 <section class="relative overflow-hidden" style="min-height:500px;">
     <div class="absolute inset-0">
-        <img src="{{ asset('images/photo_02_2.png') }}" alt="Femmes FSL lors d'un événement communautaire" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="{{ site_img('home_cta_bg') }}" alt="Femmes FSL lors d'un événement communautaire" loading="lazy" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(15,10,12,0.85),rgba(217,30,110,0.45));"></div>
     </div>
     <div class="relative max-w-3xl mx-auto px-5 text-center py-28 fade-up">
-        <span class="text-xs font-bold uppercase tracking-widest" style="color:rgba(255,255,255,0.55);">Rejoins le mouvement</span>
+        <span class="text-xs font-bold uppercase tracking-widest" style="color:rgba(255,255,255,0.55);">Tu brises les barrières</span>
         <h2 class="text-4xl lg:text-5xl font-bold mt-4 mb-6 text-white leading-tight" style="font-family:'Playfair Display',serif;">
             Prête à briser tes limites ?
         </h2>
         <p class="text-lg mb-10 mx-auto" style="color:rgba(255,255,255,0.75);max-width:480px;">
-            500+ femmes t'attendent. Commence dès aujourd'hui à vivre ta version la plus grande.
+            Les femmes t'attendent, rejoins nous maintenant !
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button @click="$store.modal.join = true" class="btn-rose text-base px-12 py-4">

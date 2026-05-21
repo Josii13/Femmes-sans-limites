@@ -16,6 +16,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Admin\CommunicationController;
 use App\Http\Controllers\Admin\CampaignTemplateController;
+use App\Http\Controllers\Admin\SiteImageController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -102,6 +103,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
     Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
     Route::get('communication/{campaign}/preview', [CommunicationController::class, 'preview'])->name('communication.preview');
+
+    // Site images
+    Route::get('site-images', [SiteImageController::class, 'index'])->name('site-images.index');
+    Route::put('site-images/{siteImage}', [SiteImageController::class, 'update'])->name('site-images.update');
+    Route::delete('site-images/{siteImage}/reset', [SiteImageController::class, 'reset'])->name('site-images.reset');
 
     // Activity log
     Route::get('activity', function () {
