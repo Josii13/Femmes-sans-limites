@@ -125,18 +125,24 @@ class MemberController extends Controller
         $member->refresh();
 
         $sendMail = $member->status === 'active' && ($typeChanged || $becomingActive);
+        $mailSent = false;
         if ($sendMail) {
-            if (!$member->card_path) {
+            if (!$member->card_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($member->card_path)) {
                 $cardPath = $this->cardService->generate($member);
                 $member->update(['card_path' => $cardPath]);
                 $member->refresh();
             }
-            \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+            try {
+                \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+                $mailSent = true;
+            } catch (\Throwable $e) {
+                \Log::error('MemberCardMail on update failed for ' . $member->email . ': ' . $e->getMessage());
+            }
         }
 
-        $message = $sendMail
+        $message = $sendMail && $mailSent
             ? 'Membre mis à jour. Sa nouvelle carte lui a été envoyée par email.'
-            : 'Membre mis à jour.';
+            : ($sendMail ? 'Membre mis à jour. (Attention : l\'envoi de l\'email a échoué.)' : 'Membre mis à jour.');
 
         return redirect()->route('admin.members.show', $member)->with('success', $message);
     }
@@ -175,11 +181,21 @@ class MemberController extends Controller
             $member->refresh();
         }
 
-        \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+        $mailSent = false;
+        try {
+            \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            \Log::error('MemberCardMail failed for ' . $member->email . ': ' . $e->getMessage());
+        }
 
         \App\Models\ActivityLog::record('member.activated', $member);
 
-        return back()->with('success', $member->name . ' est maintenant active. Sa carte lui a été envoyée par email.');
+        $msg = $mailSent
+            ? $member->name . ' est maintenant active. Sa carte lui a été envoyée par email.'
+            : $member->name . ' est maintenant active. (Attention : l\'envoi de l\'email a échoué — vérifiez la config mail.)';
+
+        return back()->with($mailSent ? 'success' : 'error', $msg);
     }
 
     public function regenerateCard(Member $member)
@@ -192,12 +208,18 @@ class MemberController extends Controller
 
     public function sendCard(Member $member)
     {
-        if (!$member->card_path) {
+        if (!$member->card_path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($member->card_path)) {
             $cardPath = $this->cardService->generate($member);
             $member->update(['card_path' => $cardPath]);
+            $member->refresh();
         }
 
-        \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+        try {
+            \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+        } catch (\Throwable $e) {
+            \Log::error('MemberCardMail failed for ' . $member->email . ': ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Carte envoyée à ' . $member->email);
     }
@@ -213,6 +235,7 @@ class MemberController extends Controller
         $members = Member::whereIn('id', $request->ids)->get();
 
         if ($request->action === 'activate') {
+            $mailErrors = 0;
             foreach ($members as $member) {
                 if ($member->status !== 'active') {
                     $member->update(['status' => 'active']);
@@ -221,10 +244,18 @@ class MemberController extends Controller
                         $member->update(['card_path' => $cardPath]);
                         $member->refresh();
                     }
-                    \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+                    try {
+                        \Mail::to($member->email)->send(new \App\Mail\MemberCardMail($member));
+                    } catch (\Throwable $e) {
+                        $mailErrors++;
+                        \Log::error('BulkActivate MemberCardMail failed for ' . $member->email . ': ' . $e->getMessage());
+                    }
                 }
             }
-            return back()->with('success', $members->count() . ' membre(s) activé(s). Cartes envoyées par email.');
+            $msg = $members->count() . ' membre(s) activé(s).';
+            if ($mailErrors === 0) $msg .= ' Cartes envoyées par email.';
+            else $msg .= ' (' . $mailErrors . ' email(s) en échec — vérifiez la config mail.)';
+            return back()->with($mailErrors > 0 ? 'error' : 'success', $msg);
         }
 
         if ($request->action === 'delete') {

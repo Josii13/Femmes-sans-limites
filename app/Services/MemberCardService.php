@@ -343,7 +343,7 @@ class MemberCardService
         // "Femmes Sans Limites" text
         $f = $this->serifFont() ?: $this->sansFont();
         if ($f) {
-            $this->text($img, 'Femmes Sans Limites', $ox + $boxSz + 12, $oy + 30, 13, $f, $d['logo_text_c']);
+            $this->text($img, 'Femme Sans Limites', $ox + $boxSz + 12, $oy + 30, 13, $f, $d['logo_text_c']);
         }
     }
 

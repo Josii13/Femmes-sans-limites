@@ -18,7 +18,7 @@ class MemberCardMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Votre carte de membre — Femmes Sans Limites');
+        return new Envelope(subject: 'Votre carte de membre — Femme Sans Limites');
     }
 
     public function content(): Content
@@ -28,7 +28,12 @@ class MemberCardMail extends Mailable
 
     public function attachments(): array
     {
+        if (!$this->member->card_path) return [];
+
         $path = \Illuminate\Support\Facades\Storage::disk('public')->path($this->member->card_path);
+
+        if (!file_exists($path)) return [];
+
         return [
             Attachment::fromPath($path)->as('carte-membre-fsl.png')->withMime('image/png'),
         ];
