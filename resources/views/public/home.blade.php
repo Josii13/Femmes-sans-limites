@@ -220,7 +220,7 @@
 </section>
 
 {{-- ══════════════════ TÉMOIGNAGES ══════════════════ --}}
-<section class="py-20 lg:py-28" style="background:var(--dark);">
+{{-- <section class="py-20 lg:py-28" style="background:var(--dark);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
         <div class="text-center mb-14 fade-up">
             <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--gold);">Ce qu'elles disent</span>
@@ -246,7 +246,7 @@
             @endforeach
         </div>
     </div>
-</section>
+</section> --}}
 
 {{-- ══════════════════ ÉVÉNEMENTS ══════════════════ --}}
 @if(isset($events) && $events->isNotEmpty())
