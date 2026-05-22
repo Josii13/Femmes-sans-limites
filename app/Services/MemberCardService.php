@@ -113,55 +113,75 @@ class MemberCardService
     private function findFont(array $paths): string
     {
         foreach ($paths as $p) {
-            if (file_exists($p)) return $p;
+            if ($p && file_exists($p)) return $p;
         }
         return '';
+    }
+
+    private function bundledFont(string $name): string
+    {
+        return resource_path('fonts/' . $name);
     }
 
     private function sansFont(): string
     {
         return $this->findFont([
+            $this->bundledFont('sans-regular.ttf'),
             'C:\Windows\Fonts\segoeui.ttf',
             'C:\Windows\Fonts\calibri.ttf',
             'C:\Windows\Fonts\arial.ttf',
             '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+            '/usr/share/fonts/dejavu/DejaVuSans.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
         ]);
     }
 
     private function boldFont(): string
     {
         return $this->findFont([
+            $this->bundledFont('sans-bold.ttf'),
             'C:\Windows\Fonts\segoeuib.ttf',
             'C:\Windows\Fonts\calibrib.ttf',
             'C:\Windows\Fonts\arialbd.ttf',
             '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf',
         ]);
     }
 
     private function serifFont(): string
     {
         return $this->findFont([
+            $this->bundledFont('serif-regular.ttf'),
             'C:\Windows\Fonts\georgia.ttf',
             'C:\Windows\Fonts\times.ttf',
             '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf',
+            '/usr/share/fonts/dejavu/DejaVuSerif.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf',
         ]);
     }
 
     private function serifBoldFont(): string
     {
         return $this->findFont([
+            $this->bundledFont('serif-bold.ttf'),
             'C:\Windows\Fonts\georgiab.ttf',
             'C:\Windows\Fonts\timesbd.ttf',
             '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf',
+            '/usr/share/fonts/dejavu/DejaVuSerif-Bold.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf',
         ]);
     }
 
     private function serifItalicFont(): string
     {
         return $this->findFont([
+            $this->bundledFont('serif-italic.ttf'),
             'C:\Windows\Fonts\georgiai.ttf',
             'C:\Windows\Fonts\timesi.ttf',
             '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf',
+            '/usr/share/fonts/dejavu/DejaVuSerif-Italic.ttf',
+            '/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf',
         ]);
     }
 
