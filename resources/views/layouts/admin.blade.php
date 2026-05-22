@@ -239,7 +239,7 @@
 
         {{-- Footer --}}
         <footer class="px-4 sm:px-6 lg:px-8 py-4 text-xs" style="color:#B0A8B5;border-top:1px solid #EEEBF0;">
-            © {{ date('Y') }} Femmes Sans Limites — Back Office v1.0
+            © {{ date('Y') }} Femme Sans Limites — Back Office v1.0
         </footer>
     </div>
 </div>

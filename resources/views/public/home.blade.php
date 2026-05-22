@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Femmes Sans Limites — Plateforme d\'empowerment féminin')
+@section('title', 'Femme Sans Limites — Plateforme d\'empowerment féminin')
 @section('description', 'FSL connecte, forme et inspire les femmes d\'Afrique et de la diaspora pour révéler leur pleine puissance.')
 @section('og_type', 'website')
 
@@ -8,7 +8,7 @@
 {
   "@@context": "https://schema.org",
   "@@type": "WebSite",
-  "name": "Femmes Sans Limites",
+  "name": "Femme Sans Limites",
   "url": "{{ config('app.url') }}",
   "description": "FSL connecte, forme et inspire les femmes d'Afrique et de la diaspora pour révéler leur pleine puissance.",
   "potentialAction": {
@@ -249,8 +249,7 @@
 </section> --}}
 
 {{-- ══════════════════ ÉVÉNEMENTS ══════════════════ --}}
-@if(isset($events) && $events->isNotEmpty())
-<section class="py-20 lg:py-28" style="background:var(--warm);">
+{{-- <section class="py-20 lg:py-28" style="background:var(--warm);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 fade-up">
             <div>
@@ -293,8 +292,7 @@
             @endforeach
         </div>
     </div>
-</section>
-@endif
+</section> --}}
 
 {{-- ══════════════════ COMMENT ÇA MARCHE ══════════════════ --}}
 <section class="py-20 lg:py-28 bg-white">

@@ -29,7 +29,7 @@
     <span class="badge">Action requise</span>
   </div>
   <div class="content">
-    <p>Une nouvelle personne souhaite rejoindre la communauté <strong>Femmes Sans Limites</strong>. Voici ses informations :</p>
+    <p>Une nouvelle personne souhaite rejoindre la communauté <strong>Femme Sans Limites</strong>. Voici ses informations :</p>
     <div class="info-card">
       <div class="info-row">
         <span class="info-label">Nom</span>
@@ -62,7 +62,7 @@
     </div>
   </div>
   <div class="footer">
-    <p>Femmes Sans Limites &mdash; Administration</p>
+    <p>Femme Sans Limites &mdash; Administration</p>
   </div>
 </div>
 </body>

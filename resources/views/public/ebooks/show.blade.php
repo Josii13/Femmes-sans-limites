@@ -14,7 +14,7 @@
   "url": "{{ url()->current() }}",
   "publisher": {
     "@type": "Organization",
-    "name": "Femmes Sans Limites",
+    "name": "Femme Sans Limites",
     "url": "{{ config('app.url') }}"
   }
   @if($ebook->cover)

@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Ebooks — Femmes Sans Limites')
+@section('title', 'Ebooks — Femme Sans Limites')
 @section('description', 'Découvrez les ebooks FSL : leadership, finance, entrepreneuriat, bien-être. Des ressources pensées pour les femmes ambitieuses d\'Afrique et de la diaspora.')
 @section('og_type', 'website')
 
@@ -52,7 +52,7 @@
             <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background:var(--rose-pale);">
                 <svg class="w-9 h-9" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             </div>
-            <h3 class="text-2xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Bientôt disponible</h3>
+            <h3 class="text-2xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Voir tout</h3>
             <p class="text-base mb-8" style="color:var(--gray);">Nos ebooks arrivent prochainement. Rejoins la communauté pour être notifiée en avant-première !</p>
             <button @click="$store.modal.join = true" class="btn-rose">Rejoindre FSL</button>
         </div>

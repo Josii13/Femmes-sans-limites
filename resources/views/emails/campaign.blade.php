@@ -30,11 +30,11 @@
         <tr>
             <td style="background-color:#1A0A10;padding:28px 40px;text-align:center;">
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo_FSL.png'))) }}"
-                     alt="Femmes Sans Limites"
+                     alt="Femme Sans Limites"
                      width="52" height="52"
                      style="display:inline-block;width:52px;height:52px;border-radius:12px;background-color:rgba(253,240,245,0.92);">
                 <p style="margin:12px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#D91E6E;letter-spacing:0.02em;">
-                    Femmes Sans Limites
+                    Femme Sans Limites
                 </p>
             </td>
         </tr>
@@ -97,10 +97,10 @@
         <tr>
             <td style="background-color:#F9F8FB;padding:28px 40px;text-align:center;">
                 <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#9CA3AF;line-height:1.6;">
-                    Tu reçois cet email car tu fais partie de la communauté <strong style="color:#6B7280;">Femmes Sans Limites</strong>.
+                    Tu reçois cet email car tu fais partie de la communauté <strong style="color:#6B7280;">Femme Sans Limites</strong>.
                 </p>
                 <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#C4BEC8;">
-                    © {{ date('Y') }} Femmes Sans Limites — Abidjan, Côte d'Ivoire
+                    © {{ date('Y') }} Femme Sans Limites — Abidjan, Côte d'Ivoire
                 </p>
             </td>
         </tr>

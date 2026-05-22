@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Mentions légales — Femmes Sans Limites')
+@section('title', 'Mentions légales — Femme Sans Limites')
 
 @section('content')
 
@@ -40,7 +40,7 @@
             <div id="ml1">
                 <h2 class="text-xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">1. Éditeur du site</h2>
                 <div class="space-y-2 text-sm leading-relaxed" style="color:var(--gray);">
-                    <p><strong style="color:var(--dark);">Dénomination :</strong> Femmes Sans Limites (FSL)</p>
+                    <p><strong style="color:var(--dark);">Dénomination :</strong> Femme Sans Limites (FSL)</p>
                     <p><strong style="color:var(--dark);">Forme juridique :</strong> Association</p>
                     <p><strong style="color:var(--dark);">Adresse :</strong> Abidjan, Côte d'Ivoire</p>
                     <p><strong style="color:var(--dark);">Email :</strong> contact@femmessanslimites.com</p>
@@ -58,7 +58,7 @@
             <div id="ml3" style="border-top:1px solid var(--border);padding-top:2rem;">
                 <h2 class="text-xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">3. Propriété intellectuelle</h2>
                 <div class="space-y-3 text-sm leading-relaxed" style="color:var(--gray);">
-                    <p>L'ensemble du contenu de ce site (textes, images, logos, ebooks, vidéos) est la propriété exclusive de Femmes Sans Limites ou de ses partenaires, et est protégé par les lois relatives à la propriété intellectuelle.</p>
+                    <p>L'ensemble du contenu de ce site (textes, images, logos, ebooks, vidéos) est la propriété exclusive de Femme Sans Limites ou de ses partenaires, et est protégé par les lois relatives à la propriété intellectuelle.</p>
                     <p>Toute reproduction, distribution, modification ou utilisation de ces contenus sans autorisation écrite préalable est strictement interdite.</p>
                 </div>
             </div>
@@ -66,7 +66,7 @@
             <div id="ml4" style="border-top:1px solid var(--border);padding-top:2rem;">
                 <h2 class="text-xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">4. Données personnelles</h2>
                 <div class="space-y-3 text-sm leading-relaxed" style="color:var(--gray);">
-                    <p>Femmes Sans Limites collecte et traite des données personnelles (nom, email, profession, ville, pays) dans le cadre des adhésions et inscriptions aux événements.</p>
+                    <p>Femme Sans Limites collecte et traite des données personnelles (nom, email, profession, ville, pays) dans le cadre des adhésions et inscriptions aux événements.</p>
                     <p>Ces données sont collectées avec le consentement des utilisateurs et ne sont jamais cédées à des tiers sans autorisation explicite.</p>
                     <p>Conformément à la réglementation en vigueur, vous disposez d'un droit d'accès, de rectification et de suppression de vos données en contactant : <strong style="color:var(--dark);">contact@femmessanslimites.com</strong></p>
                 </div>
@@ -82,7 +82,7 @@
             <div id="ml6" style="border-top:1px solid var(--border);padding-top:2rem;">
                 <h2 class="text-xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">6. Limitation de responsabilité</h2>
                 <div class="space-y-3 text-sm leading-relaxed" style="color:var(--gray);">
-                    <p>Femmes Sans Limites s'efforce de maintenir les informations de ce site à jour et exactes. Cependant, elle ne saurait être tenue responsable des erreurs ou omissions, ni des dommages résultant de l'utilisation des informations contenues sur ce site.</p>
+                    <p>Femme Sans Limites s'efforce de maintenir les informations de ce site à jour et exactes. Cependant, elle ne saurait être tenue responsable des erreurs ou omissions, ni des dommages résultant de l'utilisation des informations contenues sur ce site.</p>
                     <p>Les liens vers des sites tiers (notamment Charriow pour les ebooks) sont fournis à titre informatif. FSL n'est pas responsable du contenu de ces sites externes.</p>
                 </div>
             </div>

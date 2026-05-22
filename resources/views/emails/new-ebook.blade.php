@@ -7,7 +7,7 @@
 
 Bonjour {{ $subscriber->name ?? 'chère membre' }},
 
-Un nouvel ebook vient d'être ajouté à la bibliothèque **Femmes Sans Limites** !
+Un nouvel ebook vient d'être ajouté à la bibliothèque **Femme Sans Limites** !
 
 ---
 
@@ -33,5 +33,5 @@ Découvrir cet ebook →
 *[Se désabonner]({{ route('newsletter.unsubscribe', $subscriber->token) }})*
 
 Avec amour,
-**L'équipe Femmes Sans Limites**
+**L'équipe Femme Sans Limites**
 </x-mail::message>

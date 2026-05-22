@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="x-apple-disable-message-reformatting">
-<title>Votre carte de membre — Femmes Sans Limites</title>
+<title>Votre carte de membre — Femme Sans Limites</title>
 </head>
 <body style="margin:0;padding:0;background-color:#F4F3F6;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 
@@ -29,7 +29,7 @@
                      alt="FSL" width="52" height="52"
                      style="display:inline-block;width:52px;height:52px;border-radius:12px;background-color:rgba(253,240,245,0.92);">
                 <p style="margin:12px 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#D91E6E;">
-                    Femmes Sans Limites
+                    Femme Sans Limites
                 </p>
                 <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:rgba(255,255,255,0.55);">
                     Votre carte de membre officielle
@@ -46,7 +46,7 @@
                 </p>
 
                 <p style="margin:0 0 28px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;color:#6B7280;line-height:1.75;">
-                    Bienvenue dans la communauté <strong style="color:#1A0A10;">Femmes Sans Limites</strong> !<br>
+                    Bienvenue dans la communauté <strong style="color:#1A0A10;">Femme Sans Limites</strong> !<br>
                     Votre <strong style="color:#D91E6E;">carte de membre officielle</strong> est en pièce jointe.
                     Présentez-la lors de nos événements pour bénéficier de tous vos avantages.
                 </p>
@@ -104,7 +104,7 @@
         <tr>
             <td style="background-color:#F9F8FB;padding:24px 40px;border-top:1px solid #EEEBF0;text-align:center;">
                 <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#C4BEC8;">
-                    © {{ date('Y') }} Femmes Sans Limites — Tous droits réservés
+                    © {{ date('Y') }} Femme Sans Limites — Tous droits réservés
                 </p>
             </td>
         </tr>

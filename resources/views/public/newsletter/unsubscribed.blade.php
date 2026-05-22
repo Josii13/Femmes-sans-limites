@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Désabonnement — Femmes Sans Limites')
+@section('title', 'Désabonnement — Femme Sans Limites')
 
 @section('content')
 <section class="min-h-[60vh] flex items-center justify-center py-24 bg-white">

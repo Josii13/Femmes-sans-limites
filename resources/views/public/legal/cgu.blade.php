@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Conditions Générales d\'Utilisation — Femmes Sans Limites')
+@section('title', 'Conditions Générales d\'Utilisation — Femme Sans Limites')
 
 @section('content')
 
@@ -42,7 +42,7 @@
             <div id="art1">
                 <h2 class="text-xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">Article 1 — Objet</h2>
                 <div class="space-y-3 text-sm leading-relaxed" style="color:var(--gray);">
-                    <p>Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») régissent l'accès et l'utilisation du site internet de l'association <strong style="color:var(--dark);">Femmes Sans Limites</strong> (FSL), accessible à l'adresse <strong style="color:var(--dark);">femmessanslimites.com</strong>.</p>
+                    <p>Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») régissent l'accès et l'utilisation du site internet de l'association <strong style="color:var(--dark);">Femme Sans Limites</strong> (FSL), accessible à l'adresse <strong style="color:var(--dark);">femmessanslimites.com</strong>.</p>
                     <p>L'utilisation du site implique l'acceptation pleine et entière des présentes CGU. FSL se réserve le droit de les modifier à tout moment ; les modifications prennent effet dès leur publication sur le site.</p>
                 </div>
             </div>

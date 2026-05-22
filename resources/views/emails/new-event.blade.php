@@ -7,7 +7,7 @@
 
 Bonjour {{ $subscriber->name ?? 'chère membre' }},
 
-Un nouvel événement vient d'être publié sur la plateforme **Femmes Sans Limites** !
+Un nouvel événement vient d'être publié sur la plateforme **Femme Sans Limites** !
 
 ---
 
@@ -37,5 +37,5 @@ Voir l'événement →
 *[Se désabonner]({{ route('newsletter.unsubscribe', $subscriber->token) }})*
 
 Avec amour,
-**L'équipe Femmes Sans Limites**
+**L'équipe Femme Sans Limites**
 </x-mail::message>

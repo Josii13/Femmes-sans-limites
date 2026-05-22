@@ -1,6 +1,6 @@
 @extends('layouts.public')
-@section('title', 'Contact — Femmes Sans Limites')
-@section('description', 'Contactez l\'équipe Femmes Sans Limites pour toute question, partenariat ou suggestion.')
+@section('title', 'Contact — Femme Sans Limites')
+@section('description', 'Contactez l\'équipe Femme Sans Limites pour toute question, partenariat ou suggestion.')
 @section('robots', 'noindex, follow')
 
 @section('content')
@@ -85,7 +85,7 @@
                 ['Comment rejoindre FSL ?', 'Clique sur le bouton "Rejoindre la communauté" depuis n\'importe quelle page et remplis le formulaire en 2 minutes. Notre équipe valide ta candidature sous 48h.'],
                 ['L\'adhésion est-elle payante ?', 'L\'adhésion Standard est accessible à toutes. Les niveaux Gold et Premium sont définis avec l\'équipe selon ton profil et ton engagement au sein du mouvement.'],
                 ['Comment s\'inscrire à un événement ?', 'Rends-toi sur la page Événements, choisis l\'événement qui t\'intéresse et remplis le formulaire d\'inscription. Pour les événements payants, un lien de paiement te sera envoyé par email.'],
-                ['FSL est-elle présente dans mon pays ?', 'FSL est présente dans plus de 15 pays d\'Afrique et dans la diaspora. Nos événements se tiennent en présentiel dans plusieurs capitales africaines et en ligne pour les membres de la diaspora.'],
+                ['FSL est-elle présente dans mon pays ?', 'FSL est présente en Afrique et dans la diaspora. Nos événements se tiennent en présentiel dans plusieurs capitales africaines et en ligne pour les membres de la diaspora.'],
                 ['Je suis dans la diaspora, puis-je adhérer ?', 'Absolument ! FSL accueille les femmes africaines du monde entier. De nombreuses activités sont disponibles en ligne et nous organisons des rencontres dans plusieurs villes européennes et nord-américaines.'],
             ] as [$q, $a])
             <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border);">

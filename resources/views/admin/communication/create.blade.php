@@ -234,7 +234,7 @@
         <div class="p-6 max-w-xl mx-auto">
             <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border);">
                 <div class="px-8 py-5 text-center" style="background:#1A0A10;">
-                    <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#D91E6E;margin:0;">Femmes Sans Limites</p>
+                    <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#D91E6E;margin:0;">Femme Sans Limites</p>
                 </div>
                 <div class="px-8 py-6">
                     <p class="text-sm font-semibold mb-1" style="color:#9CA3AF;">Objet :</p>
@@ -246,7 +246,7 @@
                         </div>
                     </template>
                 </div>
-                <div class="px-8 py-4 text-center text-xs" style="background:#F9F8FB;border-top:1px solid #EEEBF0;color:#9CA3AF;">© {{ date('Y') }} Femmes Sans Limites</div>
+                <div class="px-8 py-4 text-center text-xs" style="background:#F9F8FB;border-top:1px solid #EEEBF0;color:#9CA3AF;">© {{ date('Y') }} Femme Sans Limites</div>
             </div>
         </div>
     </div>

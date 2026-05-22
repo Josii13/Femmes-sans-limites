@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', $event->title.' — Femmes Sans Limites')
+@section('title', $event->title.' — Femme Sans Limites')
 @section('description', Str::limit($event->short_description ?? $event->description, 160))
 @section('og_type', 'article')
 @section('og_image', $event->image ? asset('storage/'.$event->image) : asset('logo_FSL.png'))
@@ -18,7 +18,7 @@
   "url": "{{ url()->current() }}",
   "organizer": {
     "@type": "Organization",
-    "name": "Femmes Sans Limites",
+    "name": "Femme Sans Limites",
     "url": "{{ config('app.url') }}"
   }
   @if($event->image)

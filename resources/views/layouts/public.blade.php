@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- ══ Titre & description ══ --}}
-    <title>@yield('title', 'Femmes Sans Limites')</title>
-    <meta name="description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <title>@yield('title', 'Femme Sans Limites')</title>
+    <meta name="description" content="@yield('description', 'Femme Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
     <meta name="robots" content="@yield('robots', 'index, follow')">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="theme-color" content="#D91E6E">
@@ -18,19 +18,19 @@
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
 
     {{-- ══ Open Graph ══ --}}
-    <meta property="og:site_name" content="Femmes Sans Limites">
+    <meta property="og:site_name" content="Femme Sans Limites">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@yield('title', 'Femmes Sans Limites')">
-    <meta property="og:description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <meta property="og:title" content="@yield('title', 'Femme Sans Limites')">
+    <meta property="og:description" content="@yield('description', 'Femme Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="@yield('og_image', asset('logo_FSL.png'))">
-    <meta property="og:image:alt" content="@yield('title', 'Femmes Sans Limites')">
+    <meta property="og:image:alt" content="@yield('title', 'Femme Sans Limites')">
 
     {{-- ══ Twitter Card ══ --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Femmes Sans Limites')">
-    <meta name="twitter:description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <meta name="twitter:title" content="@yield('title', 'Femme Sans Limites')">
+    <meta name="twitter:description" content="@yield('description', 'Femme Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
     <meta name="twitter:image" content="@yield('og_image', asset('logo_FSL.png'))">
 
     {{-- ══ JSON-LD Organisation ══ --}}
@@ -38,7 +38,7 @@
     {
       "@@context": "https://schema.org",
       "@@type": "Organization",
-      "name": "Femmes Sans Limites",
+      "name": "Femme Sans Limites",
       "url": "{{ config('app.url') }}",
       "logo": "{{ asset('logo_FSL.png') }}",
       "description": "Plateforme de transformation et d'empowerment féminin pour les femmes d'Afrique et de la diaspora.",
@@ -204,7 +204,7 @@
         </div>
 
         <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3" style="border-top:1px solid rgba(255,255,255,0.07);">
-            <p class="text-xs" style="color:rgba(255,255,255,0.25);">© {{ date('Y') }} Femmes Sans Limites. Tous droits réservés.</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.25);">© {{ date('Y') }} Femme Sans Limites. Tous droits réservés.</p>
             <div class="flex items-center gap-5">
                 <a href="{{ route('legal.cgu') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">CGU</a>
                 <a href="{{ route('legal.mentions') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Mentions légales</a>

@@ -6,7 +6,7 @@
   <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       <tr><td style="background:#1A0A10;padding:32px;text-align:center;">
-        <h1 style="color:#D91E6E;font-family:Georgia,serif;font-size:28px;margin:0;">Femmes Sans Limites</h1>
+        <h1 style="color:#D91E6E;font-family:Georgia,serif;font-size:28px;margin:0;">Femme Sans Limites</h1>
         <p style="color:rgba(255,255,255,0.6);margin:8px 0 0;font-size:13px;">Votre QR code d'accès</p>
       </td></tr>
       <tr><td style="padding:40px;text-align:center;">
@@ -32,7 +32,7 @@
         <p style="color:#aaa;font-size:12px;">Le QR code est également joint en pièce jointe de cet email.</p>
       </td></tr>
       <tr><td style="background:#f9f9f9;padding:20px 40px;border-top:1px solid #eee;text-align:center;">
-        <p style="color:#aaa;font-size:12px;margin:0;">© {{ date('Y') }} Femmes Sans Limites — À bientôt !</p>
+        <p style="color:#aaa;font-size:12px;margin:0;">© {{ date('Y') }} Femme Sans Limites — À bientôt !</p>
       </td></tr>
     </table>
   </td></tr>

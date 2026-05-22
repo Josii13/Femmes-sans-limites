@@ -1,6 +1,6 @@
 @extends('layouts.public')
-@section('title', 'À propos — Femmes Sans Limites')
-@section('description', 'Découvrez l\'histoire, la mission et les valeurs de Femmes Sans Limites, la plateforme d\'empowerment féminin pour les femmes d\'Afrique et de la diaspora.')
+@section('title', 'À propos — Femme Sans Limites')
+@section('description', 'Découvrez l\'histoire, la mission et les valeurs de Femme Sans Limites, la plateforme d\'empowerment féminin pour les femmes d\'Afrique et de la diaspora.')
 @section('og_type', 'website')
 
 @section('content')
@@ -60,11 +60,11 @@
 <section class="py-24 lg:py-32" style="background:var(--warm);">
     <div class="max-w-7xl mx-auto px-5 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div class="fade-left">
-            <span class="section-label">Depuis 2020</span>
+            <span class="section-label">Depuis 2025</span>
             <h2 class="text-4xl font-bold mt-3 mb-8" style="color:var(--dark);font-family:'Playfair Display',serif;">Une conviction devenue mouvement</h2>
             <div class="space-y-5" style="color:var(--gray);">
-                <p class="text-base leading-relaxed">Femmes Sans Limites est née d'une conviction profonde : chaque femme porte en elle une puissance infinie, trop souvent étouffée par des barrières mentales, sociales et culturelles.</p>
-                <p class="text-base leading-relaxed">Ce qui a commencé comme un petit cercle d'échange entre femmes ambitieuses est devenu en quelques années une plateforme présente dans plus de 15 pays d'Afrique et de la diaspora, avec plus de 500 femmes actives dans la communauté.</p>
+                <p class="text-base leading-relaxed">Femme Sans Limites est née d'une conviction profonde : chaque femme porte en elle une puissance infinie, trop souvent étouffée par des barrières mentales, sociales et culturelles.</p>
+                <p class="text-base leading-relaxed">Ce qui a commencé comme un petit cercle d'échange entre femmes ambitieuses est devenu en quelques années une plateforme, une famille.</p>
                 <p class="text-base leading-relaxed">Chaque événement, chaque formation, chaque rencontre est conçu pour créer des déclics, ouvrir des possibilités et connecter des femmes qui se soutiennent mutuellement vers l'excellence.</p>
             </div>
         </div>
@@ -75,7 +75,7 @@
                 @foreach([
                     ['2023','Lancement digital','Plateforme en ligne, mentorat à distance et événements hybrides. La diaspora rejoint le mouvement.'],
                     ['2024','Programme Gold & Premium','Création des niveaux d\'adhésion avancés avec accompagnement personnalisé.'],
-                    ['2025','Aujourd\'hui','500+ femmes, 15+ pays, 50+ événements. Le mouvement continue de grandir.'],
+                    ['2025','Aujourd\'hui','Le mouvement continue de grandir.'],
                 ] as [$year,$title,$desc])
                 <div class="flex gap-5 pb-8 last:pb-0">
                     <div class="flex flex-col items-center">
@@ -166,38 +166,22 @@
 
                     {{-- Photo --}}
                     <div class="relative rounded-3xl overflow-hidden shadow-2xl img-reveal" style="width:340px;height:400px;z-index:1;">
-                        <img src="{{ site_img('about_fondatrice') }}" alt="Fondatrice de Femmes Sans Limites" loading="lazy" class="w-full h-full object-cover object-top">
+                        <img src="{{ site_img('about_fondatrice') }}" alt="Fondatrice de Femme Sans Limites" loading="lazy" class="w-full h-full object-cover object-top">
                         <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,10,12,0.3),transparent 60%);"></div>
                     </div>
 
                     {{-- Badge --}}
                     <div class="float-badge2 absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-5 py-3.5 shadow-xl text-center" style="border:1px solid var(--border);z-index:2;white-space:nowrap;">
                         <p class="text-xs font-semibold" style="color:var(--rose);">Fondatrice & CEO</p>
-                        <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">Femmes Sans Limites</p>
+                        <p class="text-base font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">Femme Sans Limites</p>
                     </div>
                 </div>
             </div>
 
             {{-- Bio --}}
             <div class="fade-right">
-                <blockquote class="text-xl italic font-medium mb-8 leading-relaxed" style="color:var(--dark);font-family:'Playfair Display',serif;border-left:3px solid var(--rose);padding-left:1.5rem;">
-                    « J'ai créé FSL parce que j'ai été cette femme qui se cherche — brillante mais bridée. Je sais qu'avec le bon entourage, les bonnes ressources et la bonne énergie, chaque femme peut dépasser ses peurs et vivre sa version la plus grande. »
-                </blockquote>
-                <p class="text-base leading-relaxed mb-5" style="color:var(--gray);">
-                    Coach certifiée, conférencière internationale et entrepreneur en série, la fondatrice de FSL cumule 15 ans d'expérience en leadership féminin, développement organisationnel et transformation personnelle.
-                </p>
-                <p class="text-base leading-relaxed mb-8" style="color:var(--gray);">
-                    Elle a accompagné plus de 1 000 femmes à travers ses programmes, conférences et coachings individuels, et continue à porter haut la vision d'un monde où les femmes africaines prennent toute leur place.
-                </p>
-                {{-- Métriques --}}
-                <!-- <div class="grid grid-cols-3 gap-5 pt-6" style="border-top:1px solid var(--border);">
-                    @foreach([['15','ans','d\'expérience'],['1000','+','femmes coachées'],['30','+','pays visités']] as [$target,$suffix,$l])
-                    <div>
-                        <p class="text-2xl font-bold counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
-                        <p class="text-xs mt-1" style="color:var(--gray);">{{ $l }}</p>
-                    </div>
-                    @endforeach
-                </div> -->
+                <h3 class="text-3xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">Jessica Rabé</h3>
+                <p class="text-base leading-relaxed" style="color:var(--gray);">Fondatrice de Femme Sans Limites.</p>
             </div>
         </div>
     </div>
@@ -211,7 +195,7 @@
     <div class="flex gap-4 px-5 lg:px-8 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
         @foreach(['about_gallery_1','about_gallery_2','about_gallery_3','about_gallery_4','about_gallery_5','about_gallery_6'] as $imgKey)
         <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden" style="width:280px;height:200px;">
-            <img src="{{ site_img($imgKey) }}" alt="Moment de vie de la communauté Femmes Sans Limites" loading="lazy" class="w-full h-full object-cover">
+            <img src="{{ site_img($imgKey) }}" alt="Moment de vie de la communauté Femme Sans Limites" loading="lazy" class="w-full h-full object-cover">
         </div>
         @endforeach
     </div>

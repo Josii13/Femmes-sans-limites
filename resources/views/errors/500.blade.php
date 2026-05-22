@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erreur serveur — Femmes Sans Limites</title>
+    <title>Erreur serveur — Femme Sans Limites</title>
     @vite(['resources/css/app.css'])
 </head>
 <body class="antialiased min-h-screen flex flex-col items-center justify-center px-5" style="background:var(--cream);">
@@ -12,7 +12,7 @@
 
     {{-- Logo --}}
     <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-10 rounded-2xl px-4 py-2 transition-opacity hover:opacity-80" style="background:#FDF0F5;">
-        <img src="{{ asset('logo_FSL.png') }}" alt="Femmes Sans Limites" class="h-10 w-auto">
+        <img src="{{ asset('logo_FSL.png') }}" alt="Femme Sans Limites" class="h-10 w-auto">
     </a>
 
     {{-- Illustration --}}
@@ -56,7 +56,7 @@
 
 {{-- Footer minimal --}}
 <p class="absolute bottom-6 text-xs" style="color:var(--gray);">
-    © {{ date('Y') }} Femmes Sans Limites — Tous droits réservés
+    © {{ date('Y') }} Femme Sans Limites — Tous droits réservés
 </p>
 
 </body>

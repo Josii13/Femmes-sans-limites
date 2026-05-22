@@ -31,7 +31,7 @@
   </div>
   <div class="content">
     <h2>Bonjour {{ $member->name }},</h2>
-    <p>Merci d'avoir souhaité rejoindre la communauté <strong>Femmes Sans Limites</strong>. Ta candidature est en cours d'examen par notre équipe.</p>
+    <p>Merci d'avoir souhaité rejoindre la communauté <strong>Femme Sans Limites</strong>. Ta candidature est en cours d'examen par notre équipe.</p>
     <div class="highlight">
       <p>Candidature déposée pour</p>
       <p class="name">{{ $member->name }}</p>
@@ -55,7 +55,7 @@
     <p>En attendant, n'hésite pas à nous contacter si tu as des questions.</p>
   </div>
   <div class="footer">
-    <p>Femmes Sans Limites &mdash; femmessanslimites.com</p>
+    <p>Femme Sans Limites &mdash; femmessanslimites.com</p>
   </div>
 </div>
 </body>

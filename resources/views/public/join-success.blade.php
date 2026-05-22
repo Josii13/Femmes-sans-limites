@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Candidature envoyée — Femmes Sans Limites')
+@section('title', 'Candidature envoyée — Femme Sans Limites')
 
 @section('content')
 <section class="min-h-screen flex items-center justify-center px-6" style="background:linear-gradient(160deg,#1A0A10 0%,#0D1418 100%);">
@@ -12,7 +12,7 @@
         <h1 class="text-3xl font-bold text-white mb-4">Candidature reçue !</h1>
 
         <p class="mb-4" style="color:rgba(255,255,255,0.6);">
-            Merci d'avoir postulé pour rejoindre <strong style="color:var(--rose);">Femmes Sans Limites</strong>.
+            Merci d'avoir postulé pour rejoindre <strong style="color:var(--rose);">Femme Sans Limites</strong>.
             Notre équipe examinera ta candidature et te contactera par email sous <strong style="color:#fff;">48h ouvrées</strong>.
         </p>
 

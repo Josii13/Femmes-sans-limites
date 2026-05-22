@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', 'Événements — Femmes Sans Limites')
+@section('title', 'Événements — Femme Sans Limites')
 @section('description', 'Découvrez tous les événements FSL : conférences, ateliers, formations et rencontres pour les femmes ambitieuses d\'Afrique et de la diaspora.')
 @section('og_type', 'website')
 
@@ -30,7 +30,7 @@
             <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background:var(--rose-pale);">
                 <svg class="w-8 h-8" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-            <h3 class="text-2xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Bientôt disponible</h3>
+            <h3 class="text-2xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Voir tout</h3>
             <p class="text-base mb-8" style="color:var(--gray);">Les prochains événements seront annoncés ici très prochainement. Active les notifications pour ne rien manquer !</p>
             <button @click="$store.modal.contact = true" class="btn-rose">Être notifiée</button>
         </div>
