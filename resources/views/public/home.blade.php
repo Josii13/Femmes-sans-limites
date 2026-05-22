@@ -1,6 +1,24 @@
 @extends('layouts.public')
 @section('title', 'Femmes Sans Limites — Plateforme d\'empowerment féminin')
 @section('description', 'FSL connecte, forme et inspire les femmes d\'Afrique et de la diaspora pour révéler leur pleine puissance.')
+@section('og_type', 'website')
+
+@push('seo')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebSite",
+  "name": "Femmes Sans Limites",
+  "url": "{{ config('app.url') }}",
+  "description": "FSL connecte, forme et inspire les femmes d'Afrique et de la diaspora pour révéler leur pleine puissance.",
+  "potentialAction": {
+    "@@type": "SearchAction",
+    "target": "{{ config('app.url') }}/events?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+@endpush
 
 @section('content')
 

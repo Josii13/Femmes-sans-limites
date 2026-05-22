@@ -17,7 +17,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Admin FSL',
                 'email'    => 'admin@fsl.com',
-                'password' => \Illuminate\Support\Facades\Hash::make('fsl@admin2024'),
+                'password' => \Illuminate\Support\Facades\Hash::make('FSL@Admin2026!'),
             ]
         );
     }

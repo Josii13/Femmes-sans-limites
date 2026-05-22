@@ -1,5 +1,7 @@
 @extends('layouts.public')
 @section('title', 'Événements — Femmes Sans Limites')
+@section('description', 'Découvrez tous les événements FSL : conférences, ateliers, formations et rencontres pour les femmes ambitieuses d\'Afrique et de la diaspora.')
+@section('og_type', 'website')
 
 @section('content')
 

@@ -1,6 +1,32 @@
 @extends('layouts.public')
-@section('title', $event->title.' — FSL')
+@section('title', $event->title.' — Femmes Sans Limites')
 @section('description', Str::limit($event->short_description ?? $event->description, 160))
+@section('og_type', 'article')
+@section('og_image', $event->image ? asset('storage/'.$event->image) : asset('logo_FSL.png'))
+
+@push('seo')
+<meta property="article:published_time" content="{{ $event->created_at->toIso8601String() }}">
+@if($event->start_date)
+<meta property="event:start_date" content="{{ $event->start_date }}">
+@endif
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Event",
+  "name": "{{ $event->title }}",
+  "description": "{{ Str::limit($event->short_description ?? $event->description, 200) }}",
+  "url": "{{ url()->current() }}",
+  "organizer": {
+    "@type": "Organization",
+    "name": "Femmes Sans Limites",
+    "url": "{{ config('app.url') }}"
+  }
+  @if($event->image)
+  ,"image": "{{ asset('storage/'.$event->image) }}"
+  @endif
+}
+</script>
+@endpush
 
 @section('content')
 

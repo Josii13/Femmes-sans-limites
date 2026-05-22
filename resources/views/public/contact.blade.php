@@ -1,6 +1,7 @@
 @extends('layouts.public')
 @section('title', 'Contact — Femmes Sans Limites')
 @section('description', 'Contactez l\'équipe Femmes Sans Limites pour toute question, partenariat ou suggestion.')
+@section('robots', 'noindex, follow')
 
 @section('content')
 

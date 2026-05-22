@@ -1,6 +1,7 @@
 @extends('layouts.public')
 @section('title', 'À propos — Femmes Sans Limites')
-@section('description', 'Découvrez l\'histoire, la mission et les valeurs de Femmes Sans Limites, la plateforme d\'empowerment féminin.')
+@section('description', 'Découvrez l\'histoire, la mission et les valeurs de Femmes Sans Limites, la plateforme d\'empowerment féminin pour les femmes d\'Afrique et de la diaspora.')
+@section('og_type', 'website')
 
 @section('content')
 

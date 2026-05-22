@@ -4,8 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- ══ Titre & description ══ --}}
     <title>@yield('title', 'Femmes Sans Limites')</title>
     <meta name="description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <meta name="robots" content="@yield('robots', 'index, follow')">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta name="theme-color" content="#D91E6E">
+
+    {{-- ══ Favicon ══ --}}
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+
+    {{-- ══ Open Graph ══ --}}
+    <meta property="og:site_name" content="Femmes Sans Limites">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('title', 'Femmes Sans Limites')">
+    <meta property="og:description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="@yield('og_image', asset('logo_FSL.png'))">
+    <meta property="og:image:alt" content="@yield('title', 'Femmes Sans Limites')">
+
+    {{-- ══ Twitter Card ══ --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Femmes Sans Limites')">
+    <meta name="twitter:description" content="@yield('description', 'Femmes Sans Limites — Plateforme de transformation et d\'empowerment féminin. Brise tes limites, révèle ta puissance.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('logo_FSL.png'))">
+
+    {{-- ══ JSON-LD Organisation ══ --}}
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Organization",
+      "name": "Femmes Sans Limites",
+      "url": "{{ config('app.url') }}",
+      "logo": "{{ asset('logo_FSL.png') }}",
+      "description": "Plateforme de transformation et d'empowerment féminin pour les femmes d'Afrique et de la diaspora.",
+      "sameAs": []
+    }
+    </script>
+
+    @stack('seo')
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         document.addEventListener('alpine:init', () => {

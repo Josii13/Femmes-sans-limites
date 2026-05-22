@@ -1,6 +1,7 @@
 @extends('layouts.public')
 @section('title', 'Ebooks — Femmes Sans Limites')
 @section('description', 'Découvrez les ebooks FSL : leadership, finance, entrepreneuriat, bien-être. Des ressources pensées pour les femmes ambitieuses d\'Afrique et de la diaspora.')
+@section('og_type', 'website')
 
 @section('content')
 
