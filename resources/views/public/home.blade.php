@@ -305,7 +305,7 @@
             @foreach([
                 ['01','Tu postules','Remplis le formulaire en 2 minutes. Aucun document requis.'],
                 ['02','On valide','Notre équipe active ton compte sous 48h. Tu reçois ta carte de membre FSL.'],
-                ['03','Tu t\'élèves','Accède aux événements, formations et au réseau. La communauté t\'attend.'],
+                ['03','Tu deviens sans limites','Accède aux événements, formations et au réseau. La communauté t\'attend.'],
             ] as [$n,$title,$desc])
             <div class="text-center fade-up">
                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6" style="background:var(--rose);">
