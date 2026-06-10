@@ -83,6 +83,9 @@ class MemberController extends Controller
             $validated['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
+        // Libère l'email d'éventuels membres supprimés (l'index unique inclut les soft-deleted).
+        $this->releaseTrashedEmail($validated['email']);
+
         $member = Member::create($validated);
 
         $this->ensureCard($member);
@@ -336,6 +339,12 @@ class MemberController extends Controller
             'email' => Str::limit($member->email.'#supprime-'.$member->id, 180, ''),
             'verification_token' => null,
         ])->save();
+    }
+
+    /** Libère l'email détenu par d'éventuels membres supprimés portant cet email. */
+    private function releaseTrashedEmail(string $email): void
+    {
+        Member::onlyTrashed()->where('email', $email)->get()->each(fn (Member $old) => $this->releaseEmail($old));
     }
 
     /** Garantit qu'une carte existe sur le disque (la régénère sinon). */

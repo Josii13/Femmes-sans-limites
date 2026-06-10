@@ -105,6 +105,26 @@ class MemberLifecycleTest extends TestCase
         $this->assertDatabaseHas('members', ['email' => 'reuse@example.com', 'deleted_at' => null]);
     }
 
+    public function test_application_succeeds_even_with_legacy_soft_deleted_email(): void
+    {
+        Mail::fake();
+
+        // Simule une donnée d'avant le correctif : membre supprimé dont l'email reste intact en base.
+        $old = Member::factory()->active()->create(['email' => 'legacy@example.com']);
+        $old->delete(); // soft delete SANS libération de l'email
+
+        $this->post(route('membership.store'), [
+            'name' => 'Nouvelle Candidate',
+            'email' => 'legacy@example.com',
+            'profession' => 'Coach',
+            'country' => 'Côte d\'Ivoire',
+            'city' => 'Abidjan',
+            'motivation' => 'Je souhaite réellement intégrer cette communauté de femmes ambitieuses.',
+        ])->assertRedirect(route('membership.success'));
+
+        $this->assertDatabaseHas('members', ['email' => 'legacy@example.com', 'deleted_at' => null]);
+    }
+
     public function test_application_stores_uploaded_photo(): void
     {
         Mail::fake();
