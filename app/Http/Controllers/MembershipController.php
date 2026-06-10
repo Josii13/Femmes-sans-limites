@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class MembershipController extends Controller
@@ -29,14 +30,30 @@ class MembershipController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
-                'email' => 'required|email|unique:members,email',
+                // Ignore les candidatures supprimées (soft delete) : un email libéré redevient disponible.
+                'email' => ['required', 'email', Rule::unique('members', 'email')->whereNull('deleted_at')],
                 'phone' => 'nullable|string|max:30',
-                'motivation' => 'required|string|min:20|max:1000',
+                'motivation' => 'required|string|min:30|max:1000',
                 'profession' => 'required|string|max:100',
                 'country' => 'required|string|max:100',
                 'city' => 'required|string|max:100',
-                'photo' => 'nullable|image|max:3072',
-            ], [], [
+                'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            ], [
+                'name.required' => 'Merci d\'indiquer ton nom complet.',
+                'email.required' => 'Merci d\'indiquer ton adresse email.',
+                'email.email' => 'L\'adresse email saisie n\'est pas valide (exemple : prenom@email.com).',
+                'email.unique' => 'Cette adresse email a déjà été utilisée pour une candidature.',
+                'phone.max' => 'Le numéro de téléphone est trop long.',
+                'motivation.required' => 'Merci de nous expliquer ta motivation.',
+                'motivation.min' => 'Ta motivation doit contenir au moins 30 caractères, pour qu\'on apprenne à mieux te connaître.',
+                'motivation.max' => 'Ta motivation ne doit pas dépasser 1000 caractères.',
+                'profession.required' => 'Merci de sélectionner ta profession.',
+                'country.required' => 'Merci d\'indiquer ton pays.',
+                'city.required' => 'Merci d\'indiquer ta ville.',
+                'photo.image' => 'Le fichier choisi doit être une image.',
+                'photo.mimes' => 'La photo doit être au format JPG, PNG ou WEBP.',
+                'photo.max' => 'La photo ne doit pas dépasser 3 Mo.',
+            ], [
                 'name' => 'nom complet',
                 'email' => 'email',
                 'phone' => 'téléphone',

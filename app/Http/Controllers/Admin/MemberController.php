@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
 {
@@ -63,7 +64,7 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:members,email',
+            'email' => ['required', 'email', Rule::unique('members', 'email')->whereNull('deleted_at')],
             'phone' => 'nullable|string|max:30',
             'profession' => 'required|string|max:100',
             'country' => 'required|string|max:100',
@@ -108,7 +109,7 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:members,email,'.$member->id,
+            'email' => ['required', 'email', Rule::unique('members', 'email')->ignore($member->id)->whereNull('deleted_at')],
             'phone' => 'nullable|string|max:30',
             'profession' => 'required|string|max:100',
             'country' => 'required|string|max:100',
@@ -168,6 +169,7 @@ class MemberController extends Controller
         }
 
         ActivityLog::record('member.deleted', $member);
+        $this->releaseEmail($member);
         $member->delete();
 
         return redirect()->route('admin.members.index')->with('success', 'Membre supprimé.');
@@ -260,6 +262,7 @@ class MemberController extends Controller
                 if ($member->card_path) {
                     Storage::disk('public')->delete($member->card_path);
                 }
+                $this->releaseEmail($member);
                 $member->delete();
             }
 
@@ -320,6 +323,19 @@ class MemberController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Libère l'email (et le token) d'un membre avant suppression : la contrainte
+     * unique au niveau base inclut les lignes soft-deleted, donc on « tombe » l'email
+     * pour qu'il redevienne réutilisable par une nouvelle candidature.
+     */
+    private function releaseEmail(Member $member): void
+    {
+        $member->forceFill([
+            'email' => Str::limit($member->email.'#supprime-'.$member->id, 180, ''),
+            'verification_token' => null,
+        ])->save();
     }
 
     /** Garantit qu'une carte existe sur le disque (la régénère sinon). */

@@ -248,7 +248,9 @@
                 <ul class="space-y-0.5 list-none">@foreach($errors->all() as $e)<li>• {{ $e }}</li>@endforeach</ul>
             </div>
             @endif
-            <form method="POST" action="{{ route('membership.store') }}" enctype="multipart/form-data" class="space-y-4">
+            <form method="POST" action="{{ route('membership.store') }}" enctype="multipart/form-data" class="space-y-4"
+                  x-data="{ submitting: false, motiv: @js(old('motivation', '')) }"
+                  @submit="submitting = true">
                 @csrf
                 {{-- Honeypot anti-bot (invisible pour les humains) --}}
                 <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
@@ -319,13 +321,27 @@
                 </div>
                 <div>
                     <label class="form-label">Pourquoi souhaites-tu intégrer le mouvement FSL ? <span style="color:var(--rose)">*</span></label>
-                    <textarea name="motivation" rows="4" class="form-input resize-none" placeholder="Partage ta motivation, tes objectifs, ce que tu espères apporter et recevoir au sein de la communauté…" required minlength="20" maxlength="1000">{{ old('motivation') }}</textarea>
-                    <p class="text-xs mt-1" style="color:var(--gray);">Minimum 20 caractères — cette réponse aide notre équipe à mieux te connaître.</p>
+                    <textarea name="motivation" rows="4" class="form-input resize-none" placeholder="Partage ta motivation, tes objectifs, ce que tu espères apporter et recevoir au sein de la communauté…" required minlength="30" maxlength="1000" x-model="motiv">{{ old('motivation') }}</textarea>
+                    <p class="text-xs mt-1 flex items-center justify-between" style="color:var(--gray);">
+                        <span x-show="motiv.length < 30">Minimum 30 caractères — cette réponse aide notre équipe à mieux te connaître.</span>
+                        <span x-show="motiv.length >= 30" style="color:#059669;">✓ Merci pour ce partage&nbsp;!</span>
+                        <span x-text="motiv.length + ' / 30'" :style="motiv.length < 30 ? 'color:var(--gray)' : 'color:#059669'"></span>
+                    </p>
                 </div>
                 <p class="text-xs leading-relaxed" style="color:var(--gray);">Ton adhésion démarre au niveau <strong>Standard</strong>. Notre équipe te contactera sous 48h ouvrées pour valider ta candidature.</p>
-                <button type="submit" class="btn-rose w-full py-3.5">
-                    Soumettre ma candidature
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                <button type="submit" class="btn-rose w-full py-3.5" :disabled="submitting" :class="submitting ? 'opacity-70 cursor-not-allowed' : ''">
+                    <template x-if="!submitting">
+                        <span class="inline-flex items-center gap-2">
+                            Soumettre ma candidature
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </span>
+                    </template>
+                    <template x-if="submitting">
+                        <span class="inline-flex items-center gap-2">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+                            Envoi en cours…
+                        </span>
+                    </template>
                 </button>
             </form>
         </div>

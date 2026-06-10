@@ -7,6 +7,7 @@ use App\Mail\MembershipRejectedMail;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -78,6 +79,59 @@ class MemberLifecycleTest extends TestCase
         $this->assertSame('standard', $member->type);
         $this->assertNull($member->card_path);
         $this->assertNotNull($member->verification_token);
+    }
+
+    public function test_email_becomes_reusable_after_member_deletion(): void
+    {
+        Mail::fake();
+
+        $member = Member::factory()->active()->create(['email' => 'reuse@example.com']);
+
+        // Suppression par l'admin (soft delete + libération de l'email).
+        $this->actingAs($this->admin())
+            ->delete(route('admin.members.destroy', $member))
+            ->assertRedirect();
+
+        // Une nouvelle candidature peut réutiliser l'email sans erreur « déjà occupé ».
+        $this->post(route('membership.store'), [
+            'name' => 'Nouvelle Candidate',
+            'email' => 'reuse@example.com',
+            'profession' => 'Avocate',
+            'country' => 'Côte d\'Ivoire',
+            'city' => 'Abidjan',
+            'motivation' => 'Je souhaite sincèrement contribuer à cette communauté inspirante de femmes.',
+        ])->assertRedirect(route('membership.success'));
+
+        $this->assertDatabaseHas('members', ['email' => 'reuse@example.com', 'deleted_at' => null]);
+    }
+
+    public function test_application_stores_uploaded_photo(): void
+    {
+        Mail::fake();
+        Storage::fake('public');
+
+        $this->post(route('membership.store'), [
+            'name' => 'Photo Candidate',
+            'email' => 'photo@example.com',
+            'profession' => 'Designer',
+            'country' => 'Côte d\'Ivoire',
+            'city' => 'Abidjan',
+            'motivation' => 'Je veux rejoindre cette communauté pour partager et grandir ensemble.',
+            'photo' => UploadedFile::fake()->image('moi.jpg', 600, 600),
+        ])->assertRedirect(route('membership.success'));
+
+        $member = Member::where('email', 'photo@example.com')->first();
+        $this->assertNotNull($member->photo);
+        Storage::disk('public')->assertExists($member->photo);
+    }
+
+    public function test_motivation_requires_at_least_30_characters(): void
+    {
+        $this->post(route('membership.store'), [
+            'name' => 'Test', 'email' => 'court@example.com',
+            'profession' => 'Coach', 'country' => 'CI', 'city' => 'Abidjan',
+            'motivation' => 'Trop court.',
+        ])->assertSessionHasErrors('motivation');
     }
 
     public function test_honeypot_blocks_bot_submissions(): void
