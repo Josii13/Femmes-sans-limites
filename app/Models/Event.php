@@ -17,16 +17,21 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'event_date'              => 'datetime',
-        'registration_closes_at'  => 'datetime',
-        'is_paid'                 => 'boolean',
-        'price'                   => 'decimal:2',
+        'event_date' => 'datetime',
+        'registration_closes_at' => 'datetime',
+        'is_paid' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
     public function getRegistrationOpenAttribute(): bool
     {
-        if ($this->is_sold_out) return false;
-        if ($this->registration_closes_at && now()->gt($this->registration_closes_at)) return false;
+        if ($this->is_sold_out) {
+            return false;
+        }
+        if ($this->registration_closes_at && now()->gt($this->registration_closes_at)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -34,7 +39,7 @@ class Event extends Model
     {
         static::creating(function ($event) {
             if (empty($event->slug)) {
-                $event->slug = Str::slug($event->title) . '-' . Str::random(5);
+                $event->slug = Str::slug($event->title).'-'.Str::random(5);
             }
         });
     }
@@ -51,13 +56,19 @@ class Event extends Model
 
     public function getSpotsLeftAttribute(): ?int
     {
-        if (!$this->capacity) return null;
+        if (! $this->capacity) {
+            return null;
+        }
+
         return max(0, $this->capacity - $this->registrations()->whereNotIn('status', ['cancelled'])->count());
     }
 
     public function getIsSoldOutAttribute(): bool
     {
-        if (!$this->capacity) return false;
+        if (! $this->capacity) {
+            return false;
+        }
+
         return $this->spots_left === 0;
     }
 }

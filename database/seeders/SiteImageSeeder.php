@@ -21,7 +21,7 @@ class SiteImageSeeder extends Seeder
 
             // À propos
             ['key' => 'about_hero_main',     'label' => 'À propos — Hero, photo principale',          'page' => 'about', 'default_path' => 'photo_01_3.png'],
-            ['key' => 'about_hero_secondary','label' => 'À propos — Hero, photo secondaire',           'page' => 'about', 'default_path' => 'photo_03_1.png'],
+            ['key' => 'about_hero_secondary', 'label' => 'À propos — Hero, photo secondaire',           'page' => 'about', 'default_path' => 'photo_03_1.png'],
             ['key' => 'about_fondatrice',    'label' => 'À propos — Photo de la fondatrice',           'page' => 'about', 'default_path' => 'photo_03_2.jpeg'],
             ['key' => 'about_gallery_1',     'label' => 'À propos — Galerie, photo 1',                 'page' => 'about', 'default_path' => 'photo_02_2.png'],
             ['key' => 'about_gallery_2',     'label' => 'À propos — Galerie, photo 2',                 'page' => 'about', 'default_path' => 'photo_01_1.png'],

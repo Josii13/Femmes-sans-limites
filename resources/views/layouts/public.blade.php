@@ -185,12 +185,18 @@
                 </ul>
             </div>
 
-            <div x-data="{ subscribed: {{ session('newsletter_success') ? 'true' : 'false' }} }">
+            <div x-data="{ subscribed: {{ (session('newsletter_success') || session('newsletter_pending')) ? 'true' : 'false' }} }">
                 <p class="text-xs font-bold uppercase tracking-widest mb-5" style="color:rgba(255,255,255,0.3);">Newsletter</p>
                 <p class="text-sm mb-4" style="color:rgba(255,255,255,0.45);">Reçois nos actualités et invitations en avant-première.</p>
-                <div x-show="subscribed" class="flex items-center gap-2 text-sm py-2.5 px-3 rounded-xl" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);">
-                    <svg class="w-4 h-4 flex-shrink-0" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    Inscription confirmée !
+                <div x-show="subscribed" class="flex items-start gap-2 text-sm py-2.5 px-3 rounded-xl" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);">
+                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>
+                        @if(session('newsletter_success'))
+                            Tu es déjà abonnée — merci&nbsp;!
+                        @else
+                            Vérifie ta boîte mail&nbsp;: clique sur le lien de confirmation pour finaliser ton abonnement.
+                        @endif
+                    </span>
                 </div>
                 <form x-show="!subscribed" method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col gap-2">
                     @csrf
@@ -244,6 +250,9 @@
             @endif
             <form method="POST" action="{{ route('membership.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
+                {{-- Honeypot anti-bot (invisible pour les humains) --}}
+                <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">Nom complet <span style="color:var(--rose)">*</span></label>

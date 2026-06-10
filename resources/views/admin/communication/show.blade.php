@@ -4,7 +4,7 @@
 @section('page-subtitle', $campaign->title)
 
 @section('header-actions')
-@if($campaign->status !== 'sent')
+@if(in_array($campaign->status, ['draft','scheduled']))
 <form method="POST" action="{{ route('admin.communication.send', $campaign) }}"
       x-data @submit.prevent="if(confirm('Envoyer cette campagne maintenant ?')) $el.submit()">
     @csrf
@@ -14,6 +14,11 @@
     </button>
 </form>
 <a href="{{ route('admin.communication.edit', $campaign) }}" class="btn-gold text-sm">Modifier</a>
+@elseif($campaign->status === 'sending')
+<span class="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-xl pulse-btn" style="background:#EFF6FF;color:#1D4ED8;">
+    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+    Envoi en cours…
+</span>
 @endif
 <a href="{{ route('admin.communication.index') }}" class="text-sm px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors" style="color:var(--gray);">← Retour</a>
 @endsection
@@ -21,7 +26,7 @@
 @section('content')
 
 {{-- Stats de la campagne --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     <div class="admin-card !py-5 text-center">
         <p class="text-3xl font-bold mb-1" style="color:var(--dark);">{{ number_format($campaign->sent_count) }}</p>
         <p class="text-xs" style="color:var(--gray);">Emails envoyés</p>
@@ -31,9 +36,12 @@
         <p class="text-xs" style="color:var(--gray);">Ouvertures totales</p>
     </div>
     <div class="admin-card !py-5 text-center">
-        @php $unique = $campaign->recipients()->whereNotNull('opened_at')->count(); @endphp
-        <p class="text-3xl font-bold mb-1" style="color:#3B82F6;">{{ number_format($unique) }}</p>
+        <p class="text-3xl font-bold mb-1" style="color:#3B82F6;">{{ number_format($uniqueOpens) }}</p>
         <p class="text-xs" style="color:var(--gray);">Ouvreurs uniques</p>
+    </div>
+    <div class="admin-card !py-5 text-center">
+        <p class="text-3xl font-bold mb-1" style="color:{{ $campaign->failed_count > 0 ? '#DC2626' : '#D1D5DB' }};">{{ number_format($campaign->failed_count) }}</p>
+        <p class="text-xs" style="color:var(--gray);">Échecs d'envoi</p>
     </div>
     <div class="admin-card !py-5 text-center">
         <p class="text-3xl font-bold mb-1" style="color:#10B981;">{{ $campaign->open_rate }}%</p>
@@ -137,6 +145,11 @@
                     <td class="px-4 py-3 text-center">
                         @if($r->sent_at)
                         <span class="text-xs" style="color:var(--gray);">{{ $r->sent_at->format('d/m H:i') }}</span>
+                        @elseif($r->failed_at)
+                        <span class="inline-flex items-center gap-1 text-xs font-semibold" style="color:#DC2626;" title="Échec d'envoi">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            Échec
+                        </span>
                         @else
                         <span class="text-xs text-gray-300">—</span>
                         @endif

@@ -4,12 +4,13 @@ namespace App\Mail;
 
 use App\Models\Member;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NewMembershipMail extends Mailable
+class NewMembershipMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -17,7 +18,7 @@ class NewMembershipMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Nouvelle candidature — ' . $this->member->name);
+        return new Envelope(subject: 'Nouvelle candidature — '.$this->member->name);
     }
 
     public function content(): Content

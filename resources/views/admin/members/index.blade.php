@@ -20,10 +20,13 @@
             <option value="gold" @selected(request('type')=='gold')>Gold</option>
             <option value="premium" @selected(request('type')=='premium')>Premium</option>
         </select>
-        <select name="status" class="form-input w-36">
+        <select name="status" class="form-input w-40">
             <option value="">Tous statuts</option>
+            <option value="pending" @selected(request('status')=='pending')>En attente</option>
             <option value="active" @selected(request('status')=='active')>Actifs</option>
-            <option value="inactive" @selected(request('status')=='inactive')>En attente</option>
+            <option value="rejected" @selected(request('status')=='rejected')>Refusés</option>
+            <option value="expired" @selected(request('status')=='expired')>Expirés</option>
+            <option value="suspended" @selected(request('status')=='suspended')>Suspendus</option>
         </select>
         <button type="submit" class="btn-rose text-sm px-4 py-2">Filtrer</button>
         @if(request()->anyFilled(['search','type','status']))
@@ -123,19 +126,27 @@
                     <td class="px-5 py-4"><span class="badge-{{ $member->type }}">{{ ucfirst($member->type) }}</span></td>
                     <td class="px-5 py-4 font-mono text-xs text-gray-500">{{ $member->member_number }}</td>
                     <td class="px-5 py-4">
-                        @if($member->status === 'active')
-                        <span class="text-xs px-2.5 py-1 rounded-full font-medium" style="background:#05966918;color:#059669;">Actif</span>
-                        @else
-                        <span class="text-xs px-2.5 py-1 rounded-full font-medium" style="background:#D91E6E18;color:#D91E6E;">En attente</span>
+                        @php
+                            $statusLabels = ['pending'=>'En attente','active'=>'Actif','rejected'=>'Refusé','expired'=>'Expiré','suspended'=>'Suspendu'];
+                        @endphp
+                        <span class="badge-{{ $member->status }}">{{ $statusLabels[$member->status] ?? $member->status }}</span>
+                        @if($member->status === 'active' && $member->expires_at && $member->expires_at->diffInDays(now(), false) > -30)
+                        <p class="text-[10px] mt-1" style="color:#B45309;">Expire {{ $member->expires_at->translatedFormat('d/m/Y') }}</p>
                         @endif
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center justify-end gap-1.5">
-                            @if($member->status === 'inactive')
+                            @if(in_array($member->status, ['pending','expired']))
                             <form x-ref="act_{{ $member->id }}" action="{{ route('admin.members.activate', $member) }}" method="POST">@csrf</form>
                             <button type="button"
-                                @click="confirm = { title: 'Activer ce membre ?', body: '{{ $member->name }} recevra sa carte membre par email.', ref: 'act_{{ $member->id }}' }; pendingRef = 'act_{{ $member->id }}'"
+                                @click="bulkAction = ''; pendingRef = 'act_{{ $member->id }}'; confirm = { title: 'Activer ce membre ?', body: '{{ $member->name }} recevra sa carte membre par email.' }"
                                 class="text-xs px-3 py-1.5 rounded-lg text-white font-medium" style="background:#059669;">✓ Activer</button>
+                            @endif
+                            @if($member->status === 'pending')
+                            <form x-ref="rej_{{ $member->id }}" action="{{ route('admin.members.reject', $member) }}" method="POST">@csrf</form>
+                            <button type="button"
+                                @click="bulkAction = ''; pendingRef = 'rej_{{ $member->id }}'; confirm = { title: 'Refuser cette candidature ?', body: '{{ $member->name }} recevra un email de refus bienveillant.' }"
+                                class="text-xs px-2.5 py-1.5 rounded-lg font-medium" style="background:#FEE2E2;color:#991B1B;">Refuser</button>
                             @endif
                             <a href="{{ route('admin.members.show', $member) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Voir</a>
                             <a href="{{ route('admin.members.edit', $member) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Éditer</a>
@@ -181,6 +192,7 @@ function bulkManager() {
         },
 
         bulkActivate() {
+            this.pendingRef = '';
             this.bulkAction = 'activate';
             this.confirm = {
                 title: `Activer ${this.selected.length} membre(s) ?`,
@@ -189,6 +201,7 @@ function bulkManager() {
         },
 
         bulkDelete() {
+            this.pendingRef = '';
             this.bulkAction = 'delete';
             this.confirm = {
                 title: `Supprimer ${this.selected.length} membre(s) ?`,
@@ -197,10 +210,10 @@ function bulkManager() {
         },
 
         submitForm() {
-            if (this.bulkAction) {
-                this.$refs.bulk_form.submit();
-            } else if (this.pendingRef) {
+            if (this.pendingRef) {
                 this.$refs[this.pendingRef]?.submit();
+            } else if (this.bulkAction) {
+                this.$refs.bulk_form.submit();
             }
         }
     }

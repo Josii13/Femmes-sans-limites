@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Registration;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -9,12 +10,13 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class QrCodeMail extends Mailable
+class QrCodeMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public \App\Models\Registration $registration) {}
+    public function __construct(public Registration $registration) {}
 
     public function envelope(): Envelope
     {
@@ -28,7 +30,8 @@ class QrCodeMail extends Mailable
 
     public function attachments(): array
     {
-        $path = \Illuminate\Support\Facades\Storage::disk('public')->path($this->registration->qr_code_path);
+        $path = Storage::disk('public')->path($this->registration->qr_code_path);
+
         return [
             Attachment::fromPath($path)->as('qr-code-acces.svg')->withMime('image/svg+xml'),
         ];

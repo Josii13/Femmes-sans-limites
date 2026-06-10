@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('image')->nullable();               // fichier uploadé
             $table->string('cta_label', 100)->nullable();
             $table->string('cta_url', 500)->nullable();
-            $table->enum('type', ['text','text_image','text_cta','text_image_cta'])->default('text');
-            $table->enum('target_type', ['all','standard','gold','premium','custom','single'])->default('all');
+            $table->enum('type', ['text', 'text_image', 'text_cta', 'text_image_cta'])->default('text');
+            $table->enum('target_type', ['all', 'standard', 'gold', 'premium', 'custom', 'single'])->default('all');
             $table->unsignedBigInteger('target_member_id')->nullable(); // pour single
             $table->json('target_member_ids')->nullable();     // pour custom multi-select
-            $table->enum('status', ['draft','scheduled','sending','sent'])->default('draft');
+            $table->enum('status', ['draft', 'scheduled', 'sending', 'sent'])->default('draft');
             $table->timestamp('scheduled_at')->nullable();
             $table->timestamp('sent_at')->nullable();
             $table->unsignedInteger('sent_count')->default(0);

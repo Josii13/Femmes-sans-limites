@@ -29,10 +29,13 @@
         {{-- ── HEADER ── --}}
         <tr>
             <td style="background-color:#1A0A10;padding:28px 40px;text-align:center;">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo_FSL.png'))) }}"
+                @php $logoPath = public_path('logo_FSL.png'); @endphp
+                @if(is_file($logoPath))
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}"
                      alt="Femme Sans Limites"
                      width="52" height="52"
                      style="display:inline-block;width:52px;height:52px;border-radius:12px;background-color:rgba(253,240,245,0.92);">
+                @endif
                 <p style="margin:12px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#D91E6E;letter-spacing:0.02em;">
                     Femme Sans Limites
                 </p>
@@ -99,6 +102,11 @@
                 <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#9CA3AF;line-height:1.6;">
                     Tu reçois cet email car tu fais partie de la communauté <strong style="color:#6B7280;">Femme Sans Limites</strong>.
                 </p>
+                @if(! empty($unsubscribeUrl))
+                <p style="margin:0 0 6px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#9CA3AF;line-height:1.6;">
+                    <a href="{{ $unsubscribeUrl }}" style="color:#9CA3AF;text-decoration:underline;">Se désinscrire de ces communications</a>
+                </p>
+                @endif
                 <p style="margin:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#C4BEC8;">
                     © {{ date('Y') }} Femme Sans Limites — Abidjan, Côte d'Ivoire
                 </p>

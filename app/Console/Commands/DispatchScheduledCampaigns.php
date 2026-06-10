@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Admin\CommunicationController;
 use App\Models\Campaign;
+use App\Services\CampaignDispatcher;
 use Illuminate\Console\Command;
 
 class DispatchScheduledCampaigns extends Command
 {
-    protected $signature   = 'campaigns:dispatch';
-    protected $description = 'Envoie les campagnes programmées dont l\'heure est arrivée';
+    protected $signature = 'campaigns:dispatch';
 
-    public function handle(): void
+    protected $description = 'Met en file les campagnes programmées dont l\'heure est arrivée';
+
+    public function handle(CampaignDispatcher $dispatcher): void
     {
         $campaigns = Campaign::where('status', 'scheduled')
             ->where('scheduled_at', '<=', now())
@@ -19,15 +20,13 @@ class DispatchScheduledCampaigns extends Command
 
         if ($campaigns->isEmpty()) {
             $this->info('Aucune campagne à envoyer.');
+
             return;
         }
 
-        $controller = new CommunicationController();
-
         foreach ($campaigns as $campaign) {
-            $this->info("Envoi : {$campaign->title}...");
-            $controller->dispatch($campaign);
-            $this->info("  → {$campaign->sent_count} email(s) envoyé(s).");
+            $this->info("Mise en file : {$campaign->title}...");
+            $dispatcher->dispatch($campaign);
         }
     }
 }

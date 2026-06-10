@@ -17,8 +17,8 @@ class Registration extends Model
 
     protected $casts = [
         'payment_sent_at' => 'datetime',
-        'paid_at'         => 'datetime',
-        'attended_at'     => 'datetime',
+        'paid_at' => 'datetime',
+        'attended_at' => 'datetime',
     ];
 
     public function event()
@@ -28,6 +28,6 @@ class Registration extends Model
 
     public function getFullNameAttribute(): string
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return $this->first_name.' '.$this->last_name;
     }
 }

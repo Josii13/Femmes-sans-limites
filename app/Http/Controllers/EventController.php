@@ -6,7 +6,6 @@ use App\Models\Event;
 use App\Models\Registration;
 use App\Models\WaitingList;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -23,6 +22,7 @@ class EventController extends Controller
     public function show(string $slug)
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
+
         return view('public.events.show', compact('event'));
     }
 
@@ -32,9 +32,9 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'email'      => 'required|email|max:191',
-            'phone'      => 'nullable|string|max:30',
+            'last_name' => 'required|string|max:100',
+            'email' => 'required|email|max:191',
+            'phone' => 'nullable|string|max:30',
         ]);
 
         $existing = Registration::where('event_id', $event->id)
@@ -49,7 +49,7 @@ class EventController extends Controller
         Registration::create([
             ...$validated,
             'event_id' => $event->id,
-            'status'   => 'pending',
+            'status' => 'pending',
         ]);
 
         return back()->with('success', 'Inscription confirmée ! Vous recevrez bientôt un email de confirmation.');
@@ -59,16 +59,16 @@ class EventController extends Controller
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
-        if (!$event->is_sold_out) {
+        if (! $event->is_sold_out) {
             return redirect()->route('events.show', $slug)
                 ->with('error', 'Des places sont encore disponibles. Inscrivez-vous directement.');
         }
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'email'      => 'required|email|max:191',
-            'phone'      => 'nullable|string|max:30',
+            'last_name' => 'required|string|max:100',
+            'email' => 'required|email|max:191',
+            'phone' => 'nullable|string|max:30',
         ]);
 
         $existing = WaitingList::where('event_id', $event->id)
@@ -90,20 +90,20 @@ class EventController extends Controller
 
         $dtstart = $event->event_date->format('Ymd\THis\Z');
         $dtstamp = now()->format('Ymd\THis\Z');
-        $uid     = $event->slug . '@fsl.ci';
+        $uid = $event->slug.'@fsl.ci';
         $summary = addslashes($event->title);
-        $desc    = addslashes(strip_tags($event->description ?? ''));
-        $location = addslashes($event->location . ($event->city ? ', ' . $event->city : ''));
-        $url     = route('events.show', $event->slug);
+        $desc = addslashes(strip_tags($event->description ?? ''));
+        $location = addslashes($event->location.($event->city ? ', '.$event->city : ''));
+        $url = route('events.show', $event->slug);
 
         $ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//FSL//FSL Events//FR\r\n"
-              . "BEGIN:VEVENT\r\nUID:{$uid}\r\nDTSTAMP:{$dtstamp}\r\nDTSTART:{$dtstart}\r\n"
-              . "SUMMARY:{$summary}\r\nDESCRIPTION:{$desc}\r\nLOCATION:{$location}\r\nURL:{$url}\r\n"
-              . "END:VEVENT\r\nEND:VCALENDAR";
+              ."BEGIN:VEVENT\r\nUID:{$uid}\r\nDTSTAMP:{$dtstamp}\r\nDTSTART:{$dtstart}\r\n"
+              ."SUMMARY:{$summary}\r\nDESCRIPTION:{$desc}\r\nLOCATION:{$location}\r\nURL:{$url}\r\n"
+              ."END:VEVENT\r\nEND:VCALENDAR";
 
         return response($ical, 200, [
-            'Content-Type'        => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="' . $event->slug . '.ics"',
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="'.$event->slug.'.ics"',
         ]);
     }
 }

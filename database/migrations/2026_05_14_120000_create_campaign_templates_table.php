@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('subject');
-            $table->enum('type', ['text','text_image','text_cta','text_image_cta'])->default('text');
+            $table->enum('type', ['text', 'text_image', 'text_cta', 'text_image_cta'])->default('text');
             $table->text('body');
             $table->string('cta_label', 100)->nullable();
             $table->string('cta_url', 500)->nullable();

@@ -28,3 +28,8 @@ Thumbs.db
 /.claude
 Vision femme sans limites .md
 /storage/app/public/members/
+
+# Documents de travail internes (ne pas versionner)
+*.pdf
+*.docx
+/logo_FSL.png

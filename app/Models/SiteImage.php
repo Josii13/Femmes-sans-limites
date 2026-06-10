@@ -14,11 +14,12 @@ class SiteImage extends Model
         if ($this->custom_path) {
             return Storage::url($this->custom_path);
         }
-        return asset('images/' . $this->default_path);
+
+        return asset('images/'.$this->default_path);
     }
 
     public function isCustomized(): bool
     {
-        return !empty($this->custom_path);
+        return ! empty($this->custom_path);
     }
 }
