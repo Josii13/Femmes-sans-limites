@@ -29,7 +29,7 @@
     <div class="absolute top-0 right-0 bottom-0 hidden lg:block pointer-events-none" style="width:48%;background:var(--warm);clip-path:polygon(18% 0,100% 0,100% 100%,0% 100%);"></div>
 
     {{-- Titre mobile uniquement (avant l'image) --}}
-    <div class="lg:hidden relative px-5 pt-24 pb-4">
+    <div class="lg:hidden relative px-5 pt-18 pb-4">
         <h1 class="font-bold fade-up" style="font-family:'Playfair Display',serif;color:var(--dark);font-size:clamp(2.6rem,10vw,3.5rem);line-height:1.08;letter-spacing:-0.02em;">
             Révèle ta<br>
             <em style="color:var(--rose);">puissance</em><br>
