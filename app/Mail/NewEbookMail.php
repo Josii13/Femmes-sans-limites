@@ -5,12 +5,13 @@ namespace App\Mail;
 use App\Models\Ebook;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NewEbookMail extends Mailable
+class NewEbookMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -22,7 +23,7 @@ class NewEbookMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '📚 Nouvel ebook FSL : ' . $this->ebook->title,
+            subject: '📚 Nouvel ebook FSL : '.$this->ebook->title,
         );
     }
 

@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\CampaignMail;
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
 use App\Models\CampaignTemplate;
 use App\Models\Member;
+use App\Services\CampaignDispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class CommunicationController extends Controller
 {
+    public function __construct(private CampaignDispatcher $dispatcher) {}
+
     public function index()
     {
         $campaigns = Campaign::latest()->paginate(20);
@@ -38,43 +38,44 @@ class CommunicationController extends Controller
             ->orderByRaw('YEAR(sent_at), MONTH(sent_at)')
             ->get();
 
-        return view('admin.communication.index', compact('campaigns','statsMonth','statsYear','monthly'));
+        return view('admin.communication.index', compact('campaigns', 'statsMonth', 'statsYear', 'monthly'));
     }
 
     public function create(Request $request)
     {
-        $members   = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
+        $members = Member::where('status', 'active')->whereNotNull('email')->orderBy('name')->get(['id', 'name', 'email', 'type']);
         $templates = CampaignTemplate::orderBy('name')->get();
-        $prefill   = $request->template_id ? CampaignTemplate::find($request->template_id) : null;
-        return view('admin.communication.create', compact('members','templates','prefill'));
+        $prefill = $request->template_id ? CampaignTemplate::find($request->template_id) : null;
+
+        return view('admin.communication.create', compact('members', 'templates', 'prefill'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'             => 'required|string|max:200',
-            'subject'           => 'required|string|max:200',
-            'body'              => 'required|string',
-            'type'              => 'required|in:text,text_image,text_cta,text_image_cta',
-            'image'             => 'nullable|image|max:5120',
-            'cta_label'         => 'nullable|string|max:100',
-            'cta_url'           => 'nullable|url|max:500',
-            'target_type'       => 'required|in:all,standard,gold,premium,custom,single',
-            'target_member_id'  => 'nullable|exists:members,id',
+            'title' => 'required|string|max:200',
+            'subject' => 'required|string|max:200',
+            'body' => 'required|string',
+            'type' => 'required|in:text,text_image,text_cta,text_image_cta',
+            'image' => 'nullable|image|max:5120',
+            'cta_label' => 'nullable|string|max:100',
+            'cta_url' => 'nullable|url|max:500',
+            'target_type' => 'required|in:all,standard,gold,premium,custom,single',
+            'target_member_id' => 'nullable|exists:members,id',
             'target_member_ids' => 'nullable|array',
-            'target_member_ids.*'=> 'exists:members,id',
-            'send_mode'         => 'required|in:draft,now,scheduled',
-            'scheduled_at'      => 'nullable|date|after:now',
+            'target_member_ids.*' => 'exists:members,id',
+            'send_mode' => 'required|in:draft,now,scheduled',
+            'scheduled_at' => 'nullable|date|after:now',
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('campaigns','public');
+            $validated['image'] = $request->file('image')->store('campaigns', 'public');
         }
 
-        $validated['status'] = match($validated['send_mode']) {
-            'now'       => 'draft',   // sera sent juste après
+        $validated['status'] = match ($validated['send_mode']) {
+            'now' => 'draft',   // sera sent juste après
             'scheduled' => 'scheduled',
-            default     => 'draft',
+            default => 'draft',
         };
 
         if ($validated['send_mode'] === 'scheduled') {
@@ -84,9 +85,10 @@ class CommunicationController extends Controller
         $campaign = Campaign::create($validated);
 
         if ($validated['send_mode'] === 'now') {
-            $this->dispatch($campaign);
+            $this->dispatcher->dispatch($campaign);
+
             return redirect()->route('admin.communication.show', $campaign)
-                ->with('success', 'Campagne envoyée avec succès — '.$campaign->sent_count.' destinataire(s).');
+                ->with('success', "Campagne en cours d'envoi — les emails partent en arrière-plan.");
         }
 
         return redirect()->route('admin.communication.show', $campaign)
@@ -98,7 +100,11 @@ class CommunicationController extends Controller
     public function show(Campaign $campaign)
     {
         $recipients = $campaign->recipients()->with('member')->latest('sent_at')->paginate(30);
-        return view('admin.communication.show', compact('campaign','recipients'));
+
+        // Statistiques précalculées (évite les requêtes SQL dans la vue).
+        $uniqueOpens = $campaign->recipients()->whereNotNull('opened_at')->count();
+
+        return view('admin.communication.show', compact('campaign', 'recipients', 'uniqueOpens'));
     }
 
     public function edit(Campaign $campaign)
@@ -107,9 +113,10 @@ class CommunicationController extends Controller
             return redirect()->route('admin.communication.show', $campaign)
                 ->with('error', 'Une campagne déjà envoyée ne peut pas être modifiée.');
         }
-        $members   = Member::where('status','active')->whereNotNull('email')->orderBy('name')->get(['id','name','email','type']);
+        $members = Member::where('status', 'active')->whereNotNull('email')->orderBy('name')->get(['id', 'name', 'email', 'type']);
         $templates = CampaignTemplate::orderBy('name')->get();
-        return view('admin.communication.edit', compact('campaign','members','templates'));
+
+        return view('admin.communication.edit', compact('campaign', 'members', 'templates'));
     }
 
     public function update(Request $request, Campaign $campaign)
@@ -120,29 +127,31 @@ class CommunicationController extends Controller
         }
 
         $validated = $request->validate([
-            'title'             => 'required|string|max:200',
-            'subject'           => 'required|string|max:200',
-            'body'              => 'required|string',
-            'type'              => 'required|in:text,text_image,text_cta,text_image_cta',
-            'image'             => 'nullable|image|max:5120',
-            'cta_label'         => 'nullable|string|max:100',
-            'cta_url'           => 'nullable|url|max:500',
-            'target_type'       => 'required|in:all,standard,gold,premium,custom,single',
-            'target_member_id'  => 'nullable|exists:members,id',
+            'title' => 'required|string|max:200',
+            'subject' => 'required|string|max:200',
+            'body' => 'required|string',
+            'type' => 'required|in:text,text_image,text_cta,text_image_cta',
+            'image' => 'nullable|image|max:5120',
+            'cta_label' => 'nullable|string|max:100',
+            'cta_url' => 'nullable|url|max:500',
+            'target_type' => 'required|in:all,standard,gold,premium,custom,single',
+            'target_member_id' => 'nullable|exists:members,id',
             'target_member_ids' => 'nullable|array',
-            'target_member_ids.*'=> 'exists:members,id',
-            'send_mode'         => 'required|in:draft,now,scheduled',
-            'scheduled_at'      => 'nullable|date|after:now',
+            'target_member_ids.*' => 'exists:members,id',
+            'send_mode' => 'required|in:draft,now,scheduled',
+            'scheduled_at' => 'nullable|date|after:now',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($campaign->image) Storage::disk('public')->delete($campaign->image);
-            $validated['image'] = $request->file('image')->store('campaigns','public');
+            if ($campaign->image) {
+                Storage::disk('public')->delete($campaign->image);
+            }
+            $validated['image'] = $request->file('image')->store('campaigns', 'public');
         }
 
-        $validated['status'] = match($validated['send_mode']) {
+        $validated['status'] = match ($validated['send_mode']) {
             'scheduled' => 'scheduled',
-            default     => 'draft',
+            default => 'draft',
         };
 
         $validated['scheduled_at'] = $validated['send_mode'] === 'scheduled' ? $request->scheduled_at : null;
@@ -150,9 +159,10 @@ class CommunicationController extends Controller
         $campaign->update($validated);
 
         if ($validated['send_mode'] === 'now') {
-            $this->dispatch($campaign);
+            $this->dispatcher->dispatch($campaign);
+
             return redirect()->route('admin.communication.show', $campaign)
-                ->with('success', 'Campagne envoyée — '.$campaign->sent_count.' destinataire(s).');
+                ->with('success', "Campagne en cours d'envoi — les emails partent en arrière-plan.");
         }
 
         return redirect()->route('admin.communication.show', $campaign)->with('success', 'Campagne mise à jour.');
@@ -160,8 +170,11 @@ class CommunicationController extends Controller
 
     public function destroy(Campaign $campaign)
     {
-        if ($campaign->image) Storage::disk('public')->delete($campaign->image);
+        if ($campaign->image) {
+            Storage::disk('public')->delete($campaign->image);
+        }
         $campaign->delete();
+
         return redirect()->route('admin.communication.index')->with('success', 'Campagne supprimée.');
     }
 
@@ -172,82 +185,45 @@ class CommunicationController extends Controller
 
         $recipient = new CampaignRecipient([
             'campaign_id' => $campaign->id,
-            'member_id'   => $member?->id,
-            'email'       => $member?->email ?? 'apercu@fsl.ci',
-            'name'        => $member?->name ?? 'Marie Koné',
-            'token'       => 'preview',
+            'member_id' => $member?->id,
+            'email' => $member?->email ?? 'apercu@fsl.ci',
+            'name' => $member?->name ?? 'Marie Koné',
+            'token' => 'preview',
         ]);
 
-        $fullName  = $member?->name ?? 'Marie Koné';
+        $fullName = $member?->name ?? 'Marie Koné';
         $firstName = mb_ucfirst(explode(' ', trim($fullName))[0]);
 
         $vars = [
-            '{prenom}'     => $firstName,
-            '{nom}'        => $fullName,
-            '{numero}'     => $member?->member_number ?? 'FSL-APERCU',
-            '{type}'       => $member ? ucfirst($member->type) : 'Standard',
-            '{ville}'      => $member?->city ?? 'Abidjan',
-            '{pays}'       => $member?->country ?? 'Côte d\'Ivoire',
+            '{prenom}' => $firstName,
+            '{nom}' => $fullName,
+            '{numero}' => $member?->member_number ?? 'FSL-APERCU',
+            '{type}' => $member ? ucfirst($member->type) : 'Standard',
+            '{ville}' => $member?->city ?? 'Abidjan',
+            '{pays}' => $member?->country ?? 'Côte d\'Ivoire',
             '{profession}' => $member?->profession ?? 'Entrepreneur',
         ];
 
         $resolvedBody = str_replace(array_keys($vars), array_values($vars), $campaign->body);
 
         return response()
-            ->view('emails.campaign', compact('campaign', 'recipient', 'resolvedBody'))
+            ->view('emails.campaign', compact('campaign', 'recipient', 'resolvedBody') + ['unsubscribeUrl' => null])
             ->header('X-Frame-Options', 'SAMEORIGIN');
     }
 
     // Envoi d'une campagne draft ou scheduled via bouton manuel
     public function send(Campaign $campaign)
     {
-        if ($campaign->status === 'sent') {
+        if (in_array($campaign->status, ['sending', 'sent'], true)) {
             return redirect()->route('admin.communication.show', $campaign)
-                ->with('error', 'Cette campagne a déjà été envoyée.');
+                ->with('error', $campaign->status === 'sending'
+                    ? "Cette campagne est déjà en cours d'envoi."
+                    : 'Cette campagne a déjà été envoyée.');
         }
-        $this->dispatch($campaign);
+
+        $this->dispatcher->dispatch($campaign);
+
         return redirect()->route('admin.communication.show', $campaign)
-            ->with('success', 'Campagne envoyée — '.$campaign->sent_count.' destinataire(s).');
-    }
-
-    // Résolution des destinataires selon la cible
-    public function resolveRecipients(Campaign $campaign): \Illuminate\Database\Eloquent\Collection
-    {
-        $base = Member::where('status','active')->whereNotNull('email')->where('email','!=','');
-
-        return match($campaign->target_type) {
-            'all'                               => $base->get(),
-            'standard','gold','premium'         => $base->where('type', $campaign->target_type)->get(),
-            'single'                            => Member::where('id', $campaign->target_member_id)
-                                                         ->where('status','active')->get(),
-            'custom'                            => $base->whereIn('id', $campaign->target_member_ids ?? [])->get(),
-            default                             => collect(),
-        };
-    }
-
-    // Envoi effectif
-    public function dispatch(Campaign $campaign): void
-    {
-        $campaign->update(['status' => 'sending']);
-        $members = $this->resolveRecipients($campaign);
-
-        foreach ($members as $member) {
-            $recipient = CampaignRecipient::create([
-                'campaign_id' => $campaign->id,
-                'member_id'   => $member->id,
-                'email'       => $member->email,
-                'name'        => $member->name,
-            ]);
-
-            try {
-                Mail::to($member->email)->send(new CampaignMail($campaign, $recipient));
-                $recipient->update(['sent_at' => now()]);
-                $campaign->increment('sent_count');
-            } catch (\Throwable) {
-                // fail silently per recipient
-            }
-        }
-
-        $campaign->update(['status' => 'sent', 'sent_at' => now()]);
+            ->with('success', "Campagne en cours d'envoi — les emails partent en arrière-plan.");
     }
 }

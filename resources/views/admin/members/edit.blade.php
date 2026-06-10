@@ -66,8 +66,11 @@
                     <div>
                         <label class="form-label">Statut <span style="color:var(--rose)">*</span></label>
                         <select name="status" class="form-input">
+                            <option value="pending" @selected(old('status',$member->status)==='pending')>En attente</option>
                             <option value="active" @selected(old('status',$member->status)==='active')>Actif</option>
-                            <option value="inactive" @selected(old('status',$member->status)==='inactive')>En attente</option>
+                            <option value="rejected" @selected(old('status',$member->status)==='rejected')>Refusé</option>
+                            <option value="expired" @selected(old('status',$member->status)==='expired')>Expiré</option>
+                            <option value="suspended" @selected(old('status',$member->status)==='suspended')>Suspendu</option>
                         </select>
                     </div>
                 </div>

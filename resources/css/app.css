@@ -145,6 +145,14 @@
     .badge-gold     { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; background: #FEF3C7; color: #92400E; }
     .badge-premium  { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; background: #FCE7F3; color: #9D174D; }
 
+    /* Statuts d'adhésion */
+    .badge-status   { @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold; }
+    .badge-pending   { @apply badge-status; background: #FEF3C7; color: #92400E; }
+    .badge-active    { @apply badge-status; background: #D1FAE5; color: #065F46; }
+    .badge-rejected  { @apply badge-status; background: #FEE2E2; color: #991B1B; }
+    .badge-expired   { @apply badge-status; background: #F3F4F6; color: #6B7280; }
+    .badge-suspended { @apply badge-status; background: #FFEDD5; color: #9A3412; }
+
     /* ── Divider ─────────────────────────────────── */
     .gold-divider { width: 40px; height: 2px; background: var(--gold); display: block; }
 

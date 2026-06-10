@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentLinkMail;
+use App\Mail\QrCodeMail;
+use App\Models\ActivityLog;
 use App\Models\Event;
 use App\Models\Registration;
 use App\Services\QrCodeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class RegistrationController extends Controller
 {
@@ -23,11 +27,11 @@ class RegistrationController extends Controller
         $registrations = $query->paginate(50)->withQueryString();
 
         $totals = [
-            'pending'      => $event->registrations()->where('status', 'pending')->count(),
+            'pending' => $event->registrations()->where('status', 'pending')->count(),
             'payment_sent' => $event->registrations()->where('status', 'payment_sent')->count(),
-            'paid'         => $event->registrations()->where('status', 'paid')->count(),
-            'attended'     => $event->registrations()->where('status', 'attended')->count(),
-            'cancelled'    => $event->registrations()->where('status', 'cancelled')->count(),
+            'paid' => $event->registrations()->where('status', 'paid')->count(),
+            'attended' => $event->registrations()->where('status', 'attended')->count(),
+            'cancelled' => $event->registrations()->where('status', 'cancelled')->count(),
         ];
 
         $totalRevenue = $event->is_paid
@@ -41,22 +45,22 @@ class RegistrationController extends Controller
     {
         $event = $registration->event;
 
-        if (!$event->is_paid || !$event->payment_link) {
+        if (! $event->is_paid || ! $event->payment_link) {
             return back()->with('error', 'Cet événement n\'a pas de lien de paiement configuré.');
         }
 
-        if (!in_array($registration->status, ['pending', 'payment_sent'])) {
+        if (! in_array($registration->status, ['pending', 'payment_sent'])) {
             return back()->with('error', 'Impossible d\'envoyer le lien pour ce statut.');
         }
 
-        \Mail::to($registration->email)->send(new \App\Mail\PaymentLinkMail($registration, $event));
+        \Mail::to($registration->email)->send(new PaymentLinkMail($registration, $event));
 
         $registration->update([
-            'status'          => 'payment_sent',
+            'status' => 'payment_sent',
             'payment_sent_at' => now(),
         ]);
 
-        return back()->with('success', 'Lien de paiement envoyé à ' . $registration->email);
+        return back()->with('success', 'Lien de paiement envoyé à '.$registration->email);
     }
 
     public function confirmPayment(Registration $registration)
@@ -65,29 +69,30 @@ class RegistrationController extends Controller
             return back()->with('error', 'Ce paiement est déjà confirmé. Le QR code a déjà été envoyé.');
         }
 
-        $qrToken = \Illuminate\Support\Str::uuid()->toString();
-        $qrPath  = $this->qrService->generate($qrToken, $registration);
+        $qrToken = Str::uuid()->toString();
+        $qrPath = $this->qrService->generate($qrToken, $registration);
 
         $registration->update([
-            'status'       => 'paid',
-            'qr_token'     => $qrToken,
+            'status' => 'paid',
+            'qr_token' => $qrToken,
             'qr_code_path' => $qrPath,
-            'paid_at'      => now(),
+            'paid_at' => now(),
         ]);
 
-        \Mail::to($registration->email)->send(new \App\Mail\QrCodeMail($registration));
+        \Mail::to($registration->email)->send(new QrCodeMail($registration));
 
-        \App\Models\ActivityLog::record('payment.confirmed', $registration->event, [
+        ActivityLog::record('payment.confirmed', $registration->event, [
             'registration_id' => $registration->id,
-            'email'           => $registration->email,
+            'email' => $registration->email,
         ]);
 
-        return back()->with('success', 'Paiement confirmé et QR code envoyé à ' . $registration->email);
+        return back()->with('success', 'Paiement confirmé et QR code envoyé à '.$registration->email);
     }
 
     public function cancel(Registration $registration)
     {
         $registration->update(['status' => 'cancelled']);
+
         return back()->with('success', 'Inscription annulée.');
     }
 
@@ -95,26 +100,26 @@ class RegistrationController extends Controller
     {
         $registrations = $event->registrations()->latest()->get();
 
-        $filename = 'inscriptions-' . $event->slug . '-' . now()->format('Ymd') . '.csv';
+        $filename = 'inscriptions-'.$event->slug.'-'.now()->format('Ymd').'.csv';
 
         $headers = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function () use ($registrations, $event) {
+        $callback = function () use ($registrations) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
 
             fputcsv($handle, ['Prénom', 'Nom', 'Email', 'Téléphone', 'Statut', 'Inscrit le', 'Payé le'], ';');
 
             foreach ($registrations as $r) {
                 $statusMap = [
-                    'pending'      => 'En attente',
+                    'pending' => 'En attente',
                     'payment_sent' => 'Lien envoyé',
-                    'paid'         => 'Payé',
-                    'attended'     => 'Présent',
-                    'cancelled'    => 'Annulé',
+                    'paid' => 'Payé',
+                    'attended' => 'Présent',
+                    'cancelled' => 'Annulé',
                 ];
                 fputcsv($handle, [
                     $r->first_name,

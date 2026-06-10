@@ -8,4 +8,10 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('campaigns:dispatch')->everyMinute();
+Schedule::command('campaigns:dispatch')
+    ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('members:expire')
+    ->dailyAt('07:00')
+    ->withoutOverlapping();

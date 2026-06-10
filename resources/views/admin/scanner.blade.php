@@ -68,7 +68,7 @@ function verifyToken(token) {
     if (!token || isProcessing) return;
     isProcessing = true;
 
-    fetch('{{ route('admin.scanner.verify') }}', {
+    fetch('{{ route('admin.scanner.verify', $event) }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

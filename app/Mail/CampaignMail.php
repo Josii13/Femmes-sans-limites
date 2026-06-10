@@ -27,31 +27,39 @@ class CampaignMail extends Mailable
 
     public function content(): Content
     {
-        $member    = $this->recipient->member ?? Member::find($this->recipient->member_id);
-        $fullName  = $this->recipient->name ?? ($member?->name ?? '');
+        $member = $this->recipient->member ?? Member::find($this->recipient->member_id);
+        $fullName = $this->recipient->name ?? ($member?->name ?? '');
         $firstName = mb_ucfirst(explode(' ', trim($fullName))[0]);
 
         $vars = [
-            '{prenom}'        => $firstName,
-            '{nom}'           => $fullName,
-            '{numero}'        => $member?->member_number ?? '',
-            '{type}'          => $member ? ucfirst($member->type) : '',
-            '{ville}'         => $member?->city ?? '',
-            '{pays}'          => $member?->country ?? '',
-            '{profession}'    => $member?->profession ?? '',
+            '{prenom}' => $firstName,
+            '{nom}' => $fullName,
+            '{numero}' => $member?->member_number ?? '',
+            '{type}' => $member ? ucfirst($member->type) : '',
+            '{ville}' => $member?->city ?? '',
+            '{pays}' => $member?->country ?? '',
+            '{profession}' => $member?->profession ?? '',
             // variantes avec crochets (format alternatif)
-            '[prenom]'        => $firstName,
-            '[nom]'           => $fullName,
-            '[numero]'        => $member?->member_number ?? '',
-            '[type]'          => $member ? ucfirst($member->type) : '',
-            '[ville]'         => $member?->city ?? '',
+            '[prenom]' => $firstName,
+            '[nom]' => $fullName,
+            '[numero]' => $member?->member_number ?? '',
+            '[type]' => $member ? ucfirst($member->type) : '',
+            '[ville]' => $member?->city ?? '',
         ];
 
         $body = str_replace(array_keys($vars), array_values($vars), $this->campaign->body);
 
+        // Lien de désinscription (RGPD). Absent pour l'aperçu (token factice « preview »).
+        $unsubscribeUrl = ($this->recipient->token && $this->recipient->token !== 'preview')
+            ? route('marketing.unsubscribe', $this->recipient->token)
+            : null;
+
         return new Content(
             view: 'emails.campaign',
-            with: ['resolvedBody' => $body]
+            with: [
+                'resolvedBody' => $body,
+                'unsubscribeUrl' => $unsubscribeUrl,
+            ],
         );
     }
 

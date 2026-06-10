@@ -1,55 +1,81 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\EbookController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\Admin\EbookController as AdminEbookController;
+use App\Http\Controllers\Admin\CampaignTemplateController;
+use App\Http\Controllers\Admin\CommunicationController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\EbookController as AdminEbookController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\ScannerController;
-use App\Http\Controllers\MembershipController;
-use App\Http\Controllers\NewsletterController;
-use App\Http\Controllers\TrackingController;
-use App\Http\Controllers\Admin\CommunicationController;
-use App\Http\Controllers\Admin\CampaignTemplateController;
 use App\Http\Controllers\Admin\SiteImageController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\EbookController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\MemberVerifyController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TrackingController;
+use App\Models\ActivityLog;
+use App\Models\Event;
+use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/a-propos', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+Route::post('/contact', [ContactController::class, 'send'])->middleware('throttle:5,1')->name('contact.send');
 Route::get('/evenements', [EventController::class, 'index'])->name('events.index');
 Route::get('/evenements/{slug}', [EventController::class, 'show'])->name('events.show');
-Route::post('/evenements/{slug}/inscription', [EventController::class, 'register'])->name('events.register');
-Route::post('/evenements/{slug}/liste-attente', [EventController::class, 'joinWaitingList'])->name('events.waiting-list');
+Route::post('/evenements/{slug}/inscription', [EventController::class, 'register'])->middleware('throttle:10,1')->name('events.register');
+Route::post('/evenements/{slug}/liste-attente', [EventController::class, 'joinWaitingList'])->middleware('throttle:10,1')->name('events.waiting-list');
 Route::get('/evenements/{slug}/ical', [EventController::class, 'ical'])->name('events.ical');
 Route::get('/ebooks', [EbookController::class, 'index'])->name('ebooks.index');
 Route::get('/ebooks/{slug}', [EbookController::class, 'show'])->name('ebooks.show');
 Route::get('/rejoindre', [MembershipController::class, 'index'])->name('membership.join');
-Route::post('/rejoindre', [MembershipController::class, 'store'])->name('membership.store');
+Route::post('/rejoindre', [MembershipController::class, 'store'])->middleware('throttle:5,1')->name('membership.store');
 Route::get('/candidature-envoyee', [MembershipController::class, 'success'])->name('membership.success');
 
-// Newsletter
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+// Newsletter (double opt-in + désinscription confirmée)
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->middleware('throttle:5,1')->name('newsletter.subscribe');
+Route::get('/newsletter/confirmer/{token}', [NewsletterController::class, 'confirm'])->name('newsletter.confirm');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+Route::post('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribeConfirm'])->name('newsletter.unsubscribe.confirm');
+
+// Désinscription marketing des membres (lien dans les campagnes — RGPD)
+Route::get('/communication/desinscription/{token}', [MarketingController::class, 'unsubscribe'])->name('marketing.unsubscribe');
+Route::post('/communication/desinscription/{token}', [MarketingController::class, 'unsubscribeConfirm'])->name('marketing.unsubscribe.confirm');
 
 // Tracking pixel email
 Route::get('/t/{token}.gif', [TrackingController::class, 'pixel'])->name('track.pixel');
 
+// Vérification publique d'une carte de membre (cible du QR de la carte)
+Route::get('/membre/{token}', [MemberVerifyController::class, 'show'])->name('members.verify');
+
 // Pages légales
-Route::get('/mentions-legales', fn() => view('public.legal.mentions-legales'))->name('legal.mentions');
-Route::get('/conditions-generales-utilisation', fn() => view('public.legal.cgu'))->name('legal.cgu');
+Route::get('/mentions-legales', fn () => view('public.legal.mentions-legales'))->name('legal.mentions');
+Route::get('/conditions-generales-utilisation', fn () => view('public.legal.cgu'))->name('legal.cgu');
 
 // Breeze auth routes
 require __DIR__.'/auth.php';
 
+// Redirection « dashboard » → back-office admin (utilisée par les contrôleurs d'auth Breeze).
+Route::get('/dashboard', fn () => redirect()->route('admin.dashboard'))
+    ->middleware('auth')
+    ->name('dashboard');
+
+// Profil du compte connecté (nom, email, mot de passe, suppression).
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 // Admin protected routes
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Members
@@ -59,6 +85,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
     Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
     Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
+    Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::post('members/{member}/regenerate-card', [MemberController::class, 'regenerateCard'])->name('members.regenerate-card');
 
     // Ebooks
@@ -77,11 +104,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // QR Code Scanner
     Route::get('scanner/{event}', [ScannerController::class, 'index'])->name('scanner.index');
-    Route::post('scanner/verify', [ScannerController::class, 'verify'])->name('scanner.verify');
+    Route::post('scanner/{event}/verify', [ScannerController::class, 'verify'])->name('scanner.verify');
 
     // Waiting list per event
-    Route::get('events/{event}/waiting-list', function (\App\Models\Event $event) {
+    Route::get('events/{event}/waiting-list', function (Event $event) {
         $waitingList = $event->waitingList()->latest()->get();
+
         return view('admin.events.waiting-list', compact('event', 'waitingList'));
     })->name('events.waiting-list-admin');
 
@@ -111,7 +139,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Activity log
     Route::get('activity', function () {
-        $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
+        $logs = ActivityLog::with('user')->latest()->paginate(50);
+
         return view('admin.activity', compact('logs'));
     })->name('activity');
 });

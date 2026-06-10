@@ -19,7 +19,7 @@ class Ebook extends Model
     {
         static::creating(function ($ebook) {
             if (empty($ebook->slug)) {
-                $ebook->slug = Str::slug($ebook->title) . '-' . Str::random(5);
+                $ebook->slug = Str::slug($ebook->title).'-'.Str::random(5);
             }
         });
     }

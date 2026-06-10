@@ -57,13 +57,12 @@
             <h2 class="text-xl font-bold mb-1" style="color:var(--dark);">{{ $member->name }}</h2>
             <p class="text-sm mb-3" style="color:var(--gray);">{{ $member->profession }}</p>
 
+            @php
+                $statusLabels = ['pending'=>'En attente','active'=>'Actif','rejected'=>'Refusé','expired'=>'Expiré','suspended'=>'Suspendu'];
+            @endphp
             <div class="flex items-center justify-center gap-2 flex-wrap">
                 <span class="badge-{{ $member->type }} text-sm px-4 py-1.5">{{ ucfirst($member->type) }}</span>
-                @if($member->status === 'active')
-                <span class="text-xs px-2.5 py-1 rounded-full font-medium" style="background:#05966918;color:#059669;">Actif</span>
-                @else
-                <span class="text-xs px-2.5 py-1 rounded-full font-medium" style="background:#D91E6E18;color:#D91E6E;">En attente</span>
-                @endif
+                <span class="badge-{{ $member->status }}">{{ $statusLabels[$member->status] ?? $member->status }}</span>
             </div>
 
             {{-- Infos contact --}}
@@ -84,19 +83,51 @@
                 </div>
                 <div class="flex items-center gap-3 text-sm">
                     <svg class="w-4 h-4 flex-shrink-0" style="color:var(--gold);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span class="text-gray-600">Membre depuis {{ $member->created_at->format('M Y') }}</span>
+                    <span class="text-gray-600">Membre depuis {{ ($member->joined_at ?? $member->created_at)->translatedFormat('M Y') }}</span>
                 </div>
+                @if($member->expires_at)
+                <div class="flex items-center gap-3 text-sm">
+                    <svg class="w-4 h-4 flex-shrink-0" style="color:{{ $member->isExpired() ? '#DC2626' : ($member->expires_at->diffInDays(now(),false) > -30 ? '#B45309' : 'var(--gold)') }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-gray-600">
+                        @if($member->isExpired())
+                            <span style="color:#DC2626;font-weight:600;">Expirée</span> le {{ $member->expires_at->translatedFormat('d M Y') }}
+                        @else
+                            Valable jusqu'au {{ $member->expires_at->translatedFormat('d M Y') }}
+                        @endif
+                    </span>
+                </div>
+                @endif
             </div>
 
             {{-- Actions --}}
             <div class="mt-6 space-y-2">
-                {{-- Activer --}}
-                @if($member->status === 'inactive')
+                {{-- Activer (candidature ou réactivation) --}}
+                @if(in_array($member->status, ['pending','expired','rejected','suspended']))
                 <form x-ref="act_form" action="{{ route('admin.members.activate', $member) }}" method="POST">@csrf</form>
                 <button type="button"
                     @click="confirm = { title: 'Activer ce membre ?', body: '{{ $member->name }} recevra sa carte membre par email.' }; confirmRef = 'act_form'"
                     class="w-full text-sm py-2.5 rounded-xl font-medium text-white transition-all" style="background:#059669;">
                     ✓ Activer le compte
+                </button>
+                @endif
+
+                {{-- Renouveler (membre actif) --}}
+                @if($member->status === 'active')
+                <form x-ref="renew_form" action="{{ route('admin.members.activate', $member) }}" method="POST">@csrf</form>
+                <button type="button"
+                    @click="confirm = { title: 'Renouveler l\'adhésion ?', body: 'La validité de {{ addslashes($member->name) }} sera prolongée d\'un an et sa carte renvoyée.' }; confirmRef = 'renew_form'"
+                    class="w-full text-sm py-2.5 rounded-xl font-medium text-white transition-all" style="background:var(--gold);">
+                    ↻ Renouveler l'adhésion (+1 an)
+                </button>
+                @endif
+
+                {{-- Refuser (candidature en attente) --}}
+                @if($member->status === 'pending')
+                <form x-ref="rej_form" action="{{ route('admin.members.reject', $member) }}" method="POST">@csrf</form>
+                <button type="button"
+                    @click="confirm = { title: 'Refuser cette candidature ?', body: '{{ addslashes($member->name) }} recevra un email de refus bienveillant.' }; confirmRef = 'rej_form'"
+                    class="w-full text-sm py-2.5 rounded-xl font-medium transition-all" style="background:#FEE2E2;color:#991B1B;">
+                    Refuser la candidature
                 </button>
                 @endif
 

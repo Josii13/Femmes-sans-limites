@@ -25,9 +25,12 @@
         {{-- Header --}}
         <tr>
             <td style="background-color:#1A0A10;padding:32px 40px;text-align:center;">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo_FSL.png'))) }}"
+                @php $logoPath = public_path('logo_FSL.png'); @endphp
+                @if(is_file($logoPath))
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}"
                      alt="FSL" width="52" height="52"
                      style="display:inline-block;width:52px;height:52px;border-radius:12px;background-color:rgba(253,240,245,0.92);">
+                @endif
                 <p style="margin:12px 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#D91E6E;">
                     Femme Sans Limites
                 </p>

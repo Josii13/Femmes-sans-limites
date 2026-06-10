@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\NewEbookMail;
+use App\Models\ActivityLog;
 use App\Models\Ebook;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,8 +19,8 @@ class EbookController extends Controller
         $query = Ebook::query();
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('category', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%')
+                ->orWhere('category', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('status')) {
@@ -38,15 +40,15 @@ class EbookController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:200',
-            'category'    => 'required|string|max:100',
+            'title' => 'required|string|max:200',
+            'category' => 'required|string|max:100',
             'description' => 'required|string',
             'author_note' => 'nullable|string',
-            'image'       => 'nullable|image|max:5120',
-            'cta_label'   => 'required|string|max:60',
-            'cta_url'     => 'required|url|max:500',
-            'status'      => 'required|in:draft,published',
-            'sort_order'  => 'nullable|integer|min:0',
+            'image' => 'nullable|image|max:5120',
+            'cta_label' => 'required|string|max:60',
+            'cta_url' => 'required|url|max:500',
+            'status' => 'required|in:draft,published',
+            'sort_order' => 'nullable|integer|min:0',
         ]);
 
         if ($request->hasFile('image')) {
@@ -57,14 +59,14 @@ class EbookController extends Controller
 
         $ebook = Ebook::create($validated);
 
-        \App\Models\ActivityLog::record('ebook.created', $ebook);
+        ActivityLog::record('ebook.created', $ebook);
 
         if ($ebook->status === 'published') {
             $this->sendNewsletterForEbook($ebook);
         }
 
         return redirect()->route('admin.ebooks.index')
-            ->with('success', 'Ebook « ' . $ebook->title . ' » créé avec succès.');
+            ->with('success', 'Ebook « '.$ebook->title.' » créé avec succès.');
     }
 
     public function edit(Ebook $ebook)
@@ -75,21 +77,23 @@ class EbookController extends Controller
     public function update(Request $request, Ebook $ebook)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:200',
-            'category'    => 'required|string|max:100',
+            'title' => 'required|string|max:200',
+            'category' => 'required|string|max:100',
             'description' => 'required|string',
             'author_note' => 'nullable|string',
-            'image'       => 'nullable|image|max:5120',
-            'cta_label'   => 'required|string|max:60',
-            'cta_url'     => 'required|url|max:500',
-            'status'      => 'required|in:draft,published',
-            'sort_order'  => 'nullable|integer|min:0',
+            'image' => 'nullable|image|max:5120',
+            'cta_label' => 'required|string|max:60',
+            'cta_url' => 'required|url|max:500',
+            'status' => 'required|in:draft,published',
+            'sort_order' => 'nullable|integer|min:0',
         ]);
 
         $wasPublished = $ebook->status === 'published';
 
         if ($request->hasFile('image')) {
-            if ($ebook->image) Storage::disk('public')->delete($ebook->image);
+            if ($ebook->image) {
+                Storage::disk('public')->delete($ebook->image);
+            }
             $validated['image'] = $request->file('image')->store('ebooks', 'public');
         }
 
@@ -98,7 +102,7 @@ class EbookController extends Controller
         $ebook->update($validated);
 
         // Envoyer la newsletter uniquement si on passe de draft → published
-        if (!$wasPublished && $ebook->status === 'published') {
+        if (! $wasPublished && $ebook->status === 'published') {
             $this->sendNewsletterForEbook($ebook);
         }
 
@@ -108,7 +112,9 @@ class EbookController extends Controller
 
     public function destroy(Ebook $ebook)
     {
-        if ($ebook->image) Storage::disk('public')->delete($ebook->image);
+        if ($ebook->image) {
+            Storage::disk('public')->delete($ebook->image);
+        }
         $ebook->delete();
 
         return redirect()->route('admin.ebooks.index')
@@ -117,11 +123,16 @@ class EbookController extends Controller
 
     private function sendNewsletterForEbook(Ebook $ebook): void
     {
-        NewsletterSubscriber::all()->each(function ($subscriber) use ($ebook) {
-            try {
-                Mail::to($subscriber->email)->send(new NewEbookMail($ebook, $subscriber));
-            } catch (\Throwable) {
-                // fail silently per subscriber
+        // Uniquement les abonnés confirmés et non désinscrits (RGPD), par lots, en file.
+        NewsletterSubscriber::mailable()->chunkById(200, function ($subscribers) use ($ebook) {
+            foreach ($subscribers as $subscriber) {
+                try {
+                    Mail::to($subscriber->email)->queue(new NewEbookMail($ebook, $subscriber));
+                } catch (\Throwable $e) {
+                    Log::warning('Newsletter ebook: échec mise en file', [
+                        'ebook_id' => $ebook->id, 'email' => $subscriber->email, 'error' => $e->getMessage(),
+                    ]);
+                }
             }
         });
     }

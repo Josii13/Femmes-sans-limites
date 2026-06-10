@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Member;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -9,12 +10,13 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class MemberCardMail extends Mailable
+class MemberCardMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public \App\Models\Member $member) {}
+    public function __construct(public Member $member) {}
 
     public function envelope(): Envelope
     {
@@ -28,11 +30,15 @@ class MemberCardMail extends Mailable
 
     public function attachments(): array
     {
-        if (!$this->member->card_path) return [];
+        if (! $this->member->card_path) {
+            return [];
+        }
 
-        $path = \Illuminate\Support\Facades\Storage::disk('public')->path($this->member->card_path);
+        $path = Storage::disk('public')->path($this->member->card_path);
 
-        if (!file_exists($path)) return [];
+        if (! file_exists($path)) {
+            return [];
+        }
 
         return [
             Attachment::fromPath($path)->as('carte-membre-fsl.png')->withMime('image/png'),

@@ -7,6 +7,7 @@ use App\Mail\NewEventMail;
 use App\Models\Event;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,9 +20,9 @@ class EventController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('location', 'like', '%' . $request->search . '%')
-                  ->orWhere('city', 'like', '%' . $request->search . '%');
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('location', 'like', '%'.$request->search.'%')
+                    ->orWhere('city', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -29,7 +30,7 @@ class EventController extends Controller
             $query->where('status', $request->status);
         }
 
-        $sortBy  = in_array($request->sort, ['event_date', 'title', 'registrations_count', 'created_at']) ? $request->sort : 'created_at';
+        $sortBy = in_array($request->sort, ['event_date', 'title', 'registrations_count', 'created_at']) ? $request->sort : 'created_at';
         $sortDir = $request->dir === 'asc' ? 'asc' : 'desc';
 
         $events = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
@@ -45,20 +46,20 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'                  => 'required|string|max:200',
-            'description'            => 'required|string',
-            'short_description'      => 'nullable|string|max:300',
-            'event_date'             => 'required|date|after:now',
+            'title' => 'required|string|max:200',
+            'description' => 'required|string',
+            'short_description' => 'nullable|string|max:300',
+            'event_date' => 'required|date|after:now',
             'registration_closes_at' => 'nullable|date|before:event_date',
-            'location'               => 'required|string|max:200',
-            'city'                   => 'nullable|string|max:100',
-            'capacity'               => 'nullable|integer|min:1',
-            'is_paid'                => 'boolean',
-            'price'                  => 'nullable|numeric|min:0',
-            'currency'               => 'nullable|string|max:20',
-            'payment_link'           => 'nullable|url|max:500',
-            'status'                 => 'required|in:draft,published,cancelled',
-            'image'                  => 'nullable|image|max:5120',
+            'location' => 'required|string|max:200',
+            'city' => 'nullable|string|max:100',
+            'capacity' => 'nullable|integer|min:1',
+            'is_paid' => 'boolean',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:20',
+            'payment_link' => 'nullable|url|max:500',
+            'status' => 'required|in:draft,published,cancelled',
+            'image' => 'nullable|image|max:5120',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -81,10 +82,11 @@ class EventController extends Controller
     {
         $event->loadCount([
             'registrations',
-            'registrations as paid_count'     => fn($q) => $q->where('status', 'paid'),
-            'registrations as pending_count'  => fn($q) => $q->where('status', 'pending'),
-            'registrations as attended_count' => fn($q) => $q->where('status', 'attended'),
+            'registrations as paid_count' => fn ($q) => $q->where('status', 'paid'),
+            'registrations as pending_count' => fn ($q) => $q->where('status', 'pending'),
+            'registrations as attended_count' => fn ($q) => $q->where('status', 'attended'),
         ]);
+
         return view('admin.events.show', compact('event'));
     }
 
@@ -96,20 +98,20 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
-            'title'                  => 'required|string|max:200',
-            'description'            => 'required|string',
-            'short_description'      => 'nullable|string|max:300',
-            'event_date'             => 'required|date|after_or_equal:today',
+            'title' => 'required|string|max:200',
+            'description' => 'required|string',
+            'short_description' => 'nullable|string|max:300',
+            'event_date' => 'required|date|after_or_equal:today',
             'registration_closes_at' => 'nullable|date|before:event_date',
-            'location'               => 'required|string|max:200',
-            'city'                   => 'nullable|string|max:100',
-            'capacity'               => 'nullable|integer|min:1',
-            'is_paid'                => 'boolean',
-            'price'                  => 'nullable|numeric|min:0',
-            'currency'               => 'nullable|string|max:20',
-            'payment_link'           => 'nullable|url|max:500',
-            'status'                 => 'required|in:draft,published,cancelled,completed',
-            'image'                  => 'nullable|image|max:5120',
+            'location' => 'required|string|max:200',
+            'city' => 'nullable|string|max:100',
+            'capacity' => 'nullable|integer|min:1',
+            'is_paid' => 'boolean',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:20',
+            'payment_link' => 'nullable|url|max:500',
+            'status' => 'required|in:draft,published,cancelled,completed',
+            'image' => 'nullable|image|max:5120',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -117,13 +119,15 @@ class EventController extends Controller
         $wasPublished = $event->status === 'published';
 
         if ($request->hasFile('image')) {
-            if ($event->image) Storage::disk('public')->delete($event->image);
+            if ($event->image) {
+                Storage::disk('public')->delete($event->image);
+            }
             $validated['image'] = $request->file('image')->store('events', 'public');
         }
 
         $event->update($validated);
 
-        if (!$wasPublished && $event->status === 'published') {
+        if (! $wasPublished && $event->status === 'published') {
             $this->sendNewsletterForEvent($event);
         }
 
@@ -132,7 +136,9 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        if ($event->image) Storage::disk('public')->delete($event->image);
+        if ($event->image) {
+            Storage::disk('public')->delete($event->image);
+        }
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Événement supprimé.');
@@ -141,8 +147,8 @@ class EventController extends Controller
     public function duplicate(Event $event)
     {
         $clone = $event->replicate(['slug', 'image']);
-        $clone->title  = $event->title . ' (copie)';
-        $clone->slug   = Str::slug($clone->title) . '-' . Str::random(5);
+        $clone->title = $event->title.' (copie)';
+        $clone->slug = Str::slug($clone->title).'-'.Str::random(5);
         $clone->status = 'draft';
         $clone->save();
 
@@ -152,11 +158,16 @@ class EventController extends Controller
 
     private function sendNewsletterForEvent(Event $event): void
     {
-        NewsletterSubscriber::all()->each(function ($subscriber) use ($event) {
-            try {
-                Mail::to($subscriber->email)->send(new NewEventMail($event, $subscriber));
-            } catch (\Throwable) {
-                // fail silently per subscriber
+        // Uniquement les abonnés confirmés et non désinscrits (RGPD), par lots, en file.
+        NewsletterSubscriber::mailable()->chunkById(200, function ($subscribers) use ($event) {
+            foreach ($subscribers as $subscriber) {
+                try {
+                    Mail::to($subscriber->email)->queue(new NewEventMail($event, $subscriber));
+                } catch (\Throwable $e) {
+                    Log::warning('Newsletter événement: échec mise en file', [
+                        'event_id' => $event->id, 'email' => $subscriber->email, 'error' => $e->getMessage(),
+                    ]);
+                }
             }
         });
     }
