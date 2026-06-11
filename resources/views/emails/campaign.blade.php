@@ -29,13 +29,10 @@
         {{-- ── HEADER ── --}}
         <tr>
             <td style="background-color:#1A0A10;padding:28px 40px;text-align:center;">
-                @php $logoPath = is_file(public_path('logo-email.png')) ? public_path('logo-email.png') : public_path('logo_FSL.png'); @endphp
-                @if(is_file($logoPath))
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}"
+                <img src="{{ asset('logo-email.png') }}"
                      alt="Femme Sans Limites"
                      width="52" height="52"
                      style="display:inline-block;width:52px;height:52px;border-radius:12px;background-color:rgba(253,240,245,0.92);">
-                @endif
                 <p style="margin:12px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#D91E6E;letter-spacing:0.02em;">
                     Femme Sans Limites
                 </p>
