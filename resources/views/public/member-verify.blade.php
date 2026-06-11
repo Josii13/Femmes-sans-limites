@@ -12,7 +12,7 @@
 
             @if($valid)
             {{-- Carte valide --}}
-            <div class="px-8 py-7 text-center" style="background:linear-gradient(135deg,var(--rose) 0%,var(--gold) 100%);">
+            <div class="px-8 py-7 text-center" style="background:linear-gradient(160deg,#1A0A10 0%,#0D1418 100%);">
                 <div class="w-16 h-16 rounded-full bg-white/95 flex items-center justify-center mx-auto mb-3">
                     <svg class="w-9 h-9" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                 </div>
