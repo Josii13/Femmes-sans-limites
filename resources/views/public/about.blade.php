@@ -63,9 +63,11 @@
             <span class="section-label">Depuis 2025</span>
             <h2 class="text-4xl font-bold mt-3 mb-8" style="color:var(--dark);font-family:'Playfair Display',serif;">Une conviction devenue mouvement</h2>
             <div class="space-y-5" style="color:var(--gray);">
-                <p class="text-base leading-relaxed">Femme Sans Limites est née d'une conviction profonde : chaque femme porte en elle une puissance infinie, trop souvent étouffée par des barrières mentales, sociales et culturelles.</p>
-                <p class="text-base leading-relaxed">Ce qui a commencé comme un petit cercle d'échange entre femmes ambitieuses est devenu en quelques années une plateforme, une famille.</p>
-                <p class="text-base leading-relaxed">Chaque événement, chaque formation, chaque rencontre est conçu pour créer des déclics, ouvrir des possibilités et connecter des femmes qui se soutiennent mutuellement vers l'excellence.</p>
+                <p class="text-base leading-relaxed">Femme Sans Limites est née de la conviction profonde d'une femme qui rêve de voir d'autres femmes libres, épanouies et conscientes de leur valeur. Car chaque femme porte en elle une puissance infinie, un potentiel extraordinaire qui est trop souvent freiné par des barrières mentales, sociales ou culturelles.</p>
+                <p class="text-base leading-relaxed">Femme Sans Limites n'est pas seulement un mouvement, c'est un appel. C'est une mission. C'est un ministère dédié à la transformation, à l'élévation et à l'épanouissement des femmes</p>
+                <p class="text-base leading-relaxed">Ce qui a commencé comme un simple cercle d'échange entre femmes ambitieuses est devenu, au fil du temps, une véritable plateforme d'inspiration, d'apprentissage et de solidarité. Plus qu'une communauté, c'est une famille où chaque femme est encouragée à grandir, à croire en ses capacités et à poursuivre ses rêves sans se fixer de limites.</p>
+                <p class="text-base leading-relaxed">Chaque événement, chaque formation et chaque rencontre sont conçus pour provoquer des déclics, révéler des talents, ouvrir de nouvelles perspectives et connecter des femmes qui avancent ensemble vers l'excellence, le leadership et l'accomplissement de leur destinée.</p>
+                <p class="text-base leading-relaxed">Parce qu'une femme qui découvre sa valeur devient une source d'inspiration pour toute une génération.</p>
             </div>
         </div>
 
@@ -73,9 +75,9 @@
         <div class="fade-right">
             <div class="space-y-0">
                 @foreach([
-                    ['2023','Lancement digital','Plateforme en ligne, mentorat à distance et événements hybrides. La diaspora rejoint le mouvement.'],
-                    ['2024','Programme Gold & Premium','Création des niveaux d\'adhésion avancés avec accompagnement personnalisé.'],
-                    ['2025','Aujourd\'hui','Le mouvement continue de grandir.'],
+                    ['2025','Lancement digital','Plateforme en ligne, mentorat à distance.'],
+                    ['2026','Programme Gold & Premium','Création des niveaux d\'adhésion avancés avec accompagnement personnalisé.'],
+                    ['2026','Aujourd\'hui','plusieurs femmes, des pays, +d’évènement, le mouvement continu de grandir.'],
                 ] as [$year,$title,$desc])
                 <div class="flex gap-5 pb-8 last:pb-0">
                     <div class="flex flex-col items-center">
@@ -102,19 +104,20 @@
             <h2 class="text-4xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">Mission & Vision</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-stagger="150">
-            <div class="card-hover p-8 fade-up">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background:var(--rose-pale);">
-                    <svg class="w-6 h-6" style="color:var(--rose);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
-                </div>
-                <h3 class="text-2xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">Notre Mission</h3>
-                <p class="text-base leading-relaxed" style="color:var(--gray);">Notre mission est de les aider à briser ces barrières, à croire en leur valeur et à révéler pleinement leur potentiel.</p>
-            </div>
+            
             <div class="card-hover p-8 fade-up">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background:var(--gold-pale);">
                     <svg class="w-6 h-6" style="color:var(--gold);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
                 <h3 class="text-2xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">Notre Vision</h3>
                 <p class="text-base leading-relaxed" style="color:var(--gray);">Femme Sans Limites est une plateforme dédiée aux femmes qui désirent évoluer, se dépasser et briser les barrières mentales imposées par la société, afin de révéler pleinement leur potentiel.</p>
+            </div>
+            <div class="card-hover p-8 fade-up">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background:var(--rose-pale);">
+                    <svg class="w-6 h-6" style="color:var(--rose);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">Notre Mission</h3>
+                <p class="text-base leading-relaxed" style="color:var(--gray);">Notre mission est de les aider à briser ces barrières, à croire en leur valeur et à révéler pleinement leur potentiel.</p>
             </div>
         </div>
     </div>

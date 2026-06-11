@@ -45,14 +45,14 @@
 
                 {{-- Titre desktop uniquement --}}
                 <h1 class="hidden lg:block font-bold mb-8 fade-up" style="font-family:'Playfair Display',serif;color:var(--dark);font-size:clamp(2.8rem,5.5vw,5rem);line-height:1.08;letter-spacing:-0.02em;">
-                    Révèle ta<br>
-                    <em style="color:var(--rose);">puissance</em><br>
-                    intérieure.
+                    Brise les<br>
+                    <em style="color:var(--rose);">barrières</em><br>
+                    invisibles.
                 </h1>
 
-                <p class="text-base font-semibold italic mb-3 fade-up" style="color:var(--rose);max-width:460px;">
+                <!-- <p class="text-base font-semibold italic mb-3 fade-up" style="color:var(--rose);max-width:460px;">
                     Brise les barrières invisibles. Révèle pleinement ton potentiel.
-                </p>
+                </p> -->
                 <p class="text-lg leading-relaxed mb-10 fade-up" style="color:var(--gray);max-width:460px;">
                     Femme Sans Limites est une communauté de transformation qui accompagne les femmes afin de les aider à dépasser leurs limites intérieures et devenir la meilleure version d'elles-mêmes.
                 </p>
@@ -175,7 +175,7 @@
                     Aujourd'hui, trouver un espace bienveillant où des femmes avancent ensemble, sans jalousie ni compétition malsaine, est devenu rare. Avec Femme Sans Limites, chaque femme a l'opportunité de grandir, apprendre, se reconstruire et se challenger aux côtés d'autres femmes dans un environnement sain, inspirant et motivant. Ici, nous croyons qu'une femme élevée peut élever une autre.
                 </p>
                 <ul class="space-y-3 mb-10">
-                    @foreach(['Événements et forums exclusifs','Mentorat et coaching personnalisé','Réseau de 500+ femmes leaders','Formations pratiques et actionables'] as $item)
+                    @foreach(['Événements et forums exclusifs','Mentorat et coaching personnalisé','Formations pratiques et actionables'] as $item)
                     <li class="flex items-center gap-3 text-sm font-medium" style="color:var(--dark);">
                         <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--rose-pale);">
                             <svg class="w-3 h-3" style="color:var(--rose);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
