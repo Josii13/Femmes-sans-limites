@@ -83,6 +83,9 @@
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex items-center justify-end gap-2">
+                        @if($ebook->status === 'published')
+                        <a href="{{ route('ebooks.show', $ebook->slug) }}" target="_blank" title="Voir sur le site public" class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Voir</a>
+                        @endif
                         <a href="{{ route('admin.ebooks.edit', $ebook) }}" class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Éditer</a>
                         <form x-ref="del_{{ $ebook->id }}" action="{{ route('admin.ebooks.destroy', $ebook) }}" method="POST">@csrf @method('DELETE')</form>
                         <button type="button"

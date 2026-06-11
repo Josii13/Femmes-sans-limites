@@ -151,6 +151,10 @@
                             <a href="{{ route('admin.members.show', $member) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Voir</a>
                             <a href="{{ route('admin.members.edit', $member) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Éditer</a>
                             <a href="{{ route('admin.members.download-card', $member) }}" class="text-xs px-2.5 py-1.5 rounded-lg text-white" style="background:var(--gold);" title="Télécharger carte">⬇</a>
+                            <form x-ref="del_{{ $member->id }}" action="{{ route('admin.members.destroy', $member) }}" method="POST">@csrf @method('DELETE')</form>
+                            <button type="button"
+                                @click="bulkAction = ''; pendingRef = 'del_{{ $member->id }}'; confirm = { title: 'Supprimer ce membre ?', body: '{{ addslashes($member->name) }} sera supprimé(e). Cette action est réversible.' }"
+                                class="text-xs px-2.5 py-1.5 rounded-lg text-red-500 bg-red-50 hover:bg-red-100">Supprimer</button>
                         </div>
                     </td>
                 </tr>
