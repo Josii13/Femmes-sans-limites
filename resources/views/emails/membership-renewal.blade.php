@@ -1,6 +1,6 @@
 <x-mail::message>
 <div style="text-align:center;margin-bottom:24px;">
-<img src="{{ asset('logo_FSL.png') }}" alt="FSL" style="height:48px;width:auto;">
+<img src="{{ asset('logo-email.png') }}" alt="FSL" style="height:48px;width:auto;">
 </div>
 
 @if($expired)

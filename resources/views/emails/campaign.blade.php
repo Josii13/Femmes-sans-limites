@@ -29,7 +29,7 @@
         {{-- ── HEADER ── --}}
         <tr>
             <td style="background-color:#1A0A10;padding:28px 40px;text-align:center;">
-                @php $logoPath = public_path('logo_FSL.png'); @endphp
+                @php $logoPath = is_file(public_path('logo-email.png')) ? public_path('logo-email.png') : public_path('logo_FSL.png'); @endphp
                 @if(is_file($logoPath))
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}"
                      alt="Femme Sans Limites"
