@@ -6,7 +6,7 @@
 @section('content')
 
 {{-- Hero --}}
-<section class="pt-28 pb-14 bg-white relative overflow-hidden">
+<section class="pt-20 pb-14 bg-white relative overflow-hidden">
     <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at 70% 50%,var(--rose-pale) 0%,transparent 55%),radial-gradient(ellipse at 20% 80%,var(--gold-pale) 0%,transparent 50%);"></div>
     <div class="max-w-7xl mx-auto px-5 lg:px-8 relative">
         <div class="max-w-2xl">
