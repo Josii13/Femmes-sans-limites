@@ -2,23 +2,23 @@
 @section('title', $ebook->title . ' — FSL Bibliothèque')
 @section('description', Str::limit($ebook->description, 160))
 @section('og_type', 'book')
-@section('og_image', $ebook->cover ? asset('storage/'.$ebook->cover) : asset('logo_FSL.png'))
+@section('og_image', $ebook->image ? asset('storage/'.$ebook->image) : asset('logo_FSL.png'))
 
 @push('seo')
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
   "@@type": "Book",
-  "name": "{{ $ebook->title }}",
-  "description": "{{ Str::limit($ebook->description, 200) }}",
+  "name": @json($ebook->title),
+  "description": @json(Str::limit($ebook->description, 200)),
   "url": "{{ url()->current() }}",
   "publisher": {
     "@type": "Organization",
     "name": "Femme Sans Limites",
     "url": "{{ config('app.url') }}"
   }
-  @if($ebook->cover)
-  ,"image": "{{ asset('storage/'.$ebook->cover) }}"
+  @if($ebook->image)
+  ,"image": "{{ asset('storage/'.$ebook->image) }}"
   @endif
 }
 </script>

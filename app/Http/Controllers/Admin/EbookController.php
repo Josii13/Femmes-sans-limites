@@ -19,8 +19,10 @@ class EbookController extends Controller
         $query = Ebook::query();
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%'.$request->search.'%')
-                ->orWhere('category', 'like', '%'.$request->search.'%');
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('category', 'like', '%'.$request->search.'%');
+            });
         }
 
         if ($request->filled('status')) {
@@ -44,9 +46,9 @@ class EbookController extends Controller
             'category' => 'required|string|max:100',
             'description' => 'required|string',
             'author_note' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'cta_label' => 'required|string|max:60',
-            'cta_url' => 'required|url|max:500',
+            'cta_url' => 'required|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ]);
@@ -61,9 +63,7 @@ class EbookController extends Controller
 
         ActivityLog::record('ebook.created', $ebook);
 
-        if ($ebook->status === 'published') {
-            $this->sendNewsletterForEbook($ebook);
-        }
+        $this->notifyNewsletterOnce($ebook);
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook « '.$ebook->title.' » créé avec succès.');
@@ -81,14 +81,12 @@ class EbookController extends Controller
             'category' => 'required|string|max:100',
             'description' => 'required|string',
             'author_note' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'cta_label' => 'required|string|max:60',
-            'cta_url' => 'required|url|max:500',
+            'cta_url' => 'required|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ]);
-
-        $wasPublished = $ebook->status === 'published';
 
         if ($request->hasFile('image')) {
             if ($ebook->image) {
@@ -101,10 +99,10 @@ class EbookController extends Controller
 
         $ebook->update($validated);
 
-        // Envoyer la newsletter uniquement si on passe de draft → published
-        if (! $wasPublished && $ebook->status === 'published') {
-            $this->sendNewsletterForEbook($ebook);
-        }
+        ActivityLog::record('ebook.updated', $ebook);
+
+        // Envoie la newsletter à la 1re publication seulement (jamais de renvoi).
+        $this->notifyNewsletterOnce($ebook);
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook mis à jour.');
@@ -112,13 +110,26 @@ class EbookController extends Controller
 
     public function destroy(Ebook $ebook)
     {
-        if ($ebook->image) {
-            Storage::disk('public')->delete($ebook->image);
-        }
+        // Soft-delete : on conserve l'image de couverture pour permettre une restauration.
+        ActivityLog::record('ebook.deleted', $ebook);
         $ebook->delete();
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook supprimé.');
+    }
+
+    /**
+     * Envoie la newsletter d'annonce une seule fois, à la première publication.
+     * Empêche tout renvoi lors d'un cycle dépublication/republication.
+     */
+    private function notifyNewsletterOnce(Ebook $ebook): void
+    {
+        if ($ebook->status !== 'published' || $ebook->newsletter_sent_at !== null) {
+            return;
+        }
+
+        $this->sendNewsletterForEbook($ebook);
+        $ebook->forceFill(['newsletter_sent_at' => now()])->save();
     }
 
     private function sendNewsletterForEbook(Ebook $ebook): void
