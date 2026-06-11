@@ -50,7 +50,7 @@ class PaymentFulfiller
         ]);
 
         try {
-            Mail::to($registration->email)->queue(new QrCodeMail($registration));
+            Mail::to($registration->email)->queue(new QrCodeMail($registration, $payment));
         } catch (\Throwable $e) {
             Log::warning('Paiement: échec envoi QrCodeMail', ['reg' => $registration->id, 'error' => $e->getMessage()]);
         }

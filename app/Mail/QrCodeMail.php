@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Payment;
 use App\Models\Registration;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,10 @@ class QrCodeMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Registration $registration) {}
+    public function __construct(
+        public Registration $registration,
+        public ?Payment $payment = null,
+    ) {}
 
     public function envelope(): Envelope
     {

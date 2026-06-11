@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Masque les éléments Alpine (modals, menus) tant que le JS n'est pas initialisé */
+[x-cloak] { display: none !important; }
+
 @layer base {
     :root {
         --rose:       #D91E6E;

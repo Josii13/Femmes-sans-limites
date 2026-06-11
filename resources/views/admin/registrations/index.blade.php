@@ -10,6 +10,14 @@
 
 @section('content')
 
+{{-- Info paiement en ligne --}}
+@if($event->is_paid)
+<div class="rounded-xl px-4 py-3 mb-5 text-sm flex items-start gap-2" style="background:#EFF6FF;color:#1D4ED8;">
+    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+    <span>Le paiement se fait <strong>en ligne (GeniusPay)</strong> : les inscrites paient directement et reçoivent leur reçu + QR automatiquement. Les boutons « manuel » ci-dessous ne servent qu'en secours.</span>
+</div>
+@endif
+
 {{-- Revenue banner (paid events only) --}}
 @if($event->is_paid && $totalRevenue > 0)
 <div class="rounded-2xl p-4 mb-5 flex items-center justify-between" style="background:linear-gradient(135deg,rgba(201,168,76,0.12) 0%,rgba(201,168,76,0.04) 100%);border:1px solid rgba(201,168,76,0.3);">
@@ -102,6 +110,9 @@
                 <td class="px-5 py-4">
                     <span class="text-xs px-2 py-1 rounded-full font-medium" style="background:{{ $statusColor }}18;color:{{ $statusColor }};">{{ $statusLabel }}</span>
                     @if($reg->paid_at)<p class="text-xs text-gray-400 mt-0.5">{{ $reg->paid_at->format('d/m/Y') }}</p>@endif
+                    @if($reg->latestPayment)
+                    <p class="text-[10px] text-gray-400 mt-0.5 font-mono" title="Référence du paiement en ligne">{{ $reg->latestPayment->provider_reference ?? $reg->latestPayment->reference }}</p>
+                    @endif
                 </td>
                 <td class="px-5 py-4 text-gray-400 text-xs">{{ $reg->created_at->format('d/m/Y H:i') }}</td>
                 <td class="px-5 py-4">
@@ -121,9 +132,9 @@
                         @if(in_array($reg->status, ['pending','payment_sent']))
                         <form x-ref="confirm_{{ $reg->id }}" action="{{ route('admin.registrations.confirm-payment', $reg) }}" method="POST">@csrf</form>
                         <button type="button"
-                            @click="confirm = { title: 'Confirmer le paiement ?', body: 'Le QR code sera généré et envoyé à {{ $reg->email }}.' }; confirmAction = 'confirm_{{ $reg->id }}'"
-                            class="text-xs px-3 py-1.5 rounded-lg font-medium text-white" style="background:#059669;">
-                            ✓ Confirmer
+                            @click="confirm = { title: 'Confirmer le paiement manuellement ?', body: 'À utiliser seulement si le paiement en ligne n\'a pas abouti. Le QR sera généré et envoyé à {{ $reg->email }}.' }; confirmAction = 'confirm_{{ $reg->id }}'"
+                            class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
+                            ✓ Confirmer (manuel)
                         </button>
                         @endif
 

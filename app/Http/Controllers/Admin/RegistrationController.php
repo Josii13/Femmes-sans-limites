@@ -23,7 +23,7 @@ class RegistrationController extends Controller
 
     public function index(Event $event, Request $request)
     {
-        $query = $event->registrations()->latest();
+        $query = $event->registrations()->with('latestPayment')->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
