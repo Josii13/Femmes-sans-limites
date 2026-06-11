@@ -26,7 +26,7 @@
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>FEMMES SANS LIMITES</h1>
+    <h1>FEMME SANS LIMITES</h1>
     <p>Ta candidature a bien été reçue ✨</p>
   </div>
   <div class="content">
@@ -40,22 +40,22 @@
     <p>Voici les prochaines étapes :</p>
     <div class="steps">
       <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Notre équipe examine ta candidature sous 48h ouvrées.</div>
+        <!-- <div class="step-num">1</div> -->
+        <div class="step-text">- Notre équipe examine ta candidature sous 48h ouvrées.</div>
       </div>
       <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Si ta candidature est validée, tu recevras un email de confirmation avec ton accès membre et ta carte personnalisée.</div>
+        <!-- <div class="step-num">2</div> -->
+        <div class="step-text">- Si ta candidature est validée, tu recevras un email de confirmation avec ton accès membre et ta carte personnalisée.</div>
       </div>
       <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Tu pourras alors accéder aux événements, formations et à toute la communauté FSL.</div>
+        <!-- <div class="step-num">3</div> -->
+        <div class="step-text">- Tu pourras alors accéder aux événements, formations et à toute la communauté FSL.</div>
       </div>
     </div>
     <p>En attendant, n'hésite pas à nous contacter si tu as des questions.</p>
   </div>
   <div class="footer">
-    <p>Femme Sans Limites &mdash; femmessanslimites.com</p>
+    <p>Femme Sans Limites &mdash; femme-sans-limites.com</p>
   </div>
 </div>
 </body>
