@@ -116,12 +116,17 @@
                 <td class="px-6 py-4">
                     <div class="flex items-center justify-end gap-1.5">
                         <a href="{{ route('events.show', $event->slug) }}" target="_blank" title="Voir sur le site public" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600">🌐</a>
+                        <a href="{{ route('admin.events.show', $event) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Voir</a>
                         <a href="{{ route('admin.registrations.index', $event) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Inscrits</a>
                         <a href="{{ route('admin.events.edit', $event) }}" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">Éditer</a>
                         <form x-ref="dup_{{ $event->id }}" action="{{ route('admin.events.duplicate', $event) }}" method="POST">@csrf</form>
                         <button type="button"
                             @click="confirm = { title: 'Dupliquer cet événement ?', body: 'Une copie brouillon sera créée.' }; confirmAction = 'dup_{{ $event->id }}'"
                             title="Dupliquer" class="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">⎘</button>
+                        <form x-ref="del_{{ $event->id }}" action="{{ route('admin.events.destroy', $event) }}" method="POST">@csrf @method('DELETE')</form>
+                        <button type="button"
+                            @click="confirm = { title: 'Supprimer cet événement ?', body: 'L\'événement et ses inscriptions seront supprimés (archivés).' }; confirmAction = 'del_{{ $event->id }}'"
+                            title="Supprimer" class="text-xs px-2.5 py-1.5 rounded-lg text-red-500 bg-red-50 hover:bg-red-100">Supprimer</button>
                     </div>
                 </td>
             </tr>
