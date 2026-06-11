@@ -49,13 +49,22 @@ php artisan db:seed --class=AdminUserSeeder
 composer dev   # serve + queue:listen + pail (logs) + vite, en parallèle
 ```
 
-## Files d'attente (emails)
+## Envoi des emails
 
-Les emails (cartes, campagnes, newsletters, confirmations) sont mis **en file**.
-Un worker doit tourner en production :
+Par défaut, `QUEUE_CONNECTION=sync` : les emails (cartes, campagnes, newsletters,
+confirmations) partent **immédiatement pendant la requête**. Aucun worker requis —
+idéal en hébergement mutualisé.
+
+**Pour de gros envois (campagnes de plusieurs centaines de membres)**, on peut basculer
+en envoi asynchrone afin de ne pas bloquer la requête : mettre `QUEUE_CONNECTION=database`
+puis faire tourner un worker (ou un cron qui vide la file chaque minute) :
 
 ```bash
+# worker permanent (VPS) :
 php artisan queue:work --queue=emails,default
+
+# ou cron (mutualisé), chaque minute :
+* * * * * cd /chemin/projet && php artisan queue:work --stop-when-empty --max-time=50 --queue=emails,default >> /dev/null 2>&1
 ```
 
 ## Tâches planifiées (cron)
@@ -86,7 +95,7 @@ php artisan test       # suite de tests
 | `APP_DEBUG` | `false` |
 | `APP_URL` | URL HTTPS réelle (utilisée par les QR de vérification) |
 | `SESSION_SECURE_COOKIE` | `true` |
-| `QUEUE_CONNECTION` | `database` ou `redis` (worker supervisé) |
+| `QUEUE_CONNECTION` | `sync` (envoi immédiat) — ou `database` + worker pour les gros envois |
 | `MAIL_*` | SMTP de l'expéditeur officiel |
 
 ## Architecture (aperçu)
