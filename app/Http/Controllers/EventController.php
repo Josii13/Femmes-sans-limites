@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Registration;
 use App\Models\WaitingList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -13,6 +14,7 @@ class EventController extends Controller
     {
         $events = Event::where('status', 'published')
             ->where('event_date', '>=', now())
+            ->withActiveRegistrationsCount()
             ->orderBy('event_date')
             ->get();
 
@@ -30,6 +32,10 @@ class EventController extends Controller
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
+        if ($event->event_date->isPast()) {
+            return back()->with('error', 'Cet événement est terminé, les inscriptions sont closes.');
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
@@ -37,22 +43,37 @@ class EventController extends Controller
             'phone' => 'nullable|string|max:30',
         ]);
 
-        $existing = Registration::where('event_id', $event->id)
-            ->where('email', $validated['email'])
-            ->whereNotIn('status', ['cancelled'])
-            ->first();
+        $validated['email'] = mb_strtolower(trim($validated['email']));
 
-        if ($existing) {
-            return back()->with('error', 'Vous êtes déjà inscrit(e) à cet événement avec cet email.');
-        }
+        // Transaction + verrou sur l'événement : sérialise les inscriptions concurrentes
+        // (évite le surbooking et les doublons en cas de soumissions simultanées).
+        return DB::transaction(function () use ($event, $validated) {
+            $event = Event::whereKey($event->id)->lockForUpdate()->first();
 
-        Registration::create([
-            ...$validated,
-            'event_id' => $event->id,
-            'status' => 'pending',
-        ]);
+            if (! $event->registration_open) {
+                return back()->with('error', $event->is_sold_out
+                    ? 'Cet événement est complet. Inscrivez-vous sur la liste d\'attente.'
+                    : 'Les inscriptions pour cet événement sont closes.');
+            }
 
-        return back()->with('success', 'Inscription confirmée ! Vous recevrez bientôt un email de confirmation.');
+            $exists = Registration::where('event_id', $event->id)
+                ->where('email', $validated['email'])
+                ->whereNotIn('status', ['cancelled'])
+                ->lockForUpdate()
+                ->exists();
+
+            if ($exists) {
+                return back()->with('error', 'Vous êtes déjà inscrit(e) à cet événement avec cet email.');
+            }
+
+            Registration::create([
+                ...$validated,
+                'event_id' => $event->id,
+                'status' => 'pending',
+            ]);
+
+            return back()->with('success', 'Inscription confirmée ! Vous recevrez bientôt un email de confirmation.');
+        });
     }
 
     public function joinWaitingList(Request $request, string $slug)
@@ -71,6 +92,8 @@ class EventController extends Controller
             'phone' => 'nullable|string|max:30',
         ]);
 
+        $validated['email'] = mb_strtolower(trim($validated['email']));
+
         $existing = WaitingList::where('event_id', $event->id)
             ->where('email', $validated['email'])
             ->first();
@@ -88,16 +111,23 @@ class EventController extends Controller
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
-        $dtstart = $event->event_date->format('Ymd\THis\Z');
-        $dtstamp = now()->format('Ymd\THis\Z');
-        $uid = $event->slug.'@fsl.ci';
-        $summary = addslashes($event->title);
-        $desc = addslashes(strip_tags($event->description ?? ''));
-        $location = addslashes($event->location.($event->city ? ', '.$event->city : ''));
+        // Échappement conforme RFC 5545 (\\, \; \, et sauts de ligne en \n) + conversion UTC.
+        $esc = fn (string $s): string => addcslashes(
+            str_replace(["\r\n", "\n", "\r"], '\n', $s),
+            ',;\\'
+        );
+
+        $dtstart = $event->event_date->copy()->utc()->format('Ymd\THis\Z');
+        $dtend = $event->event_date->copy()->addHours(2)->utc()->format('Ymd\THis\Z');
+        $dtstamp = now()->utc()->format('Ymd\THis\Z');
+        $uid = $event->slug.'@femme-sans-limites.com';
+        $summary = $esc($event->title);
+        $desc = $esc(strip_tags($event->description ?? ''));
+        $location = $esc($event->location.($event->city ? ', '.$event->city : ''));
         $url = route('events.show', $event->slug);
 
-        $ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//FSL//FSL Events//FR\r\n"
-              ."BEGIN:VEVENT\r\nUID:{$uid}\r\nDTSTAMP:{$dtstamp}\r\nDTSTART:{$dtstart}\r\n"
+        $ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//FSL//FSL Events//FR\r\nCALSCALE:GREGORIAN\r\n"
+              ."BEGIN:VEVENT\r\nUID:{$uid}\r\nDTSTAMP:{$dtstamp}\r\nDTSTART:{$dtstart}\r\nDTEND:{$dtend}\r\n"
               ."SUMMARY:{$summary}\r\nDESCRIPTION:{$desc}\r\nLOCATION:{$location}\r\nURL:{$url}\r\n"
               ."END:VEVENT\r\nEND:VCALENDAR";
 

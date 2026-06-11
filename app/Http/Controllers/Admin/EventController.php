@@ -16,7 +16,7 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Event::withCount('registrations');
+        $query = Event::withCount('registrations')->withActiveRegistrationsCount();
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -55,11 +55,15 @@ class EventController extends Controller
             'city' => 'nullable|string|max:100',
             'capacity' => 'nullable|integer|min:1',
             'is_paid' => 'boolean',
-            'price' => 'nullable|numeric|min:0',
+            'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
             'currency' => 'nullable|string|max:20',
-            'payment_link' => 'nullable|url|max:500',
+            'payment_link' => 'nullable|required_if:is_paid,1|url|max:500',
             'status' => 'required|in:draft,published,cancelled',
-            'image' => 'nullable|image|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
+        ], [
+            'price.required_if' => 'Le tarif est obligatoire pour un événement payant.',
+            'payment_link.required_if' => 'Le lien de paiement est obligatoire pour un événement payant.',
+            'event_date.after' => 'La date de l\'événement doit être dans le futur.',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -85,6 +89,8 @@ class EventController extends Controller
             'registrations as paid_count' => fn ($q) => $q->where('status', 'paid'),
             'registrations as pending_count' => fn ($q) => $q->where('status', 'pending'),
             'registrations as attended_count' => fn ($q) => $q->where('status', 'attended'),
+            'registrations as active_registrations_count' => fn ($q) => $q->whereNotIn('status', ['cancelled']),
+            'waitingList as waiting_list_count',
         ]);
 
         return view('admin.events.show', compact('event'));
@@ -101,17 +107,22 @@ class EventController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'required|string',
             'short_description' => 'nullable|string|max:300',
-            'event_date' => 'required|date|after_or_equal:today',
+            // Pas de contrainte de date future à l'édition : on doit pouvoir corriger
+            // un événement déjà passé (libellé, lieu…) sans en changer la date.
+            'event_date' => 'required|date',
             'registration_closes_at' => 'nullable|date|before:event_date',
             'location' => 'required|string|max:200',
             'city' => 'nullable|string|max:100',
             'capacity' => 'nullable|integer|min:1',
             'is_paid' => 'boolean',
-            'price' => 'nullable|numeric|min:0',
+            'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
             'currency' => 'nullable|string|max:20',
-            'payment_link' => 'nullable|url|max:500',
+            'payment_link' => 'nullable|required_if:is_paid,1|url|max:500',
             'status' => 'required|in:draft,published,cancelled,completed',
-            'image' => 'nullable|image|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
+        ], [
+            'price.required_if' => 'Le tarif est obligatoire pour un événement payant.',
+            'payment_link.required_if' => 'Le lien de paiement est obligatoire pour un événement payant.',
         ]);
 
         $validated['is_paid'] = $request->boolean('is_paid');
@@ -136,6 +147,12 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        // Protège les données comptables : on ne supprime pas un événement
+        // ayant des inscriptions payées ou des présences enregistrées.
+        if ($event->registrations()->whereIn('status', ['paid', 'attended'])->exists()) {
+            return back()->with('error', 'Impossible de supprimer : cet événement a des inscriptions payées ou des présences. Passez-le plutôt en statut « Annulé » ou « Terminé ».');
+        }
+
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
         }

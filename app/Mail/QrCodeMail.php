@@ -30,7 +30,8 @@ class QrCodeMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
-        $path = Storage::disk('public')->path($this->registration->qr_code_path);
+        $disk = Storage::disk('local')->exists($this->registration->qr_code_path) ? 'local' : 'public';
+        $path = Storage::disk($disk)->path($this->registration->qr_code_path);
 
         return [
             Attachment::fromPath($path)->as('qr-code-acces.svg')->withMime('image/svg+xml'),

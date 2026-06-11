@@ -101,10 +101,10 @@
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-2">
-                        <span class="font-semibold" style="color:var(--dark);">{{ $event->registrations_count }}</span>
+                        <span class="font-semibold" style="color:var(--dark);">{{ $event->activeRegistrationsCount() }}</span>
                         @if($event->capacity)
                         <div class="w-16 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                            <div class="h-full rounded-full" style="width:{{ min(100, intval($event->registrations_count / $event->capacity * 100)) }}%;background:var(--rose);"></div>
+                            <div class="h-full rounded-full" style="width:{{ min(100, intval($event->activeRegistrationsCount() / $event->capacity * 100)) }}%;background:var(--rose);"></div>
                         </div>
                         <span class="text-xs text-gray-400">/ {{ $event->capacity }}</span>
                         @endif

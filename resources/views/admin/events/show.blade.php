@@ -76,7 +76,7 @@
                     ['Paiements confirmés', $event->paid_count,                      'var(--rose)'],
                     ['Présents',            $event->attended_count,                  '#7C3AED'],
                     ['Places restantes',    $event->spots_left ?? '∞',              'var(--gold)'],
-                    ['Liste d\'attente',    $event->waitingList()->count(),          '#6B7280'],
+                    ['Liste d\'attente',    $event->waiting_list_count,               '#6B7280'],
                 ] as [$label, $val, $color])
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-500">{{ $label }}</span>
@@ -125,7 +125,7 @@
 
             <form x-ref="del_form" action="{{ route('admin.events.destroy', $event) }}" method="POST">@csrf @method('DELETE')</form>
             <button type="button"
-                @click="confirm = { title: 'Supprimer cet événement ?', body: 'Cette action est irréversible. Toutes les inscriptions seront également supprimées.' }; confirmAction = 'del_form'"
+                @click="confirm = { title: 'Supprimer cet événement ?', body: 'L\'événement sera archivé. Suppression impossible s\'il a des inscriptions payées ou des présences.' }; confirmAction = 'del_form'"
                 class="w-full text-sm py-2 rounded-xl font-medium text-red-400 hover:bg-red-50 border border-red-100 transition-colors">
                 Supprimer l'événement
             </button>

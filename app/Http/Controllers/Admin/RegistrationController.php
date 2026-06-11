@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\PaymentLinkMail;
 use App\Mail\QrCodeMail;
+use App\Mail\WaitingListSpotMail;
 use App\Models\ActivityLog;
 use App\Models\Event;
 use App\Models\Registration;
 use App\Services\QrCodeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RegistrationController extends Controller
 {
@@ -53,7 +58,7 @@ class RegistrationController extends Controller
             return back()->with('error', 'Impossible d\'envoyer le lien pour ce statut.');
         }
 
-        \Mail::to($registration->email)->send(new PaymentLinkMail($registration, $event));
+        Mail::to($registration->email)->queue(new PaymentLinkMail($registration, $event));
 
         $registration->update([
             'status' => 'payment_sent',
@@ -63,10 +68,19 @@ class RegistrationController extends Controller
         return back()->with('success', 'Lien de paiement envoyé à '.$registration->email);
     }
 
+    /**
+     * Confirme l'accès d'un inscrit et lui envoie son QR code.
+     * Pour un événement payant : vaut confirmation de paiement.
+     * Pour un événement gratuit : génère simplement le QR d'accès.
+     */
     public function confirmPayment(Registration $registration)
     {
-        if ($registration->status === 'paid') {
-            return back()->with('error', 'Ce paiement est déjà confirmé. Le QR code a déjà été envoyé.');
+        if (in_array($registration->status, ['paid', 'attended'], true)) {
+            return back()->with('error', 'Cette inscription est déjà confirmée (QR déjà envoyé).');
+        }
+
+        if ($registration->status === 'cancelled') {
+            return back()->with('error', 'Cette inscription est annulée. Réactivez-la avant de confirmer.');
         }
 
         $qrToken = Str::uuid()->toString();
@@ -79,21 +93,63 @@ class RegistrationController extends Controller
             'paid_at' => now(),
         ]);
 
-        \Mail::to($registration->email)->send(new QrCodeMail($registration));
+        Mail::to($registration->email)->queue(new QrCodeMail($registration));
 
         ActivityLog::record('payment.confirmed', $registration->event, [
             'registration_id' => $registration->id,
             'email' => $registration->email,
         ]);
 
-        return back()->with('success', 'Paiement confirmé et QR code envoyé à '.$registration->email);
+        $msg = $registration->event->is_paid
+            ? 'Paiement confirmé et QR code envoyé à '.$registration->email
+            : 'Accès validé et QR code envoyé à '.$registration->email;
+
+        return back()->with('success', $msg);
     }
 
     public function cancel(Registration $registration)
     {
         $registration->update(['status' => 'cancelled']);
 
+        $this->notifyNextOnWaitingList($registration->event);
+
         return back()->with('success', 'Inscription annulée.');
+    }
+
+    /**
+     * Quand une place se libère, prévient le prochain inscrit sur la liste d'attente.
+     */
+    private function notifyNextOnWaitingList(Event $event): void
+    {
+        // Pas de capacité = pas de liste d'attente ; et seulement s'il reste une place.
+        if (! $event->capacity || $event->fresh()->is_sold_out) {
+            return;
+        }
+
+        $next = $event->waitingList()->where('notified', false)->oldest()->first();
+
+        if (! $next) {
+            return;
+        }
+
+        try {
+            Mail::to($next->email)->queue(new WaitingListSpotMail($event, $next));
+            $next->update(['notified' => true]);
+        } catch (\Throwable $e) {
+            Log::warning('Liste d\'attente: échec notification', [
+                'event_id' => $event->id, 'email' => $next->email, 'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Télécharge le QR d'une inscription depuis le disque privé (non exposé publiquement).
+     */
+    public function downloadQr(Registration $registration): StreamedResponse
+    {
+        abort_unless($registration->qr_code_path && Storage::disk('local')->exists($registration->qr_code_path), 404);
+
+        return Storage::disk('local')->download($registration->qr_code_path, 'qr-acces-'.$registration->id.'.svg');
     }
 
     public function exportCsv(Event $event)

@@ -101,6 +101,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('registrations/{registration}/send-payment', [RegistrationController::class, 'sendPaymentLink'])->name('registrations.send-payment');
     Route::post('registrations/{registration}/confirm-payment', [RegistrationController::class, 'confirmPayment'])->name('registrations.confirm-payment');
     Route::post('registrations/{registration}/cancel', [RegistrationController::class, 'cancel'])->name('registrations.cancel');
+    Route::get('registrations/{registration}/qr', [RegistrationController::class, 'downloadQr'])->name('registrations.qr');
 
     // QR Code Scanner
     Route::get('scanner/{event}', [ScannerController::class, 'index'])->name('scanner.index');

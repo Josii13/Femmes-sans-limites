@@ -128,7 +128,7 @@
                         @endif
 
                         @if($reg->qr_code_path)
-                        <a href="{{ asset('storage/'.$reg->qr_code_path) }}" download class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">⬇ QR</a>
+                        <a href="{{ route('admin.registrations.qr', $reg) }}" class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700">⬇ QR</a>
                         @endif
 
                         @if(!in_array($reg->status, ['cancelled','attended']))

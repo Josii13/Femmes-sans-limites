@@ -10,6 +10,8 @@ class WaitingList extends Model
 
     protected $fillable = ['event_id', 'first_name', 'last_name', 'email', 'phone', 'notified'];
 
+    protected $casts = ['notified' => 'boolean'];
+
     public function event()
     {
         return $this->belongsTo(Event::class);
