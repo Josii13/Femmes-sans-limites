@@ -71,6 +71,10 @@ Route::post('/ebooks/{ebook:slug}/acheter', [EbookPurchaseController::class, 'st
 // Téléchargement de l'ebook acheté (lien signé envoyé par email)
 Route::get('/ebooks/telechargement/{payment:reference}', [EbookPurchaseController::class, 'download'])
     ->middleware('signed')->name('ebooks.download');
+// Renvoyer son lien de téléchargement
+Route::get('/ebooks-mes-achats', [EbookPurchaseController::class, 'resendForm'])->name('ebooks.resend');
+Route::post('/ebooks-mes-achats', [EbookPurchaseController::class, 'resend'])
+    ->middleware('throttle:5,1')->name('ebooks.resend.store');
 
 // Webhook GeniusPay (signé HMAC, exempté de CSRF)
 Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');

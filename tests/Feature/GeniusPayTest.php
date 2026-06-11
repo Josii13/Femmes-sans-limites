@@ -229,6 +229,34 @@ class GeniusPayTest extends TestCase
         $this->assertSame('pending', $recent->refresh()->status);
     }
 
+    public function test_abandoned_paid_registration_can_resume_payment(): void
+    {
+        $this->fakeCheckout();
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000]);
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'A', 'last_name' => 'B',
+            'email' => 'resume@example.com', 'status' => 'pending',
+        ]);
+
+        // Réessayer avec le même email ne bloque plus : on relance le paiement.
+        $this->post(route('events.register', $event->slug), [
+            'first_name' => 'A', 'last_name' => 'B', 'email' => 'resume@example.com',
+        ])->assertRedirect('https://geniuspay.test/checkout/MTX-TEST123');
+    }
+
+    public function test_resend_ebook_link_requeues_delivery(): void
+    {
+        Mail::fake();
+        $ebook = Ebook::factory()->create(['price' => 5000, 'file_path' => 'ebooks/files/x.pdf', 'status' => 'published']);
+        Payment::create([
+            'reference' => 'r-rs', 'provider_reference' => 'MTX-RS', 'status' => 'completed', 'amount' => 5000,
+            'customer_email' => 'buyer@example.com', 'payable_type' => (new Ebook)->getMorphClass(), 'payable_id' => $ebook->id,
+        ]);
+
+        $this->post(route('ebooks.resend.store'), ['email' => 'buyer@example.com'])->assertRedirect();
+        Mail::assertQueued(EbookDeliveryMail::class);
+    }
+
     public function test_admin_can_view_sales_dashboard(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);

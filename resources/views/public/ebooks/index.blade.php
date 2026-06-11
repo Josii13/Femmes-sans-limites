@@ -111,6 +111,7 @@
             <button @click="$store.modal.join = true" class="btn-rose text-sm px-8 py-3">
                 Rejoindre la communauté FSL
             </button>
+            <p class="text-xs mt-6" style="color:var(--gray);">Déjà acheté un ebook ? <a href="{{ route('ebooks.resend') }}" style="color:var(--rose);text-decoration:underline;">Renvoyer mon lien de téléchargement</a></p>
         </div>
         @endif
 

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EbookDeliveryMail;
 use App\Models\Ebook;
 use App\Models\Payment;
 use App\Services\GeniusPayService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -86,6 +88,37 @@ class EbookPurchaseController extends Controller
         ]);
 
         return redirect()->away($result['checkout_url']);
+    }
+
+    /** Formulaire « renvoyer mon lien de téléchargement ». */
+    public function resendForm()
+    {
+        return view('public.ebooks.resend');
+    }
+
+    /** Renvoie le lien de téléchargement pour tous les ebooks achetés avec cet email. */
+    public function resend(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $email = mb_strtolower(trim($request->email));
+
+        Payment::where('customer_email', $email)
+            ->whereIn('status', ['completed', 'paid'])
+            ->where('payable_type', (new Ebook)->getMorphClass())
+            ->with('payable')
+            ->get()
+            ->each(function (Payment $payment) {
+                if ($payment->payable) {
+                    try {
+                        Mail::to($payment->customer_email)->queue(new EbookDeliveryMail($payment->payable, $payment));
+                    } catch (\Throwable) {
+                        // silencieux
+                    }
+                }
+            });
+
+        // Réponse volontairement générique (ne révèle pas l'existence d'un achat).
+        return back()->with('resent', true);
     }
 
     /** Téléchargement de l'ebook acheté (URL signée envoyée par email). */

@@ -65,13 +65,22 @@ class EventController extends Controller
                     : 'Les inscriptions pour cet événement sont closes.'];
             }
 
-            $exists = Registration::where('event_id', $event->id)
+            $existing = Registration::where('event_id', $event->id)
                 ->where('email', $validated['email'])
                 ->whereNotIn('status', ['cancelled'])
                 ->lockForUpdate()
-                ->exists();
+                ->first();
 
-            if ($exists) {
+            if ($existing) {
+                // Déjà payé/présent → vraiment inscrit.
+                if (in_array($existing->status, ['paid', 'attended'], true)) {
+                    return ['error' => 'Vous êtes déjà inscrit(e) à cet événement avec cet email.'];
+                }
+                // Inscription payante restée impayée → on propose de REPRENDRE le paiement.
+                if ($event->is_paid && (float) $event->price > 0) {
+                    return ['resume' => $existing];
+                }
+
                 return ['error' => 'Vous êtes déjà inscrit(e) à cet événement avec cet email.'];
             }
 
@@ -84,6 +93,11 @@ class EventController extends Controller
 
         if (! empty($result['error'])) {
             return back()->with('error', $result['error']);
+        }
+
+        // Reprise d'un paiement abandonné : on relance un paiement sur l'inscription existante.
+        if (! empty($result['resume'])) {
+            return $this->initiateEventPayment($event, $result['resume']);
         }
 
         // Événement payant → paiement en ligne (GeniusPay).

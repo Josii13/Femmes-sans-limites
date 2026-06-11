@@ -29,6 +29,9 @@
         </p>
         @endif
         <a href="{{ route('home') }}" class="btn-rose">Retour à l'accueil</a>
+        @if($isEbook && $payment->isPaid())
+        <p class="text-xs mt-5" style="color:var(--gray);">Tu n'as pas reçu l'email ? <a href="{{ route('ebooks.resend') }}" style="color:var(--rose);text-decoration:underline;">Renvoyer mon lien de téléchargement</a></p>
+        @endif
     </div>
 </section>
 @endsection
