@@ -74,6 +74,22 @@ class EventRegistrationTest extends TestCase
         $this->assertDatabaseHas('registrations', ['event_id' => $event->id, 'email' => 'awa@example.com', 'status' => 'pending']);
     }
 
+    public function test_admin_can_delete_event_even_with_paid_registrations(): void
+    {
+        $event = Event::factory()->create();
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'A', 'last_name' => 'B',
+            'email' => 'paid@example.com', 'status' => 'paid',
+        ]);
+
+        $this->actingAs(User::factory()->create(['is_admin' => true]))
+            ->delete(route('admin.events.destroy', $event))
+            ->assertRedirect(route('admin.events.index'));
+
+        $this->assertSoftDeleted('events', ['id' => $event->id]);
+        $this->assertSoftDeleted('registrations', ['email' => 'paid@example.com']);
+    }
+
     public function test_cancelling_a_registration_notifies_the_waiting_list(): void
     {
         Mail::fake();

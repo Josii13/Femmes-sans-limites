@@ -125,7 +125,7 @@
 
             <form x-ref="del_form" action="{{ route('admin.events.destroy', $event) }}" method="POST">@csrf @method('DELETE')</form>
             <button type="button"
-                @click="confirm = { title: 'Supprimer cet événement ?', body: 'L\'événement sera archivé. Suppression impossible s\'il a des inscriptions payées ou des présences.' }; confirmAction = 'del_form'"
+                @click="confirm = { title: 'Supprimer cet événement ?', body: 'L\'événement et ses inscriptions seront supprimés (archivés). Cette action peut être annulée par un développeur si besoin.' }; confirmAction = 'del_form'"
                 class="w-full text-sm py-2 rounded-xl font-medium text-red-400 hover:bg-red-50 border border-red-100 transition-colors">
                 Supprimer l'événement
             </button>

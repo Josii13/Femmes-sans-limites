@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\NewEventMail;
+use App\Models\ActivityLog;
 use App\Models\Event;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
@@ -147,16 +148,17 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        // Protège les données comptables : on ne supprime pas un événement
-        // ayant des inscriptions payées ou des présences enregistrées.
-        if ($event->registrations()->whereIn('status', ['paid', 'attended'])->exists()) {
-            return back()->with('error', 'Impossible de supprimer : cet événement a des inscriptions payées ou des présences. Passez-le plutôt en statut « Annulé » ou « Terminé ».');
-        }
-
         if ($event->image) {
             Storage::disk('public')->delete($event->image);
         }
+
+        // Archive l'événement et nettoie les données liées.
+        // (Soft-delete : l'événement et ses inscriptions restent récupérables en base.)
+        $event->registrations()->delete();   // soft-delete (Registration utilise SoftDeletes)
+        $event->waitingList()->delete();      // suppression de la liste d'attente
         $event->delete();
+
+        ActivityLog::record('event.deleted', $event);
 
         return redirect()->route('admin.events.index')->with('success', 'Événement supprimé.');
     }
