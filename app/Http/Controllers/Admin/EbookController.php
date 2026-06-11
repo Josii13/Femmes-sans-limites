@@ -47,15 +47,27 @@ class EbookController extends Controller
             'description' => 'required|string',
             'author_note' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
-            'cta_label' => 'required|string|max:60',
-            'cta_url' => 'required|url|max:500|starts_with:https://,http://',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:10',
+            'pdf' => 'nullable|file|mimes:pdf|max:30720',
+            'cta_label' => 'nullable|string|max:60',
+            'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
+        ], [
+            'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
+            'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
         ]);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('ebooks', 'public');
         }
+
+        if ($request->hasFile('pdf')) {
+            // Disque PRIVÉ : le PDF n'est jamais accessible par URL directe (livré via lien signé).
+            $validated['file_path'] = $request->file('pdf')->store('ebooks/files', 'local');
+        }
+        unset($validated['pdf']);
 
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
@@ -82,10 +94,16 @@ class EbookController extends Controller
             'description' => 'required|string',
             'author_note' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
-            'cta_label' => 'required|string|max:60',
-            'cta_url' => 'required|url|max:500|starts_with:https://,http://',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:10',
+            'pdf' => 'nullable|file|mimes:pdf|max:30720',
+            'cta_label' => 'nullable|string|max:60',
+            'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
+        ], [
+            'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
+            'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
         ]);
 
         if ($request->hasFile('image')) {
@@ -94,6 +112,14 @@ class EbookController extends Controller
             }
             $validated['image'] = $request->file('image')->store('ebooks', 'public');
         }
+
+        if ($request->hasFile('pdf')) {
+            if ($ebook->file_path) {
+                Storage::disk('local')->delete($ebook->file_path);
+            }
+            $validated['file_path'] = $request->file('pdf')->store('ebooks/files', 'local');
+        }
+        unset($validated['pdf']);
 
         $validated['sort_order'] = $validated['sort_order'] ?? $ebook->sort_order;
 

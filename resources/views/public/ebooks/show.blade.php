@@ -81,6 +81,24 @@
                 </blockquote>
                 @endif
 
+                @if($ebook->isPurchasable())
+                {{-- Vente directe sur le site --}}
+                <div class="flex items-baseline gap-2 mb-4">
+                    <span class="text-3xl font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">{{ number_format($ebook->price, 0, ',', ' ') }}</span>
+                    <span class="text-sm font-semibold" style="color:var(--gray);">{{ $ebook->currency }}</span>
+                </div>
+                <a href="{{ route('ebooks.buy', $ebook->slug) }}"
+                   class="btn-rose inline-flex items-center gap-3 px-8 py-4 text-base">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Acheter et télécharger
+                </a>
+                <p class="mt-3 text-xs" style="color:var(--gray);">
+                    🔒 Paiement sécurisé (Wave, Orange Money, MTN, Moov, carte) — livraison immédiate par email.
+                </p>
+                @else
+                {{-- Lien externe (partenaire) --}}
                 <a href="{{ $ebook->cta_url }}" target="_blank" rel="noopener noreferrer"
                    class="btn-rose inline-flex items-center gap-3 px-8 py-4 text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,11 +106,11 @@
                     </svg>
                     {{ $ebook->cta_label }}
                 </a>
-
                 <p class="mt-3 text-xs" style="color:var(--gray);">
                     Disponible via notre partenaire Charriow
                     <svg class="w-3 h-3 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </p>
+                @endif
             </div>
         </div>
     </div>

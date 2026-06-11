@@ -64,19 +64,49 @@
                 @error('image')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="rounded-xl border border-gray-100 p-5 space-y-4">
-                <p class="font-semibold text-sm" style="color:var(--dark);">Bouton d'action (CTA)</p>
+            {{-- Vente directe sur le site --}}
+            <div class="rounded-xl border p-5 space-y-4" style="border-color:var(--rose-mid);background:var(--rose-pale);">
+                <div>
+                    <p class="font-semibold text-sm mb-1" style="color:var(--dark);">💳 Vente directe sur le site</p>
+                    <p class="text-xs text-gray-500">Prix + PDF = vente directe (paiement + livraison auto). Vide = lien externe seulement.</p>
+                    @if($ebook->file_path)
+                    <p class="text-xs mt-1" style="color:#059669;">✓ Un fichier PDF est déjà associé. Téléverse un nouveau fichier pour le remplacer.</p>
+                    @endif
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="form-label">Label du bouton *</label>
+                        <label class="form-label">Prix <span class="font-normal text-gray-400">(vide = gratuit / externe)</span></label>
+                        <input type="number" step="1" min="0" name="price" value="{{ old('price', $ebook->price ? (int) $ebook->price : '') }}" class="form-input @error('price') border-red-400 @enderror" placeholder="5000">
+                        @error('price')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="form-label">Devise</label>
+                        <input type="text" name="currency" value="{{ old('currency', $ebook->currency ?? 'XOF') }}" class="form-input" placeholder="XOF">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Fichier PDF de l'ebook</label>
+                    <input type="file" name="pdf" accept="application/pdf" class="form-input py-2 text-sm cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">PDF, max 30 Mo. Livré au client par lien sécurisé après paiement.</p>
+                    @error('pdf')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            {{-- CTA externe (optionnel) --}}
+            <div class="rounded-xl border border-gray-100 p-5 space-y-4">
+                <p class="font-semibold text-sm" style="color:var(--dark);">Lien externe (optionnel)</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Label du bouton</label>
                         <select name="cta_label" class="form-input">
+                            <option value="">— Aucun —</option>
                             @foreach(['Télécharger maintenant','Lire maintenant','Obtenir l\'ebook','Commander sur Charriow','Accéder à l\'ebook'] as $label)
                             <option value="{{ $label }}" @selected(old('cta_label', $ebook->cta_label) === $label)>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="form-label">Lien Charriow *</label>
+                        <label class="form-label">Lien externe</label>
                         <input type="url" name="cta_url" value="{{ old('cta_url', $ebook->cta_url) }}" class="form-input @error('cta_url') border-red-400 @enderror">
                         @error('cta_url')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>

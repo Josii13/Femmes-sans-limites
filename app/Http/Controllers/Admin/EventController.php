@@ -58,7 +58,7 @@ class EventController extends Controller
             'is_paid' => 'boolean',
             'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
             'currency' => 'nullable|string|max:20',
-            'payment_link' => 'nullable|required_if:is_paid,1|url|max:500',
+            'payment_link' => 'nullable|url|max:500',
             'status' => 'required|in:draft,published,cancelled',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ], [
@@ -118,7 +118,7 @@ class EventController extends Controller
             'is_paid' => 'boolean',
             'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
             'currency' => 'nullable|string|max:20',
-            'payment_link' => 'nullable|required_if:is_paid,1|url|max:500',
+            'payment_link' => 'nullable|url|max:500',
             'status' => 'required|in:draft,published,cancelled,completed',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ], [

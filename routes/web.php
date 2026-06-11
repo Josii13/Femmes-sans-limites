@@ -11,12 +11,15 @@ use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\Admin\SiteImageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EbookController;
+use App\Http\Controllers\EbookPurchaseController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GeniusPayWebhookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MemberVerifyController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrackingController;
 use App\Models\ActivityLog;
@@ -54,6 +57,22 @@ Route::get('/t/{token}.gif', [TrackingController::class, 'pixel'])->name('track.
 
 // Vérification publique d'une carte de membre (cible du QR de la carte)
 Route::get('/membre/{token}', [MemberVerifyController::class, 'show'])->name('members.verify');
+
+// ── Paiements GeniusPay ──────────────────────────────────────────────
+// Retours après paiement (success_url / error_url)
+Route::get('/paiement/{payment:reference}/merci', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('/paiement/{payment:reference}/echec', [PaymentController::class, 'cancel'])->name('payment.cancel');
+
+// Achat d'ebook
+Route::get('/ebooks/{ebook:slug}/acheter', [EbookPurchaseController::class, 'create'])->name('ebooks.buy');
+Route::post('/ebooks/{ebook:slug}/acheter', [EbookPurchaseController::class, 'store'])
+    ->middleware('throttle:10,1')->name('ebooks.buy.store');
+// Téléchargement de l'ebook acheté (lien signé envoyé par email)
+Route::get('/ebooks/telechargement/{payment:reference}', [EbookPurchaseController::class, 'download'])
+    ->middleware('signed')->name('ebooks.download');
+
+// Webhook GeniusPay (signé HMAC, exempté de CSRF)
+Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');
 
 // Pages légales
 Route::get('/mentions-legales', fn () => view('public.legal.mentions-legales'))->name('legal.mentions');

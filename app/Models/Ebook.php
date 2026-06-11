@@ -13,12 +13,25 @@ class Ebook extends Model
 
     protected $fillable = [
         'title', 'slug', 'category', 'description', 'author_note',
-        'image', 'cta_label', 'cta_url', 'status', 'sort_order', 'newsletter_sent_at',
+        'image', 'file_path', 'price', 'currency', 'cta_label', 'cta_url',
+        'status', 'sort_order', 'newsletter_sent_at',
     ];
 
     protected $casts = [
         'newsletter_sent_at' => 'datetime',
+        'price' => 'decimal:2',
     ];
+
+    /** Vendable sur le site : a un prix > 0 ET un fichier PDF à livrer. */
+    public function isPurchasable(): bool
+    {
+        return $this->price !== null && (float) $this->price > 0 && ! empty($this->file_path);
+    }
+
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'payable');
+    }
 
     protected static function booted(): void
     {

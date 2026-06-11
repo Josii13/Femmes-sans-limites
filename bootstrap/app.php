@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Détection correcte du HTTPS derrière le proxy de l'hébergeur (URLs, cookies sécurisés).
         $middleware->trustProxies(at: '*');
 
+        // Le webhook de paiement vient d'un serveur tiers : exempté du CSRF (protégé par signature HMAC).
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
+        ]);
+
         // En-têtes de sécurité sur toutes les réponses web.
         $middleware->web(append: [
             SecurityHeaders::class,
