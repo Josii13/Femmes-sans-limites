@@ -200,6 +200,7 @@
                 </div>
                 <form x-show="!subscribed" method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col gap-2">
                     @csrf
+                    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
                     <input type="email" name="email" placeholder="ton@email.com" required
                            class="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
                            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:white;"
@@ -380,6 +381,7 @@
             @endif
             <form method="POST" action="{{ route('contact.send') }}" class="space-y-4">
                 @csrf
+                <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div><label class="form-label">Prénom <span style="color:var(--rose)">*</span></label><input type="text" name="name" value="{{ old('name') }}" class="form-input" placeholder="Marie" required></div>
                     <div><label class="form-label">Email <span style="color:var(--rose)">*</span></label><input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="marie@email.com" required></div>

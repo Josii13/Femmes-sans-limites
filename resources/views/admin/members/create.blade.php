@@ -33,7 +33,7 @@
                 @error('profession')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Pays *</label>
                     <input type="text" name="country" value="{{ old('country') }}" class="form-input @error('country') border-red-400 @enderror" placeholder="Côte d'Ivoire">
@@ -48,7 +48,7 @@
 
             <div>
                 <label class="form-label">Type de membre *</label>
-                <div class="grid grid-cols-3 gap-3 mt-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
                     @foreach(['standard' => ['Argent/Gris','#6B7280'], 'gold' => ['Or','#C9A84C'], 'premium' => ['Rose','#D91E6E']] as $type => [$label,$color])
                     <label class="relative cursor-pointer">
                         <input type="radio" name="type" value="{{ $type }}" {{ old('type','standard') === $type ? 'checked' : '' }} class="sr-only peer">

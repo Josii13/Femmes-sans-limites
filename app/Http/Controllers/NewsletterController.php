@@ -17,6 +17,11 @@ class NewsletterController extends Controller
      */
     public function subscribe(Request $request)
     {
+        // Honeypot anti-bot.
+        if ($request->filled('website')) {
+            return back()->with('newsletter_pending', true);
+        }
+
         $request->validate([
             'email' => 'required|email|max:191',
             'name' => 'nullable|string|max:100',

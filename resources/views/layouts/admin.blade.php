@@ -208,8 +208,8 @@
                 @endif
             </div>
 
-            {{-- Actions --}}
-            <div class="flex items-center gap-2 flex-shrink-0">
+            {{-- Actions (scroll horizontal local sur mobile plutôt que débordement de page) --}}
+            <div class="flex items-center gap-2 flex-shrink-0 overflow-x-auto no-scrollbar max-w-[60%] sm:max-w-none">
                 @yield('header-actions')
             </div>
         </header>

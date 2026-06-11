@@ -17,7 +17,8 @@
 </div>
 @else
 <div class="admin-card overflow-hidden p-0">
-    <table class="w-full text-sm">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[640px]">
         <thead>
             <tr style="background:#F8F7F9;">
                 <th class="text-left px-6 py-3 font-semibold text-xs uppercase tracking-wider text-gray-500">Personne</th>
@@ -45,6 +46,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>
 @endif
 @endsection

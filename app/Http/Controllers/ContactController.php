@@ -15,6 +15,11 @@ class ContactController extends Controller
 
     public function send(Request $request)
     {
+        // Honeypot anti-bot : un humain ne remplit jamais ce champ caché.
+        if ($request->filled('website')) {
+            return back()->with('success', 'Votre message a bien été envoyé. Nous vous répondrons sous 48h.');
+        }
+
         try {
             $request->validate([
                 'name' => 'required|string|max:100',

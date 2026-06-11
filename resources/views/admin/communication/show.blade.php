@@ -126,7 +126,8 @@
                 <p class="text-sm" style="color:var(--gray);">Aucun destinataire pour l'instant.</p>
             </div>
             @else
-            <table class="w-full text-sm">
+            <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[560px]">
                 <thead>
                     <tr style="background:#FAFAFA;border-bottom:1px solid var(--border);">
                         <th class="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wide" style="color:var(--gray);">Membre</th>
@@ -173,6 +174,7 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
             @if($recipients->hasPages())
             <div class="px-5 py-4" style="border-top:1px solid var(--border);">{{ $recipients->links() }}</div>
             @endif

@@ -11,7 +11,7 @@
 
 {{-- Filters --}}
 <form method="GET" class="flex flex-wrap gap-3 mb-6">
-    <input type="text" name="search" value="{{ request('search') }}" placeholder="Titre, catégorie..." class="form-input w-64">
+    <input type="text" name="search" value="{{ request('search') }}" placeholder="Titre, catégorie..." class="form-input flex-1 min-w-[180px] sm:w-64 sm:flex-none">
     <select name="status" class="form-input w-40">
         <option value="">Tous les statuts</option>
         <option value="published" @selected(request('status')=='published')>Publié</option>
@@ -37,7 +37,8 @@
         </div>
     </div>
 
-    <table class="w-full text-sm">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[720px]">
         <thead>
             <tr style="background:#F8F7F9;">
                 <th class="text-left px-6 py-3 font-semibold text-xs uppercase tracking-wider text-gray-500">Ebook</th>
@@ -106,6 +107,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
     @if($ebooks->hasPages())
     <div class="px-6 py-4 border-t border-gray-50">{{ $ebooks->links() }}</div>
     @endif
