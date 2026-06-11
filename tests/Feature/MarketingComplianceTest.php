@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\CampaignMail;
 use App\Mail\NewsletterConfirmMail;
 use App\Models\Campaign;
 use App\Models\Member;
@@ -54,6 +55,20 @@ class MarketingComplianceTest extends TestCase
         NewsletterSubscriber::create(['email' => 'b@example.com', 'name' => 'B', 'confirmed_at' => now()]);
 
         $this->assertCount(1, NewsletterSubscriber::mailable()->get());
+    }
+
+    public function test_campaign_personalization_handles_all_placeholder_formats(): void
+    {
+        $vars = CampaignMail::variables(null, [
+            'prenom' => 'Aïcha', 'nom' => 'Aïcha Koné', 'ville' => 'Abidjan',
+            'numero' => 'FSL-STD-2026-00042',
+        ]);
+
+        // Accolades, crochets, majuscules, accents, libellés composés : tous remplacés.
+        $this->assertSame('Chère Aïcha', CampaignMail::personalize('Chère [Prénom]', $vars));
+        $this->assertSame('Aïcha / Aïcha / Aïcha', CampaignMail::personalize('{prenom} / {PRENOM} / [prenom]', $vars));
+        $this->assertSame('Ville : Abidjan', CampaignMail::personalize('Ville : [Ville]', $vars));
+        $this->assertSame('N° FSL-STD-2026-00042', CampaignMail::personalize('N° [Numéro de membre]', $vars));
     }
 
     public function test_member_can_opt_out_via_campaign_link(): void

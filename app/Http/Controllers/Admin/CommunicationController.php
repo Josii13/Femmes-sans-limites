@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CampaignMail;
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
 use App\Models\CampaignTemplate;
@@ -178,7 +179,8 @@ class CommunicationController extends Controller
         return redirect()->route('admin.communication.index')->with('success', 'Campagne supprimée.');
     }
 
-    // Aperçu HTML du mail de campagne (rendu réel dans un nouvel onglet)
+    // Aperçu HTML du mail de campagne (rendu réel dans un nouvel onglet).
+    // Utilise EXACTEMENT la même logique de personnalisation que l'envoi réel.
     public function preview(Campaign $campaign)
     {
         $member = Member::where('status', 'active')->first();
@@ -191,20 +193,18 @@ class CommunicationController extends Controller
             'token' => 'preview',
         ]);
 
-        $fullName = $member?->name ?? 'Marie Koné';
-        $firstName = mb_ucfirst(explode(' ', trim($fullName))[0]);
+        // Valeurs d'exemple si aucun membre actif n'existe encore.
+        $vars = CampaignMail::variables($member, [
+            'prenom' => 'Marie',
+            'nom' => 'Marie Koné',
+            'numero' => 'FSL-STD-2026-00001',
+            'type' => 'Standard',
+            'ville' => 'Abidjan',
+            'pays' => "Côte d'Ivoire",
+            'profession' => 'Entrepreneur',
+        ]);
 
-        $vars = [
-            '{prenom}' => $firstName,
-            '{nom}' => $fullName,
-            '{numero}' => $member?->member_number ?? 'FSL-APERCU',
-            '{type}' => $member ? ucfirst($member->type) : 'Standard',
-            '{ville}' => $member?->city ?? 'Abidjan',
-            '{pays}' => $member?->country ?? 'Côte d\'Ivoire',
-            '{profession}' => $member?->profession ?? 'Entrepreneur',
-        ];
-
-        $resolvedBody = str_replace(array_keys($vars), array_values($vars), $campaign->body);
+        $resolvedBody = CampaignMail::personalize($campaign->body, $vars);
 
         return response()
             ->view('emails.campaign', compact('campaign', 'recipient', 'resolvedBody') + ['unsubscribeUrl' => null])
