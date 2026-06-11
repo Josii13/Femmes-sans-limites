@@ -89,8 +89,8 @@
                     <img src="{{ site_img('home_hero_main') }}" alt="Membre FSL en pleine conférence" class="w-full h-full object-cover object-top" data-parallax="0.08">
                     <div class="absolute inset-x-0 bottom-0 h-2/5" style="background:linear-gradient(to top,rgba(15,10,12,0.55),transparent);"></div>
                     <div class="absolute bottom-5 left-5">
-                        <p class="text-xs font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(255,255,255,0.65);">Membre FSL</p>
-                        <p class="text-base font-bold text-white" style="font-family:'Playfair Display',serif;">Leader & Entrepreneur</p>
+                        <p class="text-xs font-semibold uppercase tracking-widest mb-0.5" style="color:rgba(255,255,255,0.65);"></p>
+                        <p class="text-base font-bold text-white" style="font-family:'Playfair Display',serif;"></p>
                     </div>
                 </div>
 

@@ -5,9 +5,9 @@
 <section class="min-h-screen flex items-center justify-center px-6" style="background:linear-gradient(160deg,#1A0A10 0%,#0D1418 100%);">
     <div class="max-w-lg w-full text-center">
 
-        <div class="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl" style="background:#D91E6E22;border:2px solid #D91E6E44;">
+        <!-- <div class="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl" style="background:#D91E6E22;border:2px solid #D91E6E44;">
             ✨
-        </div>
+        </div> -->
 
         <h1 class="text-3xl font-bold text-white mb-4">Candidature reçue !</h1>
 
