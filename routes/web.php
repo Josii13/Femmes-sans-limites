@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EbookController as AdminEbookController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\Admin\SiteImageController;
 use App\Http\Controllers\ContactController;
@@ -156,6 +157,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('site-images', [SiteImageController::class, 'index'])->name('site-images.index');
     Route::put('site-images/{siteImage}', [SiteImageController::class, 'update'])->name('site-images.update');
     Route::delete('site-images/{siteImage}/reset', [SiteImageController::class, 'reset'])->name('site-images.reset');
+
+    // Ventes / paiements
+    Route::get('sales', [SalesController::class, 'index'])->name('sales.index');
 
     // Activity log
     Route::get('activity', function () {

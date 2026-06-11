@@ -15,3 +15,13 @@ Schedule::command('campaigns:dispatch')
 Schedule::command('members:expire')
     ->dailyAt('07:00')
     ->withoutOverlapping();
+
+// Libère les places des inscriptions payantes restées impayées.
+Schedule::command('registrations:expire-unpaid')
+    ->everyTenMinutes()
+    ->withoutOverlapping();
+
+// Filet de sécurité : confirme les paiements dont le webhook aurait été manqué.
+Schedule::command('payments:reconcile')
+    ->everyTenMinutes()
+    ->withoutOverlapping();

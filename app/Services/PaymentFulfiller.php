@@ -25,7 +25,7 @@ class PaymentFulfiller
         $payable = $payment->payable;
 
         if ($payable instanceof Registration) {
-            $this->fulfillRegistration($payment, $payable);
+            $this->confirmRegistration($payable, $payment);
 
             return;
         }
@@ -35,7 +35,12 @@ class PaymentFulfiller
         }
     }
 
-    private function fulfillRegistration(Payment $payment, Registration $registration): void
+    /**
+     * Confirme une inscription : génère le QR, passe en « paid » et envoie le reçu + QR.
+     * Utilisable pour un paiement en ligne (avec $payment) OU une inscription gratuite (sans).
+     * Idempotent.
+     */
+    public function confirmRegistration(Registration $registration, ?Payment $payment = null): void
     {
         if (in_array($registration->status, ['paid', 'attended'], true)) {
             return; // déjà honoré
@@ -52,12 +57,13 @@ class PaymentFulfiller
         try {
             Mail::to($registration->email)->queue(new QrCodeMail($registration, $payment));
         } catch (\Throwable $e) {
-            Log::warning('Paiement: échec envoi QrCodeMail', ['reg' => $registration->id, 'error' => $e->getMessage()]);
+            Log::warning('Confirmation: échec envoi QrCodeMail', ['reg' => $registration->id, 'error' => $e->getMessage()]);
         }
 
-        ActivityLog::record('payment.confirmed', $registration->event, [
+        ActivityLog::record($payment ? 'payment.confirmed' : 'registration.confirmed', $registration->event, [
             'registration_id' => $registration->id,
-            'reference' => $payment->reference,
+            'reference' => $payment?->reference,
+            'free' => $payment === null,
         ]);
     }
 

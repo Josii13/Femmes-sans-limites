@@ -111,6 +111,16 @@
             </a>
 
             <div class="pt-5 pb-1.5 px-3">
+                <p class="text-[10px] font-bold uppercase tracking-[0.13em]" style="color:rgba(255,255,255,0.25);">Ventes</p>
+            </div>
+            <a href="{{ route('admin.sales.index') }}"
+               @click="sidebarOpen = false"
+               class="admin-nav-link {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 7h6m-6 4h6m-6 4h4M5 3h14a2 2 0 012 2v14l-3-2-2 2-2-2-2 2-2-2-3 2V5a2 2 0 012-2z"/></svg>
+                Ventes & paiements
+            </a>
+
+            <div class="pt-5 pb-1.5 px-3">
                 <p class="text-[10px] font-bold uppercase tracking-[0.13em]" style="color:rgba(255,255,255,0.25);">Communication</p>
             </div>
             <a href="{{ route('admin.communication.index') }}"

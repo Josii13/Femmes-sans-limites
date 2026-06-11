@@ -7,13 +7,17 @@ use App\Models\Payment;
 use App\Models\Registration;
 use App\Models\WaitingList;
 use App\Services\GeniusPayService;
+use App\Services\PaymentFulfiller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
-    public function __construct(private GeniusPayService $genius) {}
+    public function __construct(
+        private GeniusPayService $genius,
+        private PaymentFulfiller $fulfiller,
+    ) {}
 
     public function index()
     {
@@ -82,12 +86,15 @@ class EventController extends Controller
             return back()->with('error', $result['error']);
         }
 
-        // Événement payant → paiement en ligne (GeniusPay). Sinon, inscription gratuite confirmée.
+        // Événement payant → paiement en ligne (GeniusPay).
         if ($event->is_paid && (float) $event->price > 0) {
             return $this->initiateEventPayment($event, $result['registration']);
         }
 
-        return back()->with('success', 'Inscription confirmée ! Vous recevrez bientôt un email de confirmation.');
+        // Événement gratuit → inscription confirmée immédiatement : QR + email de confirmation.
+        $this->fulfiller->confirmRegistration($result['registration']);
+
+        return back()->with('success', 'Inscription confirmée ! Ton QR d\'accès vient de t\'être envoyé par email.');
     }
 
     /** Crée le paiement GeniusPay pour une inscription et redirige vers le checkout. */
@@ -125,8 +132,13 @@ class EventController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
+            // Nettoyage : on annule l'inscription et le paiement avortés pour libérer la place
+            // et permettre de réessayer (le contrôle anti-doublon ignore les annulées).
+            $registration->update(['status' => 'cancelled']);
+            $payment->update(['status' => 'failed']);
+
             return redirect()->route('events.show', $event->slug)
-                ->with('error', "Ton inscription est enregistrée, mais le paiement n'a pas pu démarrer. L'équipe te recontactera avec un lien de paiement.");
+                ->with('error', "Le paiement n'a pas pu démarrer. Réessaie dans un instant.");
         }
 
         $payment->update(['provider_reference' => $res['reference'], 'checkout_url' => $res['checkout_url']]);

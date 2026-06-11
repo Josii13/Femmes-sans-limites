@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\WaitingList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EventRegistrationTest extends TestCase
@@ -64,14 +65,18 @@ class EventRegistrationTest extends TestCase
         $this->assertDatabaseHas('registrations', ['email' => 'awa@example.com']);
     }
 
-    public function test_valid_registration_succeeds(): void
+    public function test_valid_free_registration_is_confirmed_immediately(): void
     {
-        $event = Event::factory()->withCapacity(10)->create();
+        Mail::fake();
+        Storage::fake('local');
+
+        $event = Event::factory()->withCapacity(10)->create(); // gratuit par défaut
 
         $this->post(route('events.register', $event->slug), $this->payload())
             ->assertSessionHas('success');
 
-        $this->assertDatabaseHas('registrations', ['event_id' => $event->id, 'email' => 'awa@example.com', 'status' => 'pending']);
+        // Événement gratuit → inscription confirmée + QR généré immédiatement.
+        $this->assertDatabaseHas('registrations', ['event_id' => $event->id, 'email' => 'awa@example.com', 'status' => 'paid']);
     }
 
     public function test_admin_can_delete_event_even_with_paid_registrations(): void

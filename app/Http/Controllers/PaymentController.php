@@ -23,8 +23,12 @@ class PaymentController extends Controller
         if (! $payment->isPaid() && $payment->provider_reference) {
             $remote = $this->genius->getPayment($payment->provider_reference);
             if ($remote && Payment::isSuccessfulStatus($remote['status'] ?? null)) {
-                $payment->update(['status' => 'completed', 'paid_at' => now()]);
-                $this->fulfiller->fulfill($payment->fresh('payable'));
+                // Vérifie le montant avant de confirmer (cohérence financière).
+                $paid = (float) ($remote['amount'] ?? 0);
+                if ($paid <= 0 || abs($paid - (float) $payment->amount) <= 0.01) {
+                    $payment->update(['status' => 'completed', 'paid_at' => now()]);
+                    $this->fulfiller->fulfill($payment->fresh('payable'));
+                }
             }
         }
 

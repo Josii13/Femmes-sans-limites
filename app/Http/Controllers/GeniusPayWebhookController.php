@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Payment;
+use App\Models\Registration;
 use App\Services\GeniusPayService;
 use App\Services\PaymentFulfiller;
 use Illuminate\Http\Request;
@@ -49,12 +51,39 @@ class GeniusPayWebhookController extends Controller
         }
 
         if (Payment::isSuccessfulStatus($status)) {
+            // Vérification du montant : on refuse de confirmer si le montant payé ne correspond pas.
+            $paidAmount = (float) data_get($request->all(), 'data.amount');
+            if ($paidAmount > 0 && abs($paidAmount - (float) $payment->amount) > 0.01) {
+                Log::warning('GeniusPay webhook: montant incohérent', [
+                    'reference' => $reference, 'attendu' => $payment->amount, 'recu' => $paidAmount,
+                ]);
+                $payment->update(['status' => 'amount_mismatch']);
+
+                return response()->json(['message' => 'amount mismatch'], 422);
+            }
+
             $payment->update(['status' => 'completed', 'paid_at' => now()]);
             $this->fulfiller->fulfill($payment->fresh('payable'));
         } elseif (in_array($status, ['failed', 'cancelled', 'expired'], true)) {
             $payment->update(['status' => $status]);
+        } elseif ($status === 'refunded') {
+            $this->handleRefund($payment->fresh('payable'));
         }
 
         return response()->json(['message' => 'ok']);
+    }
+
+    /** Remboursement : on révoque l'accès lié (inscription) et on journalise. */
+    private function handleRefund(Payment $payment): void
+    {
+        $payment->update(['status' => 'refunded']);
+
+        $payable = $payment->payable;
+        if ($payable instanceof Registration && $payable->status !== 'cancelled') {
+            $payable->update(['status' => 'cancelled', 'qr_token' => null]);
+            ActivityLog::record('payment.refunded', $payable->event, [
+                'registration_id' => $payable->id, 'reference' => $payment->reference,
+            ]);
+        }
     }
 }

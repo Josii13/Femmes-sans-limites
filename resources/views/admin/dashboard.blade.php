@@ -24,7 +24,7 @@
         <p class="text-sm mt-1" style="color:var(--gray);">{{ now()->isoFormat('dddd D MMMM YYYY') }} · Vue d'ensemble de la plateforme</p>
     </div>
     @if($stats['pending'] > 0)
-    <a href="{{ route('admin.members.index', ['status' => 'inactive']) }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all" style="background:rgba(217,30,110,0.08);color:var(--rose);border:1px solid rgba(217,30,110,0.18);" onmouseover="this.style.background='rgba(217,30,110,0.14)'" onmouseout="this.style.background='rgba(217,30,110,0.08)'">
+    <a href="{{ route('admin.members.index', ['status' => 'pending']) }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all" style="background:rgba(217,30,110,0.08);color:var(--rose);border:1px solid rgba(217,30,110,0.18);" onmouseover="this.style.background='rgba(217,30,110,0.14)'" onmouseout="this.style.background='rgba(217,30,110,0.08)'">
         <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--rose);animation:pulse 2s infinite;"></span>
         {{ $stats['pending'] }} candidature{{ $stats['pending'] > 1 ? 's' : '' }} en attente
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -33,7 +33,7 @@
 </div>
 
 {{-- ══ KPIs ══ --}}
-<div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     {{-- Membres --}}
     <div class="bg-white rounded-2xl p-5" style="border:1px solid #EEEBF0;box-shadow:0 1px 6px rgba(0,0,0,0.04);">
         <div class="flex items-start justify-between mb-4">
@@ -122,7 +122,7 @@
                 <p class="text-xs" style="color:var(--gray);">{{ $stats['pending'] }} membre{{ $stats['pending'] > 1 ? 's' : '' }} à activer</p>
             </div>
         </div>
-        <a href="{{ route('admin.members.index', ['status' => 'inactive']) }}" class="text-xs font-semibold" style="color:var(--rose);">Voir toutes →</a>
+        <a href="{{ route('admin.members.index', ['status' => 'pending']) }}" class="text-xs font-semibold" style="color:var(--rose);">Voir toutes →</a>
     </div>
     <div class="flex flex-wrap gap-2">
         @foreach($pendingMembers as $pm)
@@ -149,7 +149,7 @@
 @endif
 
 {{-- ══ Listes ══ --}}
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
 
     {{-- Prochains événements --}}
     <div class="bg-white rounded-2xl" style="border:1px solid #EEEBF0;box-shadow:0 1px 6px rgba(0,0,0,0.04);">
@@ -247,7 +247,7 @@
         @foreach([
             [route('admin.members.create'), 'var(--rose)', 'rgba(217,30,110,0.08)', 'Ajouter un membre', 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z'],
             [route('admin.events.create'), 'var(--gold)', 'rgba(201,168,76,0.1)', 'Créer un événement', 'M12 4v16m8-8H4'],
-            [route('admin.members.index', ['status'=>'inactive']), '#7C3AED', 'rgba(124,58,237,0.08)', 'Candidatures en attente', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'],
+            [route('admin.members.index', ['status'=>'pending']), '#7C3AED', 'rgba(124,58,237,0.08)', 'Candidatures en attente', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'],
             [route('admin.members.index'), 'var(--dark)', 'rgba(15,10,12,0.06)', 'Voir tous les membres', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
         ] as [$href, $color, $bg, $label, $icon])
         <a href="{{ $href }}" class="flex flex-col items-start gap-3 p-4 rounded-xl transition-all hover:shadow-sm" style="background:{{ $bg }};border:1px solid transparent;" onmouseover="this.style.borderColor='{{ $color }}33'" onmouseout="this.style.borderColor='transparent'">

@@ -8,6 +8,7 @@ use App\Models\Ebook;
 use App\Models\Event;
 use App\Models\Payment;
 use App\Models\Registration;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -133,6 +134,105 @@ class GeniusPayTest extends TestCase
         $this->postWebhook($body)->assertOk(); // 2e fois : ne doit rien refaire
 
         Mail::assertQueued(QrCodeMail::class, 1);
+    }
+
+    public function test_free_event_registration_generates_qr_and_receipt_immediately(): void
+    {
+        Mail::fake();
+        Storage::fake('local');
+
+        $event = Event::factory()->create(['is_paid' => false, 'price' => null]);
+
+        $this->post(route('events.register', $event->slug), [
+            'first_name' => 'Awa', 'last_name' => 'T', 'email' => 'free@example.com',
+        ])->assertSessionHas('success');
+
+        $reg = Registration::where('email', 'free@example.com')->firstOrFail();
+        $this->assertSame('paid', $reg->status);
+        $this->assertNotNull($reg->qr_token);
+        Mail::assertQueued(QrCodeMail::class);
+    }
+
+    public function test_payment_init_failure_cancels_registration(): void
+    {
+        Http::fake(['*/payments' => Http::response(['success' => false], 500)]);
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000]);
+
+        $this->post(route('events.register', $event->slug), [
+            'first_name' => 'A', 'last_name' => 'B', 'email' => 'fail@example.com',
+        ])->assertRedirect(route('events.show', $event->slug));
+
+        $this->assertSame('cancelled', Registration::where('email', 'fail@example.com')->first()->status);
+    }
+
+    public function test_webhook_rejects_amount_mismatch(): void
+    {
+        Mail::fake();
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000]);
+        $registration = Registration::create([
+            'event_id' => $event->id, 'first_name' => 'A', 'last_name' => 'B',
+            'email' => 'm@example.com', 'status' => 'pending',
+        ]);
+        Payment::create([
+            'reference' => 'r-mm', 'provider_reference' => 'MTX-MM', 'status' => 'pending', 'amount' => 5000,
+            'payable_type' => $registration->getMorphClass(), 'payable_id' => $registration->id,
+        ]);
+
+        // Montant reçu (1000) ≠ attendu (5000) → refusé.
+        $this->postWebhook(['event' => 'payment.success', 'data' => ['reference' => 'MTX-MM', 'status' => 'completed', 'amount' => 1000]])
+            ->assertStatus(422);
+
+        $this->assertSame('pending', $registration->refresh()->status);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_reconcile_confirms_pending_payment(): void
+    {
+        Mail::fake();
+        Storage::fake('local');
+        Http::fake(['*/payments/*' => Http::response(['success' => true, 'data' => ['reference' => 'MTX-REC', 'status' => 'completed', 'amount' => 5000]], 200)]);
+
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000]);
+        $registration = Registration::create([
+            'event_id' => $event->id, 'first_name' => 'A', 'last_name' => 'B',
+            'email' => 'rec@example.com', 'status' => 'pending',
+        ]);
+        $payment = Payment::create([
+            'reference' => 'r-rec', 'provider_reference' => 'MTX-REC', 'status' => 'pending', 'amount' => 5000,
+            'payable_type' => $registration->getMorphClass(), 'payable_id' => $registration->id,
+        ]);
+
+        $this->artisan('payments:reconcile')->assertExitCode(0);
+
+        $this->assertTrue($payment->refresh()->isPaid());
+        $this->assertSame('paid', $registration->refresh()->status);
+        Mail::assertQueued(QrCodeMail::class);
+    }
+
+    public function test_expire_unpaid_cancels_old_pending_paid_registrations(): void
+    {
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000]);
+        $old = Registration::create([
+            'event_id' => $event->id, 'first_name' => 'Old', 'last_name' => 'P',
+            'email' => 'old@example.com', 'status' => 'pending',
+        ]);
+        \DB::table('registrations')->where('id', $old->id)->update(['created_at' => now()->subMinutes(40)]);
+
+        $recent = Registration::create([
+            'event_id' => $event->id, 'first_name' => 'New', 'last_name' => 'P',
+            'email' => 'new@example.com', 'status' => 'pending',
+        ]);
+
+        $this->artisan('registrations:expire-unpaid')->assertExitCode(0);
+
+        $this->assertSame('cancelled', $old->refresh()->status);
+        $this->assertSame('pending', $recent->refresh()->status);
+    }
+
+    public function test_admin_can_view_sales_dashboard(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)->get(route('admin.sales.index'))->assertOk();
     }
 
     public function test_ebook_purchase_creates_payment_and_webhook_delivers_ebook(): void
