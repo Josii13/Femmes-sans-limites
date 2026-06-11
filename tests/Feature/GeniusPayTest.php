@@ -76,6 +76,18 @@ class GeniusPayTest extends TestCase
         ]);
     }
 
+    public function test_currency_fcfa_is_normalised_to_xof_for_geniuspay(): void
+    {
+        $this->fakeCheckout();
+        $event = Event::factory()->create(['is_paid' => true, 'price' => 5000, 'currency' => 'FCFA']);
+
+        $this->post(route('events.register', $event->slug), [
+            'first_name' => 'A', 'last_name' => 'B', 'email' => 'a@example.com',
+        ]);
+
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/payments') && $request['currency'] === 'XOF');
+    }
+
     public function test_webhook_confirms_event_registration_and_sends_qr(): void
     {
         Mail::fake();

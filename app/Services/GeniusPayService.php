@@ -7,6 +7,19 @@ use Illuminate\Support\Facades\Http;
 
 class GeniusPayService
 {
+    /** Convertit un libellé de devise local en code ISO 4217 accepté par GeniusPay. */
+    public function normalizeCurrency(?string $currency): string
+    {
+        $c = strtoupper(trim((string) $currency));
+
+        return match ($c) {
+            'FCFA', 'CFA', 'F CFA', 'FR CFA', 'FRANC CFA', 'XOF' => 'XOF',
+            '€', 'EURO', 'EUR' => 'EUR',
+            '$', 'USD' => 'USD',
+            default => $c !== '' ? $c : 'XOF',
+        };
+    }
+
     private function client(): PendingRequest
     {
         return Http::baseUrl(rtrim((string) config('services.geniuspay.base_url'), '/'))
@@ -32,6 +45,9 @@ class GeniusPayService
             'currency' => config('services.geniuspay.currency', 'XOF'),
             'payment_method' => null, // null = le client choisit sur la page GeniusPay
         ], $payload);
+
+        // GeniusPay attend un code ISO 4217 (XOF), pas le libellé d'affichage « FCFA ».
+        $body['currency'] = $this->normalizeCurrency($body['currency'] ?? null);
 
         $response = $this->client()->post('/payments', $body);
 

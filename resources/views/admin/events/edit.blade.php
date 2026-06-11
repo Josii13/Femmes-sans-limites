@@ -73,7 +73,7 @@
                         <div>
                             <label class="form-label">Devise</label>
                             <select name="currency" class="form-input">
-                                <option value="FCFA" @selected(old('currency',$event->currency)==='FCFA')>FCFA</option>
+                                <option value="XOF" @selected(in_array(old('currency',$event->currency), ['XOF','FCFA']))>FCFA (XOF)</option>
                                 <option value="EUR" @selected(old('currency',$event->currency)==='EUR')>EUR</option>
                                 <option value="USD" @selected(old('currency',$event->currency)==='USD')>USD</option>
                             </select>
