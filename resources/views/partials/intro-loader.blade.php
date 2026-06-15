@@ -34,7 +34,7 @@
 
     // Le nom puis les valeurs FSL (modifiables ici) :
     var BRAND = (window.innerWidth < 720) ? 'FSL' : 'FEMME SANS LIMITES';
-    var VALUES = ['Ambition', 'Sororité', 'Audace', 'Liberté', 'Puissance'];
+    var VALUES = ['Excellence', 'Résilience', 'Foi', 'Ambition'];
 
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function webglOK(){ try{ var c=document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }catch(e){ return false; } }
