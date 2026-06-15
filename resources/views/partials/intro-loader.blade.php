@@ -61,7 +61,8 @@
     // Fallback sans WebGL : écran de marque CSS.
     if(!webglOK()){ document.getElementById('fsl-intro-fallback').classList.add('show'); setTimeout(finish, 2600); return; }
 
-    function onResize(){ if(!renderer||!cam) return; renderer.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); }
+    var applyFitRef = function(){};
+    function onResize(){ if(!renderer||!cam) return; renderer.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); applyFitRef(); }
 
     // Échantillonne un texte → positions (x,y,z) pour COUNT particules.
     function sampleText(text, count){
@@ -115,6 +116,18 @@
             geo.setAttribute('color', new THREE.BufferAttribute(col,3));
             var mat=new THREE.PointsMaterial({size:0.04, vertexColors:true, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false});
             var pts=new THREE.Points(geo, mat); scene.add(pts);
+
+            // ── Ajuste l'échelle pour que le mot le plus large tienne à l'écran (clé sur mobile portrait) ──
+            var maxX=0.0001;
+            phases.forEach(function(ph){ for(var q=0;q<ph.length;q+=3){ var ax=Math.abs(ph[q]); if(ax>maxX) maxX=ax; } });
+            function applyFit(){
+                var visHalf = Math.tan((50*Math.PI/180)/2) * cam.position.z * cam.aspect;
+                var f = Math.min(1, (visHalf*0.86)/maxX);
+                pts.scale.setScalar(f);
+                // particules un peu plus grosses quand on réduit beaucoup (mobile) pour rester visibles
+                mat.size = 0.04 / Math.max(0.5, f);
+            }
+            applyFitRef = applyFit; applyFit();
 
             // Séquence temporelle (ms) : index de phase + dispersion finale.
             var HOLD_BRAND=1700, HOLD_VAL=1150;
