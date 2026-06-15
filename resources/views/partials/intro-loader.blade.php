@@ -1,7 +1,7 @@
-{{-- Intro 3D « Anneau d'or + poussière d'étoiles » (Three.js, rejoué à chaque rechargement) --}}
+{{-- Intro 3D « Particules → nom FSL + défilé des valeurs » (Three.js, rejouée à chaque rechargement) --}}
 <div id="fsl-intro" role="presentation" aria-hidden="true">
     <canvas id="fsl-intro-canvas"></canvas>
-    <div class="fsl-intro__center">
+    <div id="fsl-intro-fallback" class="fsl-intro__center">
         <p class="fsl-intro__name">FEMME SANS LIMITES</p>
         <p class="fsl-intro__tag">Brise tes limites, révèle ta puissance</p>
     </div>
@@ -9,26 +9,20 @@
 </div>
 
 <style>
-#fsl-intro{position:fixed;inset:0;z-index:99999;background:#140A0E;overflow:hidden;opacity:1;transition:opacity .7s ease;}
+#fsl-intro{position:fixed;inset:0;z-index:99999;background:#120A0E;overflow:hidden;opacity:1;transition:opacity .7s ease;}
 #fsl-intro.fsl-intro--hide{opacity:0;}
 #fsl-intro.fsl-intro--done{display:none!important;}
-#fsl-intro::before,#fsl-intro::after{content:"";position:absolute;border-radius:9999px;filter:blur(10px);pointer-events:none;}
-#fsl-intro::before{width:70vw;height:70vw;top:-20vw;right:-15vw;background:radial-gradient(circle,rgba(217,30,110,.18),transparent 60%);}
-#fsl-intro::after{width:60vw;height:60vw;bottom:-20vw;left:-15vw;background:radial-gradient(circle,rgba(201,168,76,.13),transparent 60%);}
+#fsl-intro::before,#fsl-intro::after{content:"";position:absolute;border-radius:9999px;filter:blur(12px);pointer-events:none;}
+#fsl-intro::before{width:70vw;height:70vw;top:-22vw;right:-16vw;background:radial-gradient(circle,rgba(217,30,110,.16),transparent 60%);}
+#fsl-intro::after{width:60vw;height:60vw;bottom:-22vw;left:-16vw;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 60%);}
 #fsl-intro-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
-#fsl-intro .fsl-intro__center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px;pointer-events:none;}
-#fsl-intro .fsl-intro__name{
-    margin:0;font-family:'Playfair Display',Georgia,serif;font-weight:700;
-    font-size:clamp(20px,5vw,34px);letter-spacing:.2em;
-    background:linear-gradient(90deg,#D91E6E 0%,#F2C4D8 30%,#C9A84C 55%,#D91E6E 80%);
-    background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-    opacity:0;animation:fsl-fade .9s ease .5s forwards, fsl-shimmer 3s linear .5s infinite;
-    text-shadow:0 2px 30px rgba(217,30,110,.25);
-}
-#fsl-intro .fsl-intro__tag{margin:12px 0 0;font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.5);opacity:0;animation:fsl-fade .9s ease .9s forwards;}
-#fsl-intro .fsl-intro__skip{position:absolute;bottom:24px;right:24px;background:transparent;border:0;color:rgba(255,255,255,.45);font-size:12px;cursor:pointer;letter-spacing:.04em;transition:color .2s;opacity:0;animation:fsl-fade .6s ease 1.4s forwards;}
+#fsl-intro .fsl-intro__center{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px;pointer-events:none;}
+#fsl-intro .fsl-intro__center.show{display:flex;}
+#fsl-intro .fsl-intro__name{margin:0;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(20px,5vw,32px);letter-spacing:.2em;background:linear-gradient(90deg,#D91E6E,#F2C4D8 30%,#C9A84C 55%,#D91E6E 80%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:fsl-shimmer 3s linear infinite;}
+#fsl-intro .fsl-intro__tag{margin:12px 0 0;font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.5);}
+#fsl-intro .fsl-intro__skip{position:absolute;bottom:24px;right:24px;background:transparent;border:0;color:rgba(255,255,255,.45);font-size:12px;cursor:pointer;letter-spacing:.04em;transition:color .2s;opacity:0;animation:fsl-fade .6s ease 1.2s forwards;}
 #fsl-intro .fsl-intro__skip:hover{color:#fff;}
-@keyframes fsl-fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fsl-fade{to{opacity:1;}}
 @keyframes fsl-shimmer{0%{background-position:-150% center;}100%{background-position:150% center;}}
 @media (prefers-reduced-motion:reduce){#fsl-intro{display:none!important;}}
 </style>
@@ -38,18 +32,20 @@
     var el = document.getElementById('fsl-intro');
     if(!el) return;
 
+    // Le nom puis les valeurs FSL (modifiables ici) :
+    var BRAND = (window.innerWidth < 720) ? 'FSL' : 'FEMME SANS LIMITES';
+    var VALUES = ['Ambition', 'Sororité', 'Audace', 'Liberté', 'Puissance'];
+
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function webglOK(){ try{ var c=document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }catch(e){ return false; } }
-
     if(reduce){ el.classList.add('fsl-intro--done'); return; }
 
-    var html = document.documentElement;
-    var prevOverflow = html.style.overflow;
+    var html = document.documentElement, prevOverflow = html.style.overflow;
     html.style.overflow = 'hidden';
-    var raf = null, renderer = null, finished = false;
+    var raf=null, renderer=null, finished=false, cam=null;
 
     function finish(){
-        if(finished) return; finished = true;
+        if(finished) return; finished=true;
         if(raf) cancelAnimationFrame(raf);
         window.removeEventListener('resize', onResize);
         el.classList.add('fsl-intro--hide');
@@ -59,100 +55,101 @@
             el.parentNode && el.parentNode.removeChild(el);
         }, 720);
     }
-
     document.getElementById('fsl-intro-skip').addEventListener('click', finish);
-    // Filet de sécurité (si le CDN ou le WebGL échoue) :
-    var safety = setTimeout(finish, 5000);
+    var safety = setTimeout(finish, 12000);
 
-    // Pas de WebGL → on garde juste l'écran de marque animé (CSS) ~2.4s puis on révèle.
-    if(!webglOK()){ setTimeout(finish, 2400); return; }
+    // Fallback sans WebGL : écran de marque CSS.
+    if(!webglOK()){ document.getElementById('fsl-intro-fallback').classList.add('show'); setTimeout(finish, 2600); return; }
 
-    function onResize(){
-        if(!renderer) return;
-        var w = window.innerWidth, h = window.innerHeight;
-        renderer.setSize(w, h);
-        cam.aspect = w/h; cam.updateProjectionMatrix();
+    function onResize(){ if(!renderer||!cam) return; renderer.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); }
+
+    // Échantillonne un texte → positions (x,y,z) pour COUNT particules.
+    function sampleText(text, count){
+        var cw=1200, ch=300, cnv=document.createElement('canvas'); cnv.width=cw; cnv.height=ch;
+        var ctx=cnv.getContext('2d');
+        ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        var fs=220;
+        do { ctx.font='700 '+fs+'px "Playfair Display", Georgia, serif'; fs-=6; }
+        while(fs>20 && ctx.measureText(text).width > cw*0.9);
+        ctx.fillText(text, cw/2, ch/2);
+        var d=ctx.getImageData(0,0,cw,ch).data, src=[];
+        for(var y=0;y<ch;y+=3) for(var x=0;x<cw;x+=3) if(d[(y*cw+x)*4+3]>130) src.push([x,y]);
+        var S=170, out=new Float32Array(count*3);
+        for(var i=0;i<count;i++){
+            var p = src.length ? src[(Math.random()*src.length)|0] : [cw/2,ch/2];
+            out[i*3]   = (p[0]-cw/2)/S;
+            out[i*3+1] = -(p[1]-ch/2)/S;
+            out[i*3+2] = (Math.random()-0.5)*0.35;
+        }
+        return out;
     }
-    var cam;
 
     function init(THREE){
         clearTimeout(safety);
         try{
-            var canvas = document.getElementById('fsl-intro-canvas');
-            renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, alpha:true});
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            var canvas=document.getElementById('fsl-intro-canvas');
+            renderer=new THREE.WebGLRenderer({canvas:canvas, antialias:true, alpha:true});
+            renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+            renderer.setSize(innerWidth, innerHeight);
+            var scene=new THREE.Scene();
+            cam=new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 100); cam.position.set(0,0,7);
 
-            var scene = new THREE.Scene();
-            cam = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
-            cam.position.set(0, 0, 6.2);
+            var COUNT = (innerWidth<720) ? 1600 : 3200;
 
-            // ── Anneau métallique rose-or ──
-            var ring = new THREE.Mesh(
-                new THREE.TorusGeometry(2.05, 0.5, 48, 180),
-                new THREE.MeshStandardMaterial({ color:0xC9A84C, metalness:1.0, roughness:0.26, emissive:0xD91E6E, emissiveIntensity:0.07 })
-            );
-            ring.rotation.x = 0.5;
-            ring.scale.setScalar(0.01);
-            scene.add(ring);
+            // Cibles : nom puis chaque valeur.
+            var phases=[BRAND].concat(VALUES).map(function(t){ return sampleText(t, COUNT); });
 
-            // ── Lumières (reflets mobiles) ──
-            scene.add(new THREE.AmbientLight(0x442233, 0.7));
-            var lRose = new THREE.PointLight(0xD91E6E, 1.5, 50); lRose.position.set(5,3,5); scene.add(lRose);
-            var lGold = new THREE.PointLight(0xF0D890, 1.4, 50); lGold.position.set(-5,-2,4); scene.add(lGold);
-            var lWhite = new THREE.PointLight(0xffffff, 0.8, 60); lWhite.position.set(0,4,6); scene.add(lWhite);
-
-            // ── Poussière d'étoiles ──
-            var COUNT = (window.innerWidth < 768) ? 1100 : 2200;
-            var pos = new Float32Array(COUNT*3), col = new Float32Array(COUNT*3);
-            var rose=[0.85,0.12,0.43], gold=[0.82,0.70,0.34];
+            // Positions de départ : nuage sphérique dispersé.
+            var cur=new Float32Array(COUNT*3), col=new Float32Array(COUNT*3);
+            var rose=[0.85,0.12,0.43], gold=[0.83,0.70,0.34];
             for(var i=0;i<COUNT;i++){
-                var r = 3 + Math.random()*9, th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
-                pos[i*3]   = r*Math.sin(ph)*Math.cos(th);
-                pos[i*3+1] = r*Math.sin(ph)*Math.sin(th);
-                pos[i*3+2] = r*Math.cos(ph) - 2;
-                var t = Math.random(), c = (t<0.5?rose:gold);
-                col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
+                var r=5+Math.random()*7, th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1);
+                cur[i*3]=r*Math.sin(ph)*Math.cos(th); cur[i*3+1]=r*Math.sin(ph)*Math.sin(th); cur[i*3+2]=r*Math.cos(ph)-3;
+                var c=(i%2===0?rose:gold); col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
             }
-            var pg = new THREE.BufferGeometry();
-            pg.setAttribute('position', new THREE.BufferAttribute(pos,3));
-            pg.setAttribute('color', new THREE.BufferAttribute(col,3));
-            var dust = new THREE.Points(pg, new THREE.PointsMaterial({ size:0.055, vertexColors:true, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false }));
-            scene.add(dust);
+            var geo=new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(cur,3));
+            geo.setAttribute('color', new THREE.BufferAttribute(col,3));
+            var mat=new THREE.PointsMaterial({size:0.045, vertexColors:true, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false});
+            var pts=new THREE.Points(geo, mat); scene.add(pts);
+
+            // Séquence temporelle (ms) : index de phase + dispersion finale.
+            var HOLD_BRAND=1700, HOLD_VAL=1150;
+            var schedule=[], t=300; // petit délai d'entrée
+            schedule.push({at:t, target:phases[0]}); t+=HOLD_BRAND;
+            for(var k=1;k<phases.length;k++){ schedule.push({at:t, target:phases[k]}); t+=HOLD_VAL; }
+            var DISPERSE_AT=t, END_AT=t+900;
+
+            // Dispersion finale (explosion vers la caméra).
+            var disperse=new Float32Array(COUNT*3);
+            for(i=0;i<COUNT;i++){ disperse[i*3]=(Math.random()-0.5)*18; disperse[i*3+1]=(Math.random()-0.5)*14; disperse[i*3+2]=2+Math.random()*8; }
 
             window.addEventListener('resize', onResize);
+            var start=performance.now(), targets=phases[0], lerp=0.10;
+            var posAttr=geo.getAttribute('position');
 
-            var start = performance.now();
             function loop(now){
-                var t = (now - start)/1000;
-                // entrée de l'anneau (scale élastique)
-                var s = Math.min(1, t/0.8);
-                ring.scale.setScalar(0.2 + 0.8*(1-Math.pow(1-s,3)));
-                ring.rotation.y += 0.010;
-                ring.rotation.x += 0.004;
-                // reflets : lumières qui orbitent
-                lRose.position.set(Math.cos(t*0.9)*6, Math.sin(t*0.7)*4, 5);
-                lGold.position.set(Math.cos(t*0.9+2.1)*6, Math.sin(t*0.7+2.1)*4, 4);
-                // poussière : fondu + lente rotation + scintillement
-                dust.material.opacity = Math.min(0.9, t*0.6);
-                dust.rotation.y += 0.0006; dust.rotation.x += 0.0002;
-                dust.material.size = 0.05 + Math.sin(t*2.2)*0.012;
-                renderer.render(scene, cam);
-                raf = requestAnimationFrame(loop);
+                var ms=now-start;
+                mat.opacity=Math.min(0.95, ms/500);
+                // choisir la cible courante
+                for(var s=schedule.length-1;s>=0;s--){ if(ms>=schedule[s].at){ targets=schedule[s].target; break; } }
+                if(ms>=DISPERSE_AT){ targets=disperse; lerp=0.06; mat.opacity=Math.max(0, 0.95*(1-(ms-DISPERSE_AT)/900)); }
+                var a=posAttr.array;
+                for(var j=0;j<a.length;j++){ a[j]+= (targets[j]-a[j])*lerp; }
+                posAttr.needsUpdate=true;
+                pts.rotation.y=Math.sin(ms/1400)*0.06; // léger balancement
+                renderer.render(scene,cam);
+                if(ms<END_AT){ raf=requestAnimationFrame(loop); } else { finish(); }
             }
-            raf = requestAnimationFrame(loop);
-
-            // Sortie : on révèle le site (léger dolly + fondu géré par finish()).
-            setTimeout(finish, 3200);
+            raf=requestAnimationFrame(loop);
         }catch(e){ finish(); }
     }
 
-    // Chargement non bloquant de Three.js (CDN), init à la fin.
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-    s.async = true;
-    s.onload = function(){ if(window.THREE) init(window.THREE); else finish(); };
-    s.onerror = finish;
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.async=true;
+    s.onload=function(){ if(window.THREE) init(window.THREE); else finish(); };
+    s.onerror=finish;
     document.head.appendChild(s);
 })();
 </script>
