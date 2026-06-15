@@ -73,13 +73,16 @@
         while(fs>20 && ctx.measureText(text).width > cw*0.9);
         ctx.fillText(text, cw/2, ch/2);
         var d=ctx.getImageData(0,0,cw,ch).data, src=[];
-        for(var y=0;y<ch;y+=3) for(var x=0;x<cw;x+=3) if(d[(y*cw+x)*4+3]>130) src.push([x,y]);
-        var S=170, out=new Float32Array(count*3);
+        // Échantillonnage dense (pas de 2px) pour des lettres pleines.
+        for(var y=0;y<ch;y+=2) for(var x=0;x<cw;x+=2) if(d[(y*cw+x)*4+3]>130) src.push([x,y]);
+        // Mélange puis assignation séquentielle → couverture UNIFORME (pas de trous).
+        for(var m=src.length-1;m>0;m--){ var n=(Math.random()*(m+1))|0, tmp=src[m]; src[m]=src[n]; src[n]=tmp; }
+        var S=165, out=new Float32Array(count*3);
         for(var i=0;i<count;i++){
-            var p = src.length ? src[(Math.random()*src.length)|0] : [cw/2,ch/2];
-            out[i*3]   = (p[0]-cw/2)/S;
-            out[i*3+1] = -(p[1]-ch/2)/S;
-            out[i*3+2] = (Math.random()-0.5)*0.35;
+            var p = src.length ? src[i % src.length] : [cw/2,ch/2];
+            out[i*3]   = (p[0]-cw/2)/S + (Math.random()-0.5)*0.015;
+            out[i*3+1] = -(p[1]-ch/2)/S + (Math.random()-0.5)*0.015;
+            out[i*3+2] = (Math.random()-0.5)*0.08; // profondeur réduite → texte net
         }
         return out;
     }
@@ -94,14 +97,14 @@
             var scene=new THREE.Scene();
             cam=new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 100); cam.position.set(0,0,7);
 
-            var COUNT = (innerWidth<720) ? 1600 : 3200;
+            var COUNT = (innerWidth<720) ? 3200 : 6500;
 
             // Cibles : nom puis chaque valeur.
             var phases=[BRAND].concat(VALUES).map(function(t){ return sampleText(t, COUNT); });
 
             // Positions de départ : nuage sphérique dispersé.
             var cur=new Float32Array(COUNT*3), col=new Float32Array(COUNT*3);
-            var rose=[0.85,0.12,0.43], gold=[0.83,0.70,0.34];
+            var rose=[0.95,0.24,0.55], gold=[0.97,0.82,0.45];
             for(var i=0;i<COUNT;i++){
                 var r=5+Math.random()*7, th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1);
                 cur[i*3]=r*Math.sin(ph)*Math.cos(th); cur[i*3+1]=r*Math.sin(ph)*Math.sin(th); cur[i*3+2]=r*Math.cos(ph)-3;
@@ -110,7 +113,7 @@
             var geo=new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.BufferAttribute(cur,3));
             geo.setAttribute('color', new THREE.BufferAttribute(col,3));
-            var mat=new THREE.PointsMaterial({size:0.045, vertexColors:true, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false});
+            var mat=new THREE.PointsMaterial({size:0.04, vertexColors:true, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false});
             var pts=new THREE.Points(geo, mat); scene.add(pts);
 
             // Séquence temporelle (ms) : index de phase + dispersion finale.
@@ -130,14 +133,14 @@
 
             function loop(now){
                 var ms=now-start;
-                mat.opacity=Math.min(0.95, ms/500);
+                mat.opacity=Math.min(1.0, ms/500);
                 // choisir la cible courante
                 for(var s=schedule.length-1;s>=0;s--){ if(ms>=schedule[s].at){ targets=schedule[s].target; break; } }
-                if(ms>=DISPERSE_AT){ targets=disperse; lerp=0.06; mat.opacity=Math.max(0, 0.95*(1-(ms-DISPERSE_AT)/900)); }
+                if(ms>=DISPERSE_AT){ targets=disperse; lerp=0.06; mat.opacity=Math.max(0, 1.0*(1-(ms-DISPERSE_AT)/900)); }
                 var a=posAttr.array;
                 for(var j=0;j<a.length;j++){ a[j]+= (targets[j]-a[j])*lerp; }
                 posAttr.needsUpdate=true;
-                pts.rotation.y=Math.sin(ms/1400)*0.06; // léger balancement
+                pts.rotation.y=Math.sin(ms/2200)*0.022; // balancement très léger (texte reste lisible)
                 renderer.render(scene,cam);
                 if(ms<END_AT){ raf=requestAnimationFrame(loop); } else { finish(); }
             }
