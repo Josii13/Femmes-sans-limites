@@ -22,6 +22,8 @@
 
 @section('content')
 
+@include('partials.intro-loader')
+
 {{-- ══════════════════ HERO ══════════════════ --}}
 <section class="relative bg-white overflow-hidden" style="min-height:92vh;">
 
