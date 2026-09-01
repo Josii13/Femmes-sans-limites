@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class EbookController extends Controller
 {
@@ -49,12 +50,14 @@ class EbookController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'price' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',
-            'pdf' => 'nullable|file|mimes:pdf|max:30720',
+            // Un prix sans PDF donnerait une fiche publique invendable, sans le dire à l'admin.
+            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request))],
             'cta_label' => 'nullable|string|max:60',
             'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ], [
+            'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
         ]);
@@ -96,12 +99,14 @@ class EbookController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'price' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',
-            'pdf' => 'nullable|file|mimes:pdf|max:30720',
+            // Idem à l'édition, sauf si un PDF est déjà en place (on le conserve).
+            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request) && ! $ebook->file_path)],
             'cta_label' => 'nullable|string|max:60',
             'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ], [
+            'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
         ]);
@@ -142,6 +147,12 @@ class EbookController extends Controller
 
         return redirect()->route('admin.ebooks.index')
             ->with('success', 'Ebook supprimé.');
+    }
+
+    /** Un prix strictement positif signifie « vendu sur le site » : le PDF devient indispensable. */
+    private function isPriced(Request $request): bool
+    {
+        return (float) $request->input('price', 0) > 0;
     }
 
     /**

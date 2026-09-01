@@ -97,19 +97,30 @@
                 <p class="mt-3 text-xs" style="color:var(--gray);">
                     🔒 Paiement sécurisé (Wave, Orange Money, MTN, Moov, carte) — livraison immédiate par email.
                 </p>
-                @else
+                @elseif($ebook->cta_url)
                 {{-- Lien externe (partenaire) --}}
                 <a href="{{ $ebook->cta_url }}" target="_blank" rel="noopener noreferrer"
                    class="btn-rose inline-flex items-center gap-3 px-8 py-4 text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    {{ $ebook->cta_label }}
+                    {{-- Le libellé peut être vide (option « Aucun ») : on garde un bouton lisible. --}}
+                    {{ $ebook->cta_label ?: 'Accéder à l’ebook' }}
                 </a>
                 <p class="mt-3 text-xs" style="color:var(--gray);">
                     Disponible via notre partenaire Charriow
                     <svg class="w-3 h-3 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </p>
+                @else
+                {{-- Ni vente directe (prix + PDF) ni lien partenaire : on oriente vers le contact. --}}
+                <div class="rounded-2xl p-5" style="background:var(--rose-pale);border:1px solid var(--border);">
+                    <p class="text-sm font-semibold mb-1" style="color:var(--dark);">Bientôt disponible</p>
+                    <p class="text-sm leading-relaxed" style="color:var(--gray);">Cet ebook n’est pas encore proposé au téléchargement. Écris-nous pour être prévenue de sa sortie.</p>
+                    <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 mt-3 text-sm font-semibold" style="color:var(--rose);">
+                        Nous contacter
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                </div>
                 @endif
             </div>
         </div>

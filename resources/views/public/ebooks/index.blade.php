@@ -98,7 +98,11 @@
                     <h3 class="text-sm font-bold leading-snug line-clamp-2" style="color:var(--dark);font-family:'Playfair Display',serif;">
                         {{ $ebook->title }}
                     </h3>
+                    @if($ebook->isPurchasable())
+                    <p class="text-xs font-bold" style="color:var(--rose);">{{ number_format($ebook->price, 0, ',', ' ') }} {{ $ebook->currency }}</p>
+                    @elseif($ebook->cta_label)
                     <p class="text-xs font-medium" style="color:var(--rose);">{{ $ebook->cta_label }}</p>
+                    @endif
                 </div>
 
             </a>
