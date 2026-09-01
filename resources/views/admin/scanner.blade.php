@@ -97,7 +97,7 @@ function verifyToken(token) {
             result.style.border     = '2px solid rgba(124,58,237,0.5)';
             icon.textContent = '⚠️';
             name.textContent = data.name;
-            msg.textContent  = data.message + ' (à ' + data.at + ')';
+            msg.textContent  = data.at ? data.message + ' (à ' + data.at + ')' : data.message;
         } else {
             result.style.background = 'rgba(220,38,38,0.2)';
             result.style.border     = '2px solid rgba(220,38,38,0.5)';

@@ -32,6 +32,29 @@ class MarketingComplianceTest extends TestCase
         $this->assertCount(1, $recipients);
     }
 
+    /**
+     * Le formulaire newsletter vit dans le pied de page, aux côtés des modals
+     * adhésion et contact qui ont aussi un champ « email » : ses erreurs doivent
+     * rester dans un sac dédié pour ne pas s’afficher au mauvais endroit.
+     */
+    public function test_newsletter_errors_use_a_dedicated_bag(): void
+    {
+        $this->post(route('newsletter.subscribe'), ['email' => 'pas-un-email'])
+            ->assertSessionHasErrorsIn('newsletter', ['email']);
+
+        $this->assertDatabaseCount('newsletter_subscribers', 0);
+    }
+
+    public function test_newsletter_email_is_normalised(): void
+    {
+        Mail::fake();
+
+        $this->post(route('newsletter.subscribe'), ['email' => '  Lea@Example.COM  ', 'name' => 'Lea'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('newsletter_subscribers', ['email' => 'lea@example.com']);
+    }
+
     public function test_newsletter_uses_double_opt_in(): void
     {
         Mail::fake();

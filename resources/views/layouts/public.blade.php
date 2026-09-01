@@ -198,6 +198,10 @@
                         @endif
                     </span>
                 </div>
+                {{-- Sac dédié : évite de capter les erreurs email des modals adhésion/contact. --}}
+                @error('email', 'newsletter')
+                <p class="text-xs mb-2 py-2 px-3 rounded-xl" style="background:rgba(220,38,38,0.15);color:#FCA5A5;">{{ $message }}</p>
+                @enderror
                 <form x-show="!subscribed" method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col gap-2">
                     @csrf
                     <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">

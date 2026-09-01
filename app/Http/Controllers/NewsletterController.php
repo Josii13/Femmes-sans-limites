@@ -22,13 +22,22 @@ class NewsletterController extends Controller
             return back()->with('newsletter_pending', true);
         }
 
-        $request->validate([
+        // Sac d'erreurs dédié « newsletter » : le formulaire vit dans le pied de page,
+        // partagé avec les modals adhésion/contact qui ont aussi un champ « email ».
+        $request->validateWithBag('newsletter', [
             'email' => 'required|email|max:191',
             'name' => 'nullable|string|max:100',
+        ], [
+            'email.required' => 'Merci de renseigner ton adresse email.',
+            'email.email' => 'Cette adresse email est invalide.',
         ]);
 
+        // Normalisation identique au reste du site (achats ebook, inscriptions) :
+        // évite deux abonnés pour la même adresse écrite différemment.
+        $email = mb_strtolower(trim($request->email));
+
         $subscriber = NewsletterSubscriber::firstOrCreate(
-            ['email' => $request->email],
+            ['email' => $email],
             ['name' => $request->name],
         );
 

@@ -14,7 +14,8 @@ class TrackingController extends Controller
         if ($recipient) {
             if (! $recipient->opened_at) {
                 $recipient->opened_at = now();
-                $recipient->campaign->increment('open_count');
+                // La campagne peut avoir été supprimée entre-temps : un pixel ne doit jamais casser.
+                $recipient->campaign?->increment('open_count');
             }
             $recipient->increment('open_count');
             $recipient->save();

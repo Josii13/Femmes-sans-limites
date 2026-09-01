@@ -56,7 +56,9 @@
         <span class="info-value">{{ $member->member_number }}</span>
       </div>
     </div>
-    <p>La carte membre a été générée automatiquement. Rendez-vous dans le back office pour valider et activer ce compte.</p>
+    <p style="margin-bottom:4px;"><strong>Motivation :</strong></p>
+    <div style="background:#fff;border-left:4px solid #D91E6E;padding:16px 20px;margin:0 0 16px;color:#333;font-size:15px;line-height:1.7;white-space:pre-line;">{{ $member->motivation }}</div>
+    <p>La carte de membre sera générée automatiquement à l’activation. Rendez-vous dans le back office pour valider ce compte.</p>
     <div class="cta">
       <a href="{{ url('/admin/members') }}" class="btn">Voir dans le back office</a>
     </div>

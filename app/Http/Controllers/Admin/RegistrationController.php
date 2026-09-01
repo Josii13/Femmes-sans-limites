@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Models\Registration;
 use App\Services\QrCodeService;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -58,7 +59,9 @@ class RegistrationController extends Controller
             return back()->with('error', 'Impossible d\'envoyer le lien pour ce statut.');
         }
 
-        Mail::to($registration->email)->queue(new PaymentLinkMail($registration, $event));
+        if (! $this->safeMail($registration->email, new PaymentLinkMail($registration, $event), 'PaymentLinkMail')) {
+            return back()->with('error', "L'envoi du lien de paiement a échoué — vérifiez la config mail.");
+        }
 
         $registration->update([
             'status' => 'payment_sent',
@@ -93,12 +96,17 @@ class RegistrationController extends Controller
             'paid_at' => now(),
         ]);
 
-        Mail::to($registration->email)->queue(new QrCodeMail($registration));
+        $mailSent = $this->safeMail($registration->email, new QrCodeMail($registration), 'QrCodeMail');
 
         ActivityLog::record('payment.confirmed', $registration->event, [
             'registration_id' => $registration->id,
             'email' => $registration->email,
         ]);
+
+        if (! $mailSent) {
+            return back()->with('error', ($registration->event->is_paid ? 'Paiement confirmé' : 'Accès validé')
+                .", mais l'envoi du QR par email a échoué — vérifiez la config mail.");
+        }
 
         $msg = $registration->event->is_paid
             ? 'Paiement confirmé et QR code envoyé à '.$registration->email
@@ -114,6 +122,23 @@ class RegistrationController extends Controller
         $this->notifyNextOnWaitingList($registration->event);
 
         return back()->with('success', 'Inscription annulée.');
+    }
+
+    /**
+     * Met un email en file sans jamais renvoyer une page d'erreur à l'administrateur.
+     * Retourne false si l'envoi a échoué, pour l'en informer dans le message flash.
+     */
+    private function safeMail(string $to, Mailable $mailable, string $label): bool
+    {
+        try {
+            Mail::to($to)->queue($mailable);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning("Inscriptions: échec mise en file {$label}", ['to' => $to, 'error' => $e->getMessage()]);
+
+            return false;
+        }
     }
 
     /**
@@ -165,7 +190,7 @@ class RegistrationController extends Controller
 
         $callback = function () use ($registrations) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+            fwrite($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8 (fwrite : pas de format à interpréter)
 
             fputcsv($handle, ['Prénom', 'Nom', 'Email', 'Téléphone', 'Statut', 'Inscrit le', 'Payé le'], ';');
 

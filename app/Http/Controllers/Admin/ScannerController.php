@@ -31,7 +31,8 @@ class ScannerController extends Controller
                 'message' => 'Ce QR code a déjà été scanné.',
                 'name' => $registration->full_name,
                 'event' => $registration->event->title,
-                'at' => $registration->attended_at->format('H:i'),
+                // attended_at peut être absent sur une donnée marquée à la main : jamais de 500 sur un scan.
+                'at' => $registration->attended_at?->format('H:i'),
             ]);
         }
 

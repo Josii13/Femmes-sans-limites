@@ -38,7 +38,7 @@ class SiteImageController extends Controller
         $path = $request->file('image')->store('site-images', 'public');
         $siteImage->update(['custom_path' => $path]);
 
-        return back()->with('success', '«&nbsp;'.$siteImage->label.'&nbsp;» a bien été mis à jour.');
+        return back()->with('success', '« '.$siteImage->label.' » a bien été mis à jour.');
     }
 
     public function reset(SiteImage $siteImage)
@@ -48,6 +48,6 @@ class SiteImageController extends Controller
             $siteImage->update(['custom_path' => null]);
         }
 
-        return back()->with('success', '«&nbsp;'.$siteImage->label.'&nbsp;» a été réinitialisée à l\'image par défaut.');
+        return back()->with('success', '« '.$siteImage->label.' » a été réinitialisée à l\'image par défaut.');
     }
 }

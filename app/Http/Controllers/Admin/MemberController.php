@@ -302,7 +302,7 @@ class MemberController extends Controller
 
         $callback = function () use ($members, $statusLabels) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+            fwrite($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8 (fwrite : pas de format à interpréter)
 
             fputcsv($handle, ['N° Membre', 'Nom', 'Email', 'Téléphone', 'Profession', 'Ville', 'Pays', 'Type', 'Statut', 'Inscrit le', 'Expire le'], ';');
 
