@@ -316,8 +316,9 @@
                         <input type="text" name="city" value="{{ old('city') }}" class="form-input" placeholder="Abidjan" required>
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="form-label">Photo <span class="font-normal" style="color:var(--gray)">(optionnel, max 3 Mo)</span></label>
-                        <input type="file" name="photo" accept="image/*" class="form-input py-2 cursor-pointer text-sm">
+                        <label class="form-label">Photo <span style="color:var(--rose)">*</span> <span class="font-normal" style="color:var(--gray)">(JPG, PNG ou WEBP — max 3 Mo)</span></label>
+                        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="form-input py-2 cursor-pointer text-sm" required>
+                        <p class="text-xs mt-1" style="color:var(--gray);">Ta photo figurera sur ta carte de membre officielle.</p>
                     </div>
                 </div>
                 <div>

@@ -135,7 +135,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach([
-                ['01', 'Tu soumets ta candidature', 'Remplis le formulaire en 2 minutes avec tes informations de base. Aucun document requis.'],
+                ['01', 'Tu soumets ta candidature', 'Remplis le formulaire en 2 minutes avec tes informations de base et une photo pour ta carte de membre.'],
                 ['02', 'L\'équipe valide ton profil', 'Notre équipe examine ta candidature et active ton compte sous 48h. Tu reçois ta carte de membre.'],
                 ['03', 'Tu rejoins la communauté', 'Accède aux événements, formations et au réseau FSL. Bienvenue dans le mouvement !'],
             ] as [$n, $title, $desc])

@@ -38,7 +38,7 @@ class MembershipController extends Controller
                 'profession' => 'required|string|max:100',
                 'country' => 'required|string|max:100',
                 'city' => 'required|string|max:100',
-                'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+                'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:3072',
             ], [
                 'name.required' => 'Merci d\'indiquer ton nom complet.',
                 'email.required' => 'Merci d\'indiquer ton adresse email.',
@@ -51,6 +51,7 @@ class MembershipController extends Controller
                 'profession.required' => 'Merci de sélectionner ta profession.',
                 'country.required' => 'Merci d\'indiquer ton pays.',
                 'city.required' => 'Merci d\'indiquer ta ville.',
+                'photo.required' => 'Merci de joindre une photo de toi : elle figurera sur ta carte de membre.',
                 'photo.image' => 'Le fichier choisi doit être une image.',
                 'photo.mimes' => 'La photo doit être au format JPG, PNG ou WEBP.',
                 'photo.max' => 'La photo ne doit pas dépasser 3 Mo.',
@@ -62,6 +63,7 @@ class MembershipController extends Controller
                 'profession' => 'profession',
                 'country' => 'pays',
                 'city' => 'ville',
+                'photo' => 'photo',
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()

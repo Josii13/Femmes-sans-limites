@@ -63,8 +63,10 @@ class MemberLifecycleTest extends TestCase
     public function test_public_application_creates_pending_member_without_card(): void
     {
         Mail::fake();
+        Storage::fake('public');
 
         $this->post(route('membership.store'), [
+            'photo' => UploadedFile::fake()->image('awa.jpg'),
             'name' => 'Awa Traoré',
             'email' => 'awa@example.com',
             'profession' => 'Ingénieure',
@@ -84,6 +86,7 @@ class MemberLifecycleTest extends TestCase
     public function test_email_becomes_reusable_after_member_deletion(): void
     {
         Mail::fake();
+        Storage::fake('public');
 
         $member = Member::factory()->active()->create(['email' => 'reuse@example.com']);
 
@@ -94,6 +97,7 @@ class MemberLifecycleTest extends TestCase
 
         // Une nouvelle candidature peut réutiliser l'email sans erreur « déjà occupé ».
         $this->post(route('membership.store'), [
+            'photo' => UploadedFile::fake()->image('p.jpg'),
             'name' => 'Nouvelle Candidate',
             'email' => 'reuse@example.com',
             'profession' => 'Avocate',
@@ -108,12 +112,14 @@ class MemberLifecycleTest extends TestCase
     public function test_application_succeeds_even_with_legacy_soft_deleted_email(): void
     {
         Mail::fake();
+        Storage::fake('public');
 
         // Simule une donnée d'avant le correctif : membre supprimé dont l'email reste intact en base.
         $old = Member::factory()->active()->create(['email' => 'legacy@example.com']);
         $old->delete(); // soft delete SANS libération de l'email
 
         $this->post(route('membership.store'), [
+            'photo' => UploadedFile::fake()->image('p.jpg'),
             'name' => 'Nouvelle Candidate',
             'email' => 'legacy@example.com',
             'profession' => 'Coach',
@@ -143,6 +149,22 @@ class MemberLifecycleTest extends TestCase
         $member = Member::where('email', 'photo@example.com')->first();
         $this->assertNotNull($member->photo);
         Storage::disk('public')->assertExists($member->photo);
+    }
+
+    public function test_public_application_requires_a_photo(): void
+    {
+        Mail::fake();
+
+        $this->post(route('membership.store'), [
+            'name' => 'Sans Photo',
+            'email' => 'sansphoto@example.com',
+            'profession' => 'Coach',
+            'country' => 'Côte d\'Ivoire',
+            'city' => 'Abidjan',
+            'motivation' => 'Je souhaite rejoindre cette communauté de femmes inspirantes et engagées.',
+        ])->assertSessionHasErrors('photo');
+
+        $this->assertDatabaseMissing('members', ['email' => 'sansphoto@example.com']);
     }
 
     public function test_motivation_requires_at_least_30_characters(): void
