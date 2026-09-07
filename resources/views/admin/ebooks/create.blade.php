@@ -100,6 +100,9 @@
                 </div>
             </div>
 
+            {{-- Promotion à durée limitée --}}
+            @include('admin.ebooks.partials.promo')
+
             {{-- CTA externe (optionnel) --}}
             <div class="rounded-xl border border-gray-100 p-5 space-y-4">
                 <div>

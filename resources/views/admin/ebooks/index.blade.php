@@ -64,6 +64,22 @@
                         <div>
                             <p class="font-semibold" style="color:var(--dark);">{{ $ebook->title }}</p>
                             <p class="text-xs text-gray-400 mt-0.5 line-clamp-2 max-w-xs">{{ Str::limit($ebook->description, 80) }}</p>
+                            @if($ebook->price)
+                            <p class="text-xs mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                @if($ebook->hasActivePromo())
+                                <span class="font-bold" style="color:var(--rose);">{{ number_format($ebook->promo_price, 0, ',', ' ') }} {{ $ebook->currency }}</span>
+                                <span class="line-through text-gray-400">{{ number_format($ebook->price, 0, ',', ' ') }}</span>
+                                <span class="px-1.5 py-0.5 rounded font-semibold text-[10px]" style="background:#05966918;color:#059669;">promo −{{ $ebook->promoDiscountPercent() }}% · fin {{ $ebook->promo_ends_at->translatedFormat('d/m/Y H:i') }}</span>
+                                @else
+                                <span class="font-semibold text-gray-600">{{ number_format($ebook->price, 0, ',', ' ') }} {{ $ebook->currency }}</span>
+                                @if($ebook->hasScheduledPromo())
+                                <span class="px-1.5 py-0.5 rounded font-semibold text-[10px]" style="background:#B4530918;color:#B45309;">promo programmée le {{ $ebook->promo_starts_at->translatedFormat('d/m/Y H:i') }}</span>
+                                @elseif($ebook->hasExpiredPromo())
+                                <span class="px-1.5 py-0.5 rounded font-medium text-[10px] bg-gray-100 text-gray-400">promo terminée</span>
+                                @endif
+                                @endif
+                            </p>
+                            @endif
                         </div>
                     </div>
                 </td>
@@ -71,8 +87,15 @@
                     <span class="text-xs px-2.5 py-1 rounded-full font-medium" style="background:var(--rose-pale);color:var(--rose);">{{ $ebook->category }}</span>
                 </td>
                 <td class="px-6 py-4">
+                    @if($ebook->cta_url)
                     <p class="text-sm font-medium" style="color:var(--dark);">{{ $ebook->cta_label }}</p>
-                    <a href="{{ $ebook->cta_url }}" target="_blank" class="text-xs break-all" style="color:var(--gray);" title="{{ $ebook->cta_url }}">{{ Str::limit($ebook->cta_url, 40) }}</a>
+                    <a href="{{ $ebook->cta_url }}" target="_blank" rel="noopener noreferrer" class="text-xs break-all" style="color:var(--gray);" title="{{ $ebook->cta_url }}">{{ Str::limit($ebook->cta_url, 40) }}</a>
+                    @elseif($ebook->file_path)
+                    <p class="text-sm font-medium" style="color:var(--dark);">Vente directe</p>
+                    <p class="text-xs" style="color:var(--gray);">PDF livré par lien signé</p>
+                    @else
+                    <p class="text-xs" style="color:var(--gray);">—</p>
+                    @endif
                 </td>
                 <td class="px-6 py-4 text-center text-gray-500 text-sm">{{ $ebook->sort_order }}</td>
                 <td class="px-6 py-4">

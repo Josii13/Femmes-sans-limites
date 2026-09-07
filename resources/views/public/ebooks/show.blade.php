@@ -86,6 +86,15 @@
                     <div class="absolute top-3 left-3 lg:top-4 lg:left-4">
                         <span class="text-[11px] lg:text-xs font-bold px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full" style="background:rgba(217,30,110,0.9);color:white;">{{ $ebook->category }}</span>
                     </div>
+
+                    @if($ebook->hasActivePromo())
+                    <div class="absolute top-3 right-3 lg:top-4 lg:right-4">
+                        <span class="inline-flex flex-col items-center leading-none font-bold text-white rounded-full px-3 py-2 shadow-lg" style="background:var(--dark);">
+                            <span class="text-sm">−{{ $ebook->promoDiscountPercent() }}%</span>
+                            <span class="text-[9px] font-semibold uppercase tracking-wider mt-0.5 opacity-70">Promo</span>
+                        </span>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -97,10 +106,13 @@
                 @if($isSale)
                 {{-- Vente directe : encadré sur mobile pour détacher le prix du texte, sobre sur desktop. --}}
                 <div class="rounded-2xl border p-5 bg-[var(--rose-pale)] border-[var(--rose-mid)] lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl lg:text-4xl font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">{{ number_format($ebook->price, 0, ',', ' ') }}</span>
-                        <span class="text-sm font-semibold" style="color:var(--gray);">{{ $ebook->currency }}</span>
-                    </div>
+                    <x-ebook-price :ebook="$ebook" variant="page" />
+                    @if($ebook->hasActivePromo())
+                    <p class="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold" style="color:var(--rose);">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Offre valable jusqu'au {{ $ebook->promo_ends_at->translatedFormat('d F Y à H:i') }}
+                    </p>
+                    @endif
 
                     <a href="{{ $ctaUrl }}"
                        class="btn-rose w-full lg:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base mt-4">
@@ -232,10 +244,8 @@
     <div class="flex items-center gap-3 px-4 py-3">
         @if($isSale)
         <div class="min-w-0 shrink-0">
-            <p class="text-[11px] font-medium leading-none" style="color:var(--gray);">Prix</p>
-            <p class="text-lg font-bold leading-tight mt-0.5" style="color:var(--dark);font-family:'Playfair Display',serif;">
-                {{ number_format($ebook->price, 0, ',', ' ') }}<span class="text-xs font-semibold ml-1" style="color:var(--gray);">{{ $ebook->currency }}</span>
-            </p>
+            <p class="text-[11px] font-medium leading-none" style="color:var(--gray);">{{ $ebook->hasActivePromo() ? 'Prix promo' : 'Prix' }}</p>
+            <x-ebook-price :ebook="$ebook" variant="bar" class="mt-0.5" />
         </div>
         @endif
         <a href="{{ $ctaUrl }}" @if(! $isSale) target="_blank" rel="noopener noreferrer" @endif

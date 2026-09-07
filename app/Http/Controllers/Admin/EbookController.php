@@ -49,6 +49,8 @@ class EbookController extends Controller
             'author_note' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'price' => 'nullable|numeric|min:0',
+            // Promotion : prix réduit + fenêtre. Voir promoRules() pour le détail.
+            ...$this->promoRules($request),
             'currency' => 'nullable|string|max:10',
             // Un prix sans PDF donnerait une fiche publique invendable, sans le dire à l'admin.
             'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request))],
@@ -60,6 +62,7 @@ class EbookController extends Controller
             'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
+            ...self::PROMO_MESSAGES,
         ]);
 
         if ($request->hasFile('image')) {
@@ -98,6 +101,8 @@ class EbookController extends Controller
             'author_note' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'price' => 'nullable|numeric|min:0',
+            // Promotion : prix réduit + fenêtre. Voir promoRules() pour le détail.
+            ...$this->promoRules($request),
             'currency' => 'nullable|string|max:10',
             // Idem à l'édition, sauf si un PDF est déjà en place (on le conserve).
             'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request) && ! $ebook->file_path)],
@@ -109,6 +114,7 @@ class EbookController extends Controller
             'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
+            ...self::PROMO_MESSAGES,
         ]);
 
         if ($request->hasFile('image')) {
@@ -154,6 +160,55 @@ class EbookController extends Controller
     {
         return (float) $request->input('price', 0) > 0;
     }
+
+    /**
+     * Règles de la promotion.
+     *
+     * Une promotion n'a de sens que sur un ebook payant, à un prix strictement
+     * inférieur au prix normal, et — comme demandé — avec une date de fin : c'est
+     * elle qui fait reprendre le prix normal. La date de début est facultative
+     * (promo immédiate) mais permet de programmer une promo à l'avance.
+     *
+     * Une date de fin passée est acceptée : la promotion est simplement terminée.
+     * L'exiger dans le futur empêcherait de modifier le titre d'un ebook dont une
+     * ancienne promotion figure encore dans le formulaire.
+     *
+     * @return array<string, mixed>
+     */
+    private function promoRules(Request $request): array
+    {
+        $hasPromo = $request->filled('promo_price') && (float) $request->input('promo_price') > 0;
+
+        return [
+            'promo_price' => [
+                'nullable', 'numeric', 'gt:0',
+                // Comparé au prix normal soumis dans le même formulaire.
+                'lt:price',
+                Rule::requiredIf(fn () => $request->filled('promo_ends_at') || $request->filled('promo_starts_at')),
+            ],
+            'promo_starts_at' => ['nullable', 'date'],
+            'promo_ends_at' => array_values(array_filter([
+                Rule::requiredIf(fn () => $hasPromo),
+                'nullable', 'date',
+                // « after » ne s'applique qu'avec une date de début réelle à comparer.
+                $request->filled('promo_starts_at') ? 'after:promo_starts_at' : null,
+            ])),
+        ];
+    }
+
+    /**
+     * Messages de la promotion : les règles par défaut (« lt », « after ») sont
+     * incompréhensibles pour l'administratrice qui remplit le formulaire.
+     */
+    private const PROMO_MESSAGES = [
+        'promo_price.gt' => 'Le prix promotionnel doit être supérieur à 0.',
+        'promo_price.lt' => 'Le prix promotionnel doit être inférieur au prix normal, sinon ce n\'est pas une promotion.',
+        'promo_price.required' => 'Indiquez le prix promotionnel, ou videz les dates de la promotion.',
+        'promo_ends_at.required' => 'Une promotion doit avoir une date de fin : c\'est elle qui fait reprendre le prix normal.',
+        'promo_ends_at.after' => 'La fin de la promotion doit être postérieure à sa date de début.',
+        'promo_starts_at.date' => 'La date de début de promotion est invalide.',
+        'promo_ends_at.date' => 'La date de fin de promotion est invalide.',
+    ];
 
     /**
      * Envoie la newsletter d'annonce une seule fois, à la première publication.

@@ -84,6 +84,13 @@
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:rgba(217,30,110,0.88);color:white;">{{ $ebook->category }}</span>
                     </div>
 
+                    {{-- Étiquette de remise, pour repérer les promotions dans la grille --}}
+                    @if($ebook->hasActivePromo())
+                    <div class="absolute top-2.5 right-2.5">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shadow" style="background:var(--dark);color:white;">−{{ $ebook->promoDiscountPercent() }}%</span>
+                    </div>
+                    @endif
+
                     {{-- Hover overlay --}}
                     <div class="absolute inset-0 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background:linear-gradient(to top, rgba(217,30,110,0.8) 0%, transparent 50%);">
                         <span class="text-white text-xs font-semibold flex items-center gap-1">
@@ -99,7 +106,7 @@
                         {{ $ebook->title }}
                     </h3>
                     @if($ebook->isPurchasable())
-                    <p class="text-xs font-bold" style="color:var(--rose);">{{ number_format($ebook->price, 0, ',', ' ') }} {{ $ebook->currency }}</p>
+                    <x-ebook-price :ebook="$ebook" variant="card" />
                     @elseif($ebook->cta_label)
                     <p class="text-xs font-medium" style="color:var(--rose);">{{ $ebook->cta_label }}</p>
                     @endif

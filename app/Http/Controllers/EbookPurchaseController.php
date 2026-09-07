@@ -60,11 +60,15 @@ class EbookPurchaseController extends Controller
             'email.email' => 'L\'adresse email n\'est pas valide.',
         ]);
 
+        // Prix promotionnel s'il y a une promo en cours, sinon prix normal. Le montant
+        // est figé ici : une promo qui expire pendant le paiement n'y change plus rien.
+        $amount = $ebook->effectivePrice();
+
         $payment = Payment::create([
             'provider' => 'geniuspay',
             'reference' => (string) Str::uuid(),
             'status' => 'pending',
-            'amount' => $ebook->price,
+            'amount' => $amount,
             'currency' => $ebook->currency ?: config('services.geniuspay.currency', 'XOF'),
             'customer_name' => $validated['name'],
             'customer_email' => mb_strtolower(trim($validated['email'])),
@@ -76,7 +80,7 @@ class EbookPurchaseController extends Controller
 
         try {
             $result = $this->genius->createPayment([
-                'amount' => (float) $ebook->price,
+                'amount' => (float) $amount,
                 'currency' => $payment->currency,
                 'description' => 'Ebook : '.$ebook->title,
                 'customer' => [

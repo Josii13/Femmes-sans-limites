@@ -9,8 +9,12 @@
             <div class="px-8 py-7" style="background:linear-gradient(160deg,#1A0A10 0%,#0D1418 100%);">
                 <p class="text-xs font-bold uppercase tracking-[0.14em] mb-2" style="color:var(--rose);">Ebook</p>
                 <h1 class="text-2xl font-bold text-white leading-tight" style="font-family:'Playfair Display',serif;">{{ $ebook->title }}</h1>
-                <p class="mt-3 text-white text-lg font-bold">
-                    {{ number_format($ebook->price, 0, ',', ' ') }} <span class="text-sm font-medium">{{ $ebook->currency }}</span>
+                <p class="mt-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span class="text-white text-lg font-bold">{{ number_format($ebook->effectivePrice(), 0, ',', ' ') }} <span class="text-sm font-medium">{{ $ebook->currency }}</span></span>
+                    @if($ebook->hasActivePromo())
+                    <span class="text-sm line-through" style="color:rgba(255,255,255,0.45);">{{ number_format($ebook->price, 0, ',', ' ') }}</span>
+                    <span class="text-[11px] font-bold px-1.5 py-0.5 rounded" style="background:var(--rose);color:white;">−{{ $ebook->promoDiscountPercent() }}&nbsp;%</span>
+                    @endif
                 </p>
             </div>
 
@@ -47,7 +51,7 @@
                     </div>
 
                     <button type="submit" class="btn-rose w-full py-3.5" :disabled="submitting" :class="submitting ? 'opacity-70 cursor-not-allowed' : ''">
-                        <template x-if="!submitting"><span>Payer {{ number_format($ebook->price, 0, ',', ' ') }} {{ $ebook->currency }} →</span></template>
+                        <template x-if="!submitting"><span>Payer {{ number_format($ebook->effectivePrice(), 0, ',', ' ') }} {{ $ebook->currency }} →</span></template>
                         <template x-if="submitting"><span class="inline-flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> Redirection…</span></template>
                     </button>
                     <a href="{{ route('ebooks.show', $ebook->slug) }}" class="block text-center text-xs mt-2" style="color:var(--gray);">← Retour à l'ebook</a>
