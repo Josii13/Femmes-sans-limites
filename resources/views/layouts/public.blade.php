@@ -204,12 +204,12 @@
                 @enderror
                 <form x-show="!subscribed" method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col gap-2">
                     @csrf
-                    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
                     <input type="email" name="email" placeholder="ton@email.com" required
                            class="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
                            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:white;"
                            onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                     <button type="submit" class="btn-rose py-2.5 text-sm w-full">S'abonner</button>
+                    <x-honeypot />
                 </form>
             </div>
         </div>
@@ -257,8 +257,6 @@
                   x-data="{ submitting: false, motiv: @js(old('motivation', '')) }"
                   @submit="submitting = true">
                 @csrf
-                {{-- Honeypot anti-bot (invisible pour les humains) --}}
-                <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -349,6 +347,7 @@
                         </span>
                     </template>
                 </button>
+                <x-honeypot />
             </form>
         </div>
     </div>
@@ -386,7 +385,6 @@
             @endif
             <form method="POST" action="{{ route('contact.send') }}" class="space-y-4">
                 @csrf
-                <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div><label class="form-label">Prénom <span style="color:var(--rose)">*</span></label><input type="text" name="name" value="{{ old('name') }}" class="form-input" placeholder="Marie" required></div>
                     <div><label class="form-label">Email <span style="color:var(--rose)">*</span></label><input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="marie@email.com" required></div>
@@ -397,6 +395,7 @@
                     Envoyer le message
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
+                <x-honeypot />
             </form>
         </div>
     </div>

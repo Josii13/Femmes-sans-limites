@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\DetectsBots;
 use App\Mail\MembershipConfirmationMail;
 use App\Mail\NewMembershipMail;
 use App\Models\Member;
@@ -16,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 class MembershipController extends Controller
 {
+    use DetectsBots;
+
     public function index()
     {
         return view('public.join');
@@ -23,8 +26,7 @@ class MembershipController extends Controller
 
     public function store(Request $request)
     {
-        // Honeypot anti-bot : un humain ne remplit jamais ce champ caché.
-        if ($request->filled('website')) {
+        if ($this->isBotSubmission($request, 'membership')) {
             return redirect()->route('membership.success');
         }
 

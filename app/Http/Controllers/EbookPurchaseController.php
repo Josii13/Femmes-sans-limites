@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\DetectsBots;
 use App\Mail\EbookDeliveryMail;
 use App\Models\Ebook;
 use App\Models\Payment;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
 
 class EbookPurchaseController extends Controller
 {
+    use DetectsBots;
+
     public function __construct(private GeniusPayService $genius) {}
 
     /** Formulaire d'achat (nom + email) avant redirection vers le paiement. */
@@ -43,8 +46,7 @@ class EbookPurchaseController extends Controller
             return back()->with('error', 'Cet ebook est momentanément indisponible. Écris-nous et nous le débloquons tout de suite.');
         }
 
-        // Honeypot anti-bot.
-        if ($request->filled('website')) {
+        if ($this->isBotSubmission($request, 'ebook.purchase')) {
             return redirect()->route('ebooks.show', $ebook->slug);
         }
 

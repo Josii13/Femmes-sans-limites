@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Concerns\Honeypot;
 use App\Mail\ContactMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,7 +66,7 @@ class ContactFormTest extends TestCase
         Mail::fake();
         User::factory()->create(['is_admin' => true]);
 
-        $this->post(route('contact.send'), $this->payload + ['website' => 'http://spam.test'])
+        $this->post(route('contact.send'), $this->payload + [Honeypot::FIELD => 'http://spam.test'])
             ->assertRedirect();
 
         Mail::assertNothingQueued();

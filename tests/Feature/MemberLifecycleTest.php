@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Concerns\Honeypot;
 use App\Mail\MemberCardMail;
 use App\Mail\MembershipRejectedMail;
 use App\Models\Member;
@@ -179,7 +180,7 @@ class MemberLifecycleTest extends TestCase
     public function test_honeypot_blocks_bot_submissions(): void
     {
         $this->post(route('membership.store'), [
-            'name' => 'Bot', 'email' => 'bot@example.com', 'website' => 'http://spam',
+            'name' => 'Bot', 'email' => 'bot@example.com', Honeypot::FIELD => 'http://spam',
         ])->assertRedirect(route('membership.success'));
 
         $this->assertDatabaseMissing('members', ['email' => 'bot@example.com']);

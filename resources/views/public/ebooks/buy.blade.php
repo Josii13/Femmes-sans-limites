@@ -31,7 +31,6 @@
                 <form method="POST" action="{{ route('ebooks.buy.store', $ebook->slug) }}" class="space-y-4"
                       x-data="{ submitting: false }" @submit="submitting = true">
                     @csrf
-                    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
 
                     <div>
                         <label class="form-label">Nom complet <span style="color:var(--rose)">*</span></label>
@@ -52,6 +51,8 @@
                         <template x-if="submitting"><span class="inline-flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> Redirection…</span></template>
                     </button>
                     <a href="{{ route('ebooks.show', $ebook->slug) }}" class="block text-center text-xs mt-2" style="color:var(--gray);">← Retour à l'ebook</a>
+
+                    <x-honeypot />
                 </form>
             </div>
         </div>

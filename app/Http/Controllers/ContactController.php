@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\DetectsBots;
 use App\Mail\ContactMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class ContactController extends Controller
 {
+    use DetectsBots;
+
     public function index()
     {
         return view('public.contact');
@@ -18,8 +21,7 @@ class ContactController extends Controller
 
     public function send(Request $request)
     {
-        // Honeypot anti-bot : un humain ne remplit jamais ce champ caché.
-        if ($request->filled('website')) {
+        if ($this->isBotSubmission($request, 'contact')) {
             return back()->with('success', 'Votre message a bien été envoyé. Nous vous répondrons sous 48h.');
         }
 

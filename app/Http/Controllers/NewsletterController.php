@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\DetectsBots;
 use App\Mail\NewsletterConfirmMail;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Mail;
 
 class NewsletterController extends Controller
 {
+    use DetectsBots;
+
     /**
      * Inscription en double opt-in : on enregistre l'abonné comme NON confirmé
      * et on lui envoie un email de confirmation. L'abonnement n'est effectif
@@ -17,8 +20,7 @@ class NewsletterController extends Controller
      */
     public function subscribe(Request $request)
     {
-        // Honeypot anti-bot.
-        if ($request->filled('website')) {
+        if ($this->isBotSubmission($request, 'newsletter')) {
             return back()->with('newsletter_pending', true);
         }
 
