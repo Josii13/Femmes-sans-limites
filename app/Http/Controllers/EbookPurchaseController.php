@@ -7,6 +7,7 @@ use App\Models\Ebook;
 use App\Models\Payment;
 use App\Services\GeniusPayService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -30,6 +31,16 @@ class EbookPurchaseController extends Controller
     {
         if ($ebook->status !== 'published' || ! $ebook->isPurchasable()) {
             return redirect()->route('ebooks.show', $ebook->slug);
+        }
+
+        // Le chemin du PDF peut pointer vers un fichier absent (restauration partielle,
+        // suppression manuelle) : on refuse d'encaisser un paiement qu'on ne pourrait pas livrer.
+        if (! Storage::disk('local')->exists($ebook->file_path)) {
+            Log::error('Achat ebook bloqué : fichier PDF introuvable sur le disque', [
+                'ebook_id' => $ebook->id, 'file_path' => $ebook->file_path,
+            ]);
+
+            return back()->with('error', 'Cet ebook est momentanément indisponible. Écris-nous et nous le débloquons tout de suite.');
         }
 
         // Honeypot anti-bot.

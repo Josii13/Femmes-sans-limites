@@ -257,6 +257,30 @@ class GeniusPayTest extends TestCase
         Mail::assertQueued(EbookDeliveryMail::class);
     }
 
+    /**
+     * Un chemin de PDF qui ne correspond à aucun fichier ne doit jamais aboutir à un
+     * encaissement : le client paierait pour un ebook impossible à livrer.
+     */
+    public function test_purchase_is_blocked_when_the_pdf_file_is_missing(): void
+    {
+        Mail::fake();
+        Storage::fake('local');
+        $this->fakeCheckout();
+
+        // file_path renseigné, mais aucun fichier sur le disque.
+        $ebook = Ebook::factory()->create(['price' => 5000, 'currency' => 'XOF', 'file_path' => 'ebooks/files/disparu.pdf', 'status' => 'published']);
+
+        $this->from(route('ebooks.buy', $ebook->slug))
+            ->post(route('ebooks.buy.store', $ebook->slug), [
+                'name' => 'Marie', 'email' => 'marie@example.com',
+            ])
+            ->assertRedirect(route('ebooks.buy', $ebook->slug))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseCount('payments', 0);
+        Http::assertNothingSent();
+    }
+
     public function test_admin_can_view_sales_dashboard(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
@@ -266,9 +290,12 @@ class GeniusPayTest extends TestCase
     public function test_ebook_purchase_creates_payment_and_webhook_delivers_ebook(): void
     {
         Mail::fake();
+        Storage::fake('local');
         $this->fakeCheckout();
 
         $ebook = Ebook::factory()->create(['price' => 5000, 'currency' => 'XOF', 'file_path' => 'ebooks/files/test.pdf', 'status' => 'published']);
+        // Le PDF doit exister : on ne prend pas de paiement pour un fichier introuvable.
+        Storage::disk('local')->put($ebook->file_path, '%PDF-1.4 contenu de test');
 
         // Achat
         $this->post(route('ebooks.buy.store', $ebook->slug), [
