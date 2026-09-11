@@ -6,11 +6,14 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EbookController as AdminEbookController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\MembershipPlanController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\Admin\SiteImageController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\TwoFactorController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EbookController;
 use App\Http\Controllers\EbookPurchaseController;
@@ -128,74 +131,98 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin protected routes
+// Le défi du second facteur vit hors du groupe protégé par « 2fa » : sinon la
+// page du défi exigerait elle-même d’avoir franchi le défi.
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('two-factor/challenge', [TwoFactorController::class, 'showChallenge'])->name('two-factor.challenge');
+    Route::post('two-factor/challenge', [TwoFactorController::class, 'challenge'])
+        ->middleware('throttle:10,1')->name('two-factor.challenge.verify');
+    Route::post('two-factor/abandon', [TwoFactorController::class, 'abandonChallenge'])->name('two-factor.abandon');
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', '2fa'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Members
-    Route::post('members/bulk-action', [MemberController::class, 'bulkAction'])->name('members.bulk-action');
-    Route::get('members/export-csv', [MemberController::class, 'exportCsv'])->name('members.export-csv');
-    Route::resource('members', MemberController::class);
-    Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
-    Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
-    Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
-    Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
-    Route::post('members/{member}/regenerate-card', [MemberController::class, 'regenerateCard'])->name('members.regenerate-card');
+    // Membres, inscriptions, ventes et campagnes : données personnelles et
+    // financières, hors de portée du rôle « éditrice ».
+    Route::middleware('role:owner,admin')->group(function () {
 
-    // Ebooks
-    Route::resource('ebooks', AdminEbookController::class)->except(['show']);
+        // Members
+        Route::post('members/bulk-action', [MemberController::class, 'bulkAction'])->name('members.bulk-action');
+        Route::get('members/export-csv', [MemberController::class, 'exportCsv'])->name('members.export-csv');
+        Route::resource('members', MemberController::class);
+        Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
+        Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');
+        Route::post('members/{member}/activate', [MemberController::class, 'activate'])->name('members.activate');
+        Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
+        Route::post('members/{member}/regenerate-card', [MemberController::class, 'regenerateCard'])->name('members.regenerate-card');
 
-    // Events
+        // Registrations
+        Route::get('events/{event}/registrations', [RegistrationController::class, 'index'])->name('registrations.index');
+        Route::get('events/{event}/registrations/export', [RegistrationController::class, 'exportCsv'])->name('registrations.export-csv');
+        Route::post('registrations/{registration}/send-payment', [RegistrationController::class, 'sendPaymentLink'])->name('registrations.send-payment');
+        Route::post('registrations/{registration}/confirm-payment', [RegistrationController::class, 'confirmPayment'])->name('registrations.confirm-payment');
+        Route::post('registrations/{registration}/cancel', [RegistrationController::class, 'cancel'])->name('registrations.cancel');
+        Route::get('registrations/{registration}/qr', [RegistrationController::class, 'downloadQr'])->name('registrations.qr');
+
+        // QR Code Scanner
+        Route::get('scanner/{event}', [ScannerController::class, 'index'])->name('scanner.index');
+        Route::post('scanner/{event}/verify', [ScannerController::class, 'verify'])->name('scanner.verify');
+
+        // Waiting list per event
+        Route::get('events/{event}/waiting-list', function (Event $event) {
+            $waitingList = $event->waitingList()->latest()->get();
+
+            return view('admin.events.waiting-list', compact('event', 'waitingList'));
+        })->name('events.waiting-list-admin');
+
+        // Communication / Templates (doit être avant la resource communication pour éviter le conflit {campaign})
+        Route::prefix('communication')->name('communication.')->group(function () {
+            Route::get('templates', [CampaignTemplateController::class, 'index'])->name('templates.index');
+            Route::get('templates/create', [CampaignTemplateController::class, 'create'])->name('templates.create');
+            Route::post('templates', [CampaignTemplateController::class, 'store'])->name('templates.store');
+            Route::get('templates/{template}/edit', [CampaignTemplateController::class, 'edit'])->name('templates.edit');
+            Route::put('templates/{template}', [CampaignTemplateController::class, 'update'])->name('templates.update');
+            Route::delete('templates/{template}', [CampaignTemplateController::class, 'destroy'])->name('templates.destroy');
+            Route::get('templates/{template}/apply', [CampaignTemplateController::class, 'apply'])->name('templates.apply');
+        });
+
+        // Communication / Campagnes
+        Route::resource('communication', CommunicationController::class)
+            ->except(['show'])
+            ->parameters(['communication' => 'campaign']);
+        Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
+        Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
+        Route::get('communication/{campaign}/preview', [CommunicationController::class, 'preview'])->name('communication.preview');
+
+        // Ventes / paiements
+        Route::get('sales', [SalesController::class, 'index'])->name('sales.index');
+
+    }); // fin du groupe « opérations »
+
+    // Contenu éditorial : accessible aussi au rôle « éditrice ».
+    // Les événements sont du contenu ; leurs inscriptions, la liste d’attente et
+    // le scanner restent côté « opérations » car ils portent des données personnelles.
     Route::resource('events', AdminEventController::class);
     Route::post('events/{event}/duplicate', [AdminEventController::class, 'duplicate'])->name('events.duplicate');
-
-    // Registrations
-    Route::get('events/{event}/registrations', [RegistrationController::class, 'index'])->name('registrations.index');
-    Route::get('events/{event}/registrations/export', [RegistrationController::class, 'exportCsv'])->name('registrations.export-csv');
-    Route::post('registrations/{registration}/send-payment', [RegistrationController::class, 'sendPaymentLink'])->name('registrations.send-payment');
-    Route::post('registrations/{registration}/confirm-payment', [RegistrationController::class, 'confirmPayment'])->name('registrations.confirm-payment');
-    Route::post('registrations/{registration}/cancel', [RegistrationController::class, 'cancel'])->name('registrations.cancel');
-    Route::get('registrations/{registration}/qr', [RegistrationController::class, 'downloadQr'])->name('registrations.qr');
-
-    // QR Code Scanner
-    Route::get('scanner/{event}', [ScannerController::class, 'index'])->name('scanner.index');
-    Route::post('scanner/{event}/verify', [ScannerController::class, 'verify'])->name('scanner.verify');
-
-    // Waiting list per event
-    Route::get('events/{event}/waiting-list', function (Event $event) {
-        $waitingList = $event->waitingList()->latest()->get();
-
-        return view('admin.events.waiting-list', compact('event', 'waitingList'));
-    })->name('events.waiting-list-admin');
-
-    // Communication / Templates (doit être avant la resource communication pour éviter le conflit {campaign})
-    Route::prefix('communication')->name('communication.')->group(function () {
-        Route::get('templates', [CampaignTemplateController::class, 'index'])->name('templates.index');
-        Route::get('templates/create', [CampaignTemplateController::class, 'create'])->name('templates.create');
-        Route::post('templates', [CampaignTemplateController::class, 'store'])->name('templates.store');
-        Route::get('templates/{template}/edit', [CampaignTemplateController::class, 'edit'])->name('templates.edit');
-        Route::put('templates/{template}', [CampaignTemplateController::class, 'update'])->name('templates.update');
-        Route::delete('templates/{template}', [CampaignTemplateController::class, 'destroy'])->name('templates.destroy');
-        Route::get('templates/{template}/apply', [CampaignTemplateController::class, 'apply'])->name('templates.apply');
-    });
-
-    // Communication / Campagnes
-    Route::resource('communication', CommunicationController::class)
-        ->except(['show'])
-        ->parameters(['communication' => 'campaign']);
-    Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
-    Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
-    Route::get('communication/{campaign}/preview', [CommunicationController::class, 'preview'])->name('communication.preview');
-
-    // Témoignages affichés sur la page d’accueil
+    Route::resource('ebooks', AdminEbookController::class)->except(['show']);
     Route::resource('testimonials', TestimonialController::class)->except(['show']);
-
-    // Site images
     Route::get('site-images', [SiteImageController::class, 'index'])->name('site-images.index');
     Route::put('site-images/{siteImage}', [SiteImageController::class, 'update'])->name('site-images.update');
     Route::delete('site-images/{siteImage}/reset', [SiteImageController::class, 'reset'])->name('site-images.reset');
 
-    // Ventes / paiements
-    Route::get('sales', [SalesController::class, 'index'])->name('sales.index');
+    // Réglages personnels de double authentification (chaque compte gère le sien)
+    Route::get('two-factor', [TwoFactorController::class, 'show'])->name('two-factor.index');
+    Route::post('two-factor/start', [TwoFactorController::class, 'start'])->name('two-factor.start');
+    Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+    Route::delete('two-factor', [TwoFactorController::class, 'destroy'])->name('two-factor.destroy');
+    Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery');
+
+    // Comptes du back-office et tarifs : réservés à la propriétaire
+    Route::middleware('role:owner')->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::resource('membership-plans', MembershipPlanController::class)->only(['index', 'edit', 'update']);
+    });
 
     // Activity log
     Route::get('activity', function () {

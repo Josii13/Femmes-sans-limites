@@ -145,6 +145,26 @@
             <div class="pt-5 pb-1.5 px-3">
                 <p class="text-[10px] font-bold uppercase tracking-[0.13em]" style="color:rgba(255,255,255,0.25);">Outils</p>
             </div>
+            <a href="{{ route('admin.two-factor.index') }}"
+               @click="sidebarOpen = false"
+               class="admin-nav-link {{ request()->routeIs('admin.two-factor.*') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Ma sécurité
+            </a>
+            @if(auth()->user()?->isOwner())
+            <a href="{{ route('admin.users.index') }}"
+               @click="sidebarOpen = false"
+               class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Comptes
+            </a>
+            <a href="{{ route('admin.membership-plans.index') }}"
+               @click="sidebarOpen = false"
+               class="admin-nav-link {{ request()->routeIs('admin.membership-plans.*') ? 'active' : '' }}">
+                <svg class="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Tarifs d’adhésion
+            </a>
+            @endif
             <a href="{{ route('admin.testimonials.index') }}"
                @click="sidebarOpen = false"
                class="admin-nav-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}">
