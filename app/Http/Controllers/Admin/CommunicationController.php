@@ -31,13 +31,23 @@ class CommunicationController extends Controller
             ->selectRaw('COUNT(*) as total, SUM(sent_count) as emails, SUM(open_count) as opens')
             ->first();
 
-        // 12 derniers mois pour le graphe
+        // 12 derniers mois pour le graphe.
+        //
+        // Le regroupement se fait en PHP plutôt qu'en SQL : YEAR() et MONTH() sont
+        // propres à MySQL, ce qui rendait cette page impossible à couvrir par la
+        // suite de tests — et la casserait sur tout autre moteur.
         $monthly = Campaign::sent()
-            ->selectRaw('YEAR(sent_at) as y, MONTH(sent_at) as m, COUNT(*) as campaigns, SUM(sent_count) as emails')
             ->where('sent_at', '>=', now()->subMonths(11)->startOfMonth())
-            ->groupByRaw('YEAR(sent_at), MONTH(sent_at)')
-            ->orderByRaw('YEAR(sent_at), MONTH(sent_at)')
-            ->get();
+            ->get(['sent_at', 'sent_count'])
+            ->groupBy(fn (Campaign $campaign) => $campaign->sent_at->format('Y-n'))
+            ->map(fn ($group, $key) => (object) [
+                'y' => (int) explode('-', $key)[0],
+                'm' => (int) explode('-', $key)[1],
+                'campaigns' => $group->count(),
+                'emails' => (int) $group->sum('sent_count'),
+            ])
+            ->sortBy([['y', 'asc'], ['m', 'asc']])
+            ->values();
 
         return view('admin.communication.index', compact('campaigns', 'statsMonth', 'statsYear', 'monthly'));
     }
