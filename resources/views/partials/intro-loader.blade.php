@@ -1,4 +1,7 @@
-{{-- Intro 3D « Particules → nom FSL + défilé des valeurs » (Three.js, rejouée à chaque rechargement) --}}
+{{-- Intro 3D « Particules → nom FSL + défilé des valeurs » (Three.js).
+     Jouée UNE SEULE FOIS par session de navigation : la séquence dure ~8 s
+     pendant lesquelles la page est masquée et le défilement bloqué, ce qui
+     devenait pénible à chaque retour sur l'accueil. --}}
 <div id="fsl-intro" role="presentation" aria-hidden="true">
     <canvas id="fsl-intro-canvas"></canvas>
     <div id="fsl-intro-fallback" class="fsl-intro__center">
@@ -38,7 +41,23 @@
 
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function webglOK(){ try{ var c=document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }catch(e){ return false; } }
-    if(reduce){ el.classList.add('fsl-intro--done'); return; }
+
+    // Une seule fois par session de navigation. sessionStorage plutôt que
+    // localStorage : l'intro reste une entrée en matière pour une nouvelle visite,
+    // mais ne se rejoue pas à chaque retour sur l'accueil depuis une autre page.
+    // Le stockage peut lever une exception (navigation privée) : dans ce cas on
+    // laisse simplement l'intro se jouer.
+    var SEEN_KEY = 'fsl.intro.seen';
+    function seen(){ try{ return sessionStorage.getItem(SEEN_KEY) === '1'; }catch(e){ return false; } }
+    function markSeen(){ try{ sessionStorage.setItem(SEEN_KEY, '1'); }catch(e){} }
+
+    // Retire l'écran sans animation ni blocage du défilement.
+    function dismiss(){ el.parentNode && el.parentNode.removeChild(el); }
+
+    if(reduce || seen()){ dismiss(); return; }
+
+    // Marqué dès le départ : quitter la page en pleine intro ne doit pas la rejouer.
+    markSeen();
 
     var html = document.documentElement, prevOverflow = html.style.overflow;
     html.style.overflow = 'hidden';
