@@ -25,3 +25,8 @@ Schedule::command('registrations:expire-unpaid')
 Schedule::command('payments:reconcile')
     ->everyTenMinutes()
     ->withoutOverlapping();
+
+// Sauvegarde quotidienne de la base et des fichiers téléversés (14 jours conservés).
+Schedule::command('fsl:backup')
+    ->dailyAt('02:30')
+    ->withoutOverlapping();

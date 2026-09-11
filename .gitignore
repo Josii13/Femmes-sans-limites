@@ -32,3 +32,6 @@ Vision femme sans limites .md
 *.pdf
 *.docx
 /logo_FSL.png
+
+# Sauvegardes automatiques (contiennent des données personnelles)
+/storage/app/backups
