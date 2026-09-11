@@ -108,14 +108,14 @@ class SiteStatsTest extends TestCase
 
     // ── Rendu ────────────────────────────────────────────────────
 
-    public function test_home_page_shows_the_real_figures(): void
+    public function test_the_band_shows_the_real_figures(): void
     {
         Member::factory()->count(7)->create(['status' => 'active', 'country' => 'Côte d’Ivoire']);
         Member::factory()->count(2)->create(['status' => 'active', 'country' => 'Sénégal']);
         $this->event('published');
         $this->event('completed');
 
-        $html = $this->get(route('home'))->assertOk()->getContent();
+        $html = $this->get(route('about'))->assertOk()->getContent();
 
         $this->assertStringContainsString('data-target="9"', $html);   // membres actives
         $this->assertStringContainsString('data-target="2"', $html);   // pays et événements
@@ -129,9 +129,25 @@ class SiteStatsTest extends TestCase
 
     public function test_stats_band_disappears_on_an_empty_site(): void
     {
+        $html = $this->get(route('about'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Membres actives', $html);
+        $this->assertStringNotContainsString('Événements organisés', $html);
+    }
+
+    /**
+     * La bande est volontairement masquée sur l'accueil tant que les chiffres
+     * réels restent modestes — décision produit, pas un effet de bord.
+     */
+    public function test_home_page_does_not_show_the_stats_band(): void
+    {
+        Member::factory()->count(14)->create(['status' => 'active', 'country' => 'Côte d’Ivoire']);
+        $this->event('published');
+
         $html = $this->get(route('home'))->assertOk()->getContent();
 
         $this->assertStringNotContainsString('Membres actives', $html);
+        $this->assertStringNotContainsString('Pays représentés', $html);
         $this->assertStringNotContainsString('Événements organisés', $html);
     }
 

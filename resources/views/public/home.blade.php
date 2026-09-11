@@ -127,7 +127,10 @@
 </section>
 
 {{-- ══════════════════ BANDE CHIFFRES ══════════════════ --}}
-<x-stats-band />
+{{-- Masquée sur l'accueil tant que les chiffres réels restent modestes.
+     Pour la réafficher, décommenter la ligne ci-dessous : elle se remplit
+     toute seule depuis la base. La même bande reste visible sur « À propos ». --}}
+{{-- <x-stats-band /> --}}
 
 {{-- ══════════════════ COMMUNAUTÉ ══════════════════ --}}
 <section class="py-20 lg:py-28 overflow-hidden" style="background:var(--warm);">
