@@ -73,6 +73,33 @@ class CommunityGalleryTest extends TestCase
         $this->assertStringNotContainsString(Storage::disk('public')->url($hidden->photo), $html);
     }
 
+    /**
+     * Les photos de membres sont des portraits pris au téléphone. Les afficher dans
+     * la vignette paysage des visuels éditoriaux n'en gardait qu'une bande et
+     * coupait les visages au front : elles ont leur propre format.
+     */
+    public function test_member_portraits_use_a_portrait_tile(): void
+    {
+        $this->activeMemberWithPhoto('Awa', 'awa.jpg');
+        SiteImage::create([
+            'key' => 'about_gallery_1', 'label' => 'À propos — Galerie, photo 1',
+            'page' => 'about', 'default_path' => 'photo_02_2.png',
+        ]);
+
+        $html = $this->get(route('about'))->assertOk()->getContent();
+
+        // Restreint à la bande : le hero de la page utilise « object-top » à bon droit.
+        $start = strpos($html, 'snap-x snap-mandatory');
+        $gallery = substr($html, (int) $start, (int) strpos($html, '</section>', (int) $start) - (int) $start);
+
+        $this->assertStringContainsString('width:150px;height:200px', $gallery, 'Vignette portrait pour les membres.');
+        $this->assertStringContainsString('width:280px;height:200px', $gallery, 'Vignette paysage pour les visuels éditoriaux.');
+
+        // « object-top » collait le cadrage au sommet de l'image, au-dessus du visage.
+        $this->assertStringNotContainsString('object-top', $gallery);
+        $this->assertStringContainsString('object-position:center 30%', $gallery);
+    }
+
     public function test_newest_members_come_first(): void
     {
         $old = Member::factory()->create([

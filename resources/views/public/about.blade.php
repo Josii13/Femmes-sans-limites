@@ -209,15 +209,25 @@
             );
     @endphp
 
+    {{--
+        Deux formats de vignette à hauteur constante. Les photos de membres sont des
+        portraits pris au téléphone : les faire entrer dans une vignette paysage
+        n'en gardait qu'une bande, et les visages ressortaient coupés au front.
+        Elles ont donc une vignette au format portrait (3/4), où elles tiennent
+        presque sans recadrage ; les visuels éditoriaux gardent le format paysage.
+
+        Le point de cadrage est légèrement au-dessus du centre : sur une photo plus
+        haute que 3/4, c'est là que se trouve le visage.
+    --}}
     <div class="flex gap-4 px-5 lg:px-8 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
         @foreach($tiles as $tile)
-        <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden" style="width:280px;height:200px;">
-            {{-- Les portraits de membres sont cadrés par le haut : un cadrage centré
-                 couperait les visages sur une vignette en format paysage. --}}
+        <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden"
+             style="width:{{ $tile['isMember'] ? '150px' : '280px' }};height:200px;">
             <img src="{{ $tile['url'] }}"
                  alt="{{ $tile['isMember'] ? 'Membre de la communauté Femme Sans Limites' : 'Moment de vie de la communauté Femme Sans Limites' }}"
                  loading="lazy"
-                 class="w-full h-full object-cover {{ $tile['isMember'] ? 'object-top' : '' }}">
+                 class="w-full h-full object-cover"
+                 @if($tile['isMember']) style="object-position:center 30%;" @endif>
         </div>
         @endforeach
     </div>
