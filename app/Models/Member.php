@@ -2,21 +2,36 @@
 
 namespace App\Models;
 
+use App\Mail\MemberPasswordSetupMail;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use SensitiveParameter;
 
-class Member extends Model
+class Member extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
-    use HasFactory, SoftDeletes;
+    use AuthenticatableTrait, CanResetPassword, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
         'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
     ];
+
+    /**
+     * Jamais exposé : ni en JSON, ni dans un dump de debug.
+     * `password` est volontairement absent de $fillable : il ne se définit que
+     * par assignation explicite, jamais depuis une requête HTTP.
+     */
+    protected $hidden = ['password', 'remember_token', 'verification_token'];
 
     protected static function booted(): void
     {
@@ -40,8 +55,31 @@ class Member extends Model
             'joined_at' => 'datetime',
             'expires_at' => 'datetime',
             'renewal_reminded_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'show_in_gallery' => 'boolean',
         ];
+    }
+
+    /**
+     * Le lien de réinitialisation doit mener à l’espace membre, pas au
+     * back-office : la notification par défaut de Laravel pointe vers la route
+     * d’administration, qui refuserait l’adresse.
+     */
+    public function sendPasswordResetNotification(#[SensitiveParameter] $token): void
+    {
+        $url = route('member.password.reset', ['token' => $token, 'email' => $this->email]);
+
+        Mail::to($this->email)->queue(new MemberPasswordSetupMail($this, $url, $this->password === null));
+    }
+
+    /**
+     * Une membre peut se connecter si son adhésion est active, non expirée, et
+     * qu'elle a défini un mot de passe. Le contrôle vit ici plutôt que dans le
+     * fournisseur d'authentification, pour pouvoir expliquer le refus.
+     */
+    public function canAccessPortal(): bool
+    {
+        return $this->status === 'active' && ! $this->isExpired() && $this->password !== null;
     }
 
     public function registrations()

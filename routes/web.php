@@ -109,6 +109,9 @@ Route::get('/robots.txt', function () {
 Route::get('/mentions-legales', fn () => view('public.legal.mentions-legales'))->name('legal.mentions');
 Route::get('/conditions-generales-utilisation', fn () => view('public.legal.cgu'))->name('legal.cgu');
 
+// Espace membre (guard « member », distinct de celui du back-office)
+require __DIR__.'/member.php';
+
 // Breeze auth routes
 require __DIR__.'/auth.php';
 

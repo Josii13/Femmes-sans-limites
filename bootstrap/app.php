@@ -5,6 +5,7 @@ use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
         ]);
+
+        // Le site a DEUX espaces authentifiés : le back-office et l’espace membre.
+        // Laravel ne connaît qu’une route « login » par défaut, si bien qu’une membre
+        // non connectée atterrissait sur la page de connexion de l’administration,
+        // où ses identifiants ne fonctionnent pas.
+        //
+        // Le réglage doit vivre ICI et non dans un service provider : withMiddleware()
+        // réapplique sa valeur par défaut à la résolution du kernel HTTP, donc après le
+        // boot des providers, et écraserait silencieusement toute configuration posée là.
+        $middleware->redirectTo(
+            guests: fn (Request $request) => $request->is('espace-membre*')
+                ? route('member.login')
+                : route('login'),
+            users: fn (Request $request) => $request->is('espace-membre*')
+                ? route('member.dashboard')
+                : route('admin.dashboard'),
+        );
 
         // Détection correcte du HTTPS derrière le proxy de l'hébergeur (URLs, cookies sécurisés).
         $middleware->trustProxies(at: '*');

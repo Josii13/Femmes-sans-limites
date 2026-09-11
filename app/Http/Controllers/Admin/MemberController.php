@@ -11,6 +11,7 @@ use App\Services\MemberCardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -147,6 +148,12 @@ class MemberController extends Controller
         $cardNeedsRefresh = $member->isDirty(self::CARD_FIELDS) || $photoChanged || $becomingActive;
 
         $member->save();
+
+        // L'activation par ce formulaire ne passe pas par markActive() : l'invitation
+        // à l'espace membre doit donc être déclenchée ici aussi.
+        if ($becomingActive) {
+            $this->inviteToPortal($member);
+        }
 
         if ($cardNeedsRefresh) {
             $member->update(['card_path' => $this->cardService->generate($member->fresh())]);
@@ -384,5 +391,31 @@ class MemberController extends Controller
             'joined_at' => $member->joined_at ?? now(),
             'expires_at' => now()->addYears(Member::MEMBERSHIP_YEARS),
         ])->save();
+
+        $this->inviteToPortal($member);
+    }
+
+    /**
+     * Invite la membre à activer son espace personnel.
+     *
+     * Envoyé une seule fois, à la première activation : une membre qui a déjà
+     * choisi son mot de passe n'a pas à recevoir un lien de réinitialisation
+     * chaque fois qu'une administratrice touche à sa fiche.
+     */
+    private function inviteToPortal(Member $member): void
+    {
+        if ($member->password !== null) {
+            return;
+        }
+
+        try {
+            Password::broker('members')->sendResetLink(['email' => $member->email]);
+        } catch (\Throwable $e) {
+            // L'adhésion est activée : l'invitation peut toujours être renvoyée
+            // plus tard via « mot de passe oublié ».
+            Log::warning('Espace membre: échec envoi du lien d\'activation', [
+                'member' => $member->id, 'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

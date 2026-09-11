@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Member;
 use App\Models\User;
 
 return [
@@ -42,6 +43,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Espace membre : session distincte de celle du back-office, pour qu une
+        // connexion membre ne donne jamais accès à l administration.
+        'member' => [
+            'driver' => 'session',
+            'provider' => 'members',
+        ],
     ],
 
     /*
@@ -67,10 +75,10 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'members' => [
+            'driver' => 'eloquent',
+            'model' => Member::class,
+        ],
     ],
 
     /*
@@ -97,6 +105,16 @@ return [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // Espace membre. Le premier mot de passe se définit par ce même canal :
+        // aucun mot de passe n est jamais envoyé par email. Lien valable 7 jours,
+        // le temps qu une nouvelle adhérente ouvre son message.
+        'members' => [
+            'provider' => 'members',
+            'table' => 'password_reset_tokens',
+            'expire' => 10080,
             'throttle' => 60,
         ],
     ],
