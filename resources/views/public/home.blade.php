@@ -209,33 +209,7 @@
 </section>
 
 {{-- ══════════════════ TÉMOIGNAGES ══════════════════ --}}
-{{-- <section class="py-20 lg:py-28" style="background:var(--dark);">
-    <div class="max-w-7xl mx-auto px-5 lg:px-8">
-        <div class="text-center mb-14 fade-up">
-            <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--gold);">Ce qu'elles disent</span>
-            <h2 class="text-4xl font-bold mt-3 text-white" style="font-family:'Playfair Display',serif;">La parole aux membres</h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-stagger="120">
-            @foreach([
-                ['home_temoignage_1','Khadija Mbaye','Entrepreneur · Dakar','FSL a transformé ma façon de voir les affaires. J\'ai rencontré mes deux associées actuelles lors du Forum 2023. Ce réseau est une vraie chance — des femmes qui se soutiennent vraiment, sans jalousie.'],
-                ['home_temoignage_2','Dr. Aminata Sow','Médecin · Abidjan','J\'hésitais à me lancer en parallèle à ma carrière médicale. Le mentorat FSL m\'a donné les outils et la confiance. Aujourd\'hui mon cabinet attire 3× plus de patientes grâce à ma visibilité.'],
-                ['home_temoignage_3','Bintou Diarra','Cadre finance · Paris','Être dans la diaspora et rester connectée à l\'Afrique, c\'est possible avec FSL. J\'ai trouvé une communauté qui me comprend et m\'inspire à rester ambitieuse, peu importe où je vis.'],
-            ] as [$photoKey,$name,$role,$quote])
-            <div class="rounded-2xl p-7 flex flex-col fade-up" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
-                <svg class="w-8 h-8 mb-5 flex-shrink-0" style="color:var(--rose);" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-                <p class="text-sm leading-relaxed flex-1 mb-6" style="color:rgba(255,255,255,0.7);">{{ $quote }}</p>
-                <div class="flex items-center gap-3 pt-5" style="border-top:1px solid rgba(255,255,255,0.1);">
-                    <img src="{{ site_img($photoKey) }}" alt="{{ $name }}" loading="lazy" class="w-11 h-11 rounded-full object-cover object-top flex-shrink-0">
-                    <div>
-                        <p class="text-sm font-bold text-white">{{ $name }}</p>
-                        <p class="text-xs" style="color:rgba(255,255,255,0.4);">{{ $role }}</p>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section> --}}
+<x-testimonials />
 
 {{-- ══════════════════ ÉVÉNEMENTS ══════════════════ --}}
 {{-- <section class="py-20 lg:py-28" style="background:var(--warm);">

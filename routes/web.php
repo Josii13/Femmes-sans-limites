@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\ScannerController;
 use App\Http\Controllers\Admin\SiteImageController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EbookController;
 use App\Http\Controllers\EbookPurchaseController;
@@ -181,6 +182,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('communication/{campaign}', [CommunicationController::class, 'show'])->name('communication.show');
     Route::post('communication/{campaign}/send', [CommunicationController::class, 'send'])->name('communication.send');
     Route::get('communication/{campaign}/preview', [CommunicationController::class, 'preview'])->name('communication.preview');
+
+    // Témoignages affichés sur la page d’accueil
+    Route::resource('testimonials', TestimonialController::class)->except(['show']);
 
     // Site images
     Route::get('site-images', [SiteImageController::class, 'index'])->name('site-images.index');
