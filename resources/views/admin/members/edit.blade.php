@@ -102,6 +102,20 @@
                             <img :src="photoPreview" alt="" class="w-full h-full object-cover">
                         </div>
                     </div>
+
+                    {{-- Publication de la photo sur le site public. --}}
+                    <label class="flex items-start gap-3 mt-4 p-3 rounded-xl cursor-pointer" style="background:var(--rose-pale);">
+                        {{-- Champ caché : une case décochée n'est pas soumise par le navigateur. --}}
+                        <input type="hidden" name="show_in_gallery" value="0">
+                        <input type="checkbox" name="show_in_gallery" value="1" class="mt-0.5"
+                               @checked(old('show_in_gallery', $member->show_in_gallery))>
+                        <span class="text-xs leading-relaxed" style="color:var(--gray);">
+                            <strong style="color:var(--dark);">Afficher cette photo sur le site public</strong><br>
+                            Une fois l'adhésion active, la photo rejoint la galerie « Notre communauté »
+                            de la page À propos et la page de connexion. Décochez pour l'en retirer
+                            sans toucher à l'adhésion.
+                        </span>
+                    </label>
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t border-gray-100">

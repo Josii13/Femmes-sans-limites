@@ -120,7 +120,11 @@ class MemberController extends Controller
             'type' => 'required|in:standard,gold,premium',
             'status' => 'required|in:'.implode(',', Member::STATUSES),
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            // Publication de la photo dans la galerie publique et sur la page de connexion.
+            'show_in_gallery' => 'boolean',
         ]);
+
+        $validated['show_in_gallery'] = $request->boolean('show_in_gallery');
 
         $becomingActive = $member->status !== 'active' && $validated['status'] === 'active';
         $photoChanged = $request->hasFile('photo');

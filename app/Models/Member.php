@@ -14,7 +14,7 @@ class Member extends Model
 
     protected $fillable = [
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
-        'country', 'city', 'photo', 'type', 'status', 'card_path', 'verification_token',
+        'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
     ];
 
@@ -40,6 +40,7 @@ class Member extends Model
             'joined_at' => 'datetime',
             'expires_at' => 'datetime',
             'renewal_reminded_at' => 'datetime',
+            'show_in_gallery' => 'boolean',
         ];
     }
 
@@ -57,6 +58,21 @@ class Member extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
+    }
+
+    /**
+     * Membres dont la photo peut illustrer publiquement la communauté :
+     * adhésion active, photo fournie, et publication non retirée par l'administration.
+     * Les plus récemment arrivées d'abord, pour que la galerie vive au fil des adhésions.
+     */
+    public function scopeInPublicGallery(Builder $query): Builder
+    {
+        return $query->where('status', 'active')
+            ->where('show_in_gallery', true)
+            ->whereNotNull('photo')
+            ->where('photo', '!=', '')
+            ->orderByDesc('joined_at')
+            ->orderByDesc('id');
     }
 
     public function scopePending(Builder $query): Builder

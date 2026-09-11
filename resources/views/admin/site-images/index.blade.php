@@ -5,8 +5,17 @@
 
 @section('content')
 
-<div class="mb-6 p-4 rounded-xl text-sm" style="background:#FFF8F1;border:1px solid #FDDCAD;color:#92400E;">
+<div class="mb-4 p-4 rounded-xl text-sm" style="background:#FFF8F1;border:1px solid #FDDCAD;color:#92400E;">
     <strong>Comment ça marche :</strong> cliquez sur <em>Modifier</em> pour remplacer une image sur le site en direct. L'image par défaut est toujours conservée et restaurable à tout moment.
+</div>
+
+{{-- La galerie « Notre communauté » n'est plus alimentée que par ces 6 images. --}}
+<div class="mb-6 p-4 rounded-xl text-sm" style="background:var(--rose-pale);border:1px solid var(--rose-mid);color:var(--dark);">
+    <strong>Galerie « Notre communauté » :</strong> les photos des membres actives s'y ajoutent
+    <strong>automatiquement</strong>, dès l'activation de l'adhésion. Les 6 images « À propos — Galerie »
+    ci-dessous viennent les compléter. Pour retirer la photo d'une membre du site public, ouvrez sa fiche
+    dans <a href="{{ route('admin.members.index') }}" class="underline" style="color:var(--rose);">Membres</a>
+    et décochez « Afficher cette photo sur le site public ».
 </div>
 
 @foreach($pages as $pageKey => $pageLabel)

@@ -37,10 +37,19 @@
                 « Chaque femme porte<br>en elle une puissance<br><em style="color:var(--rose);">sans limites.</em> »
             </blockquote>
             <div class="flex items-center gap-4">
+                @php
+                    // Visages des dernières membres activées ; repli sur les visuels
+                    // livrés avec le site tant qu'aucune photo n'est disponible.
+                    $avatars = community_photos(3) ?: [
+                        asset('images/photo_01_2.png'),
+                        asset('images/photo_03_4.png'),
+                        asset('images/photo_03_1.png'),
+                    ];
+                @endphp
                 <div class="flex -space-x-2">
-                    <img src="{{ asset('images/photo_01_2.png') }}" class="w-9 h-9 rounded-full object-cover object-top border-2 border-white/20" alt="">
-                    <img src="{{ asset('images/photo_03_4.png') }}" class="w-9 h-9 rounded-full object-cover object-top border-2 border-white/20" alt="">
-                    <img src="{{ asset('images/photo_03_1.png') }}" class="w-9 h-9 rounded-full object-cover object-top border-2 border-white/20" alt="">
+                    @foreach($avatars as $avatar)
+                    <img src="{{ $avatar }}" class="w-9 h-9 rounded-full object-cover object-top border-2 border-white/20" alt="">
+                    @endforeach
                 </div>
                 <div>
                     <p class="text-sm font-semibold text-white">500+ femmes accompagnées</p>

@@ -195,10 +195,29 @@
     <div class="max-w-7xl mx-auto px-5 lg:px-8 mb-6 fade-up">
         <span class="section-label">Notre communauté</span>
     </div>
+    @php
+        // Les photos des membres actives alimentent la bande automatiquement : chaque
+        // nouvelle adhésion activée s'y ajoute, sans manipulation en back-office.
+        // Les visuels éditoriaux de la galerie viennent ensuite compléter, pour que
+        // la section reste pleine même avec peu de membres photographiées.
+        $tiles = collect(community_photos(12))
+            ->map(fn (string $url) => ['url' => $url, 'isMember' => true])
+            ->concat(
+                collect(['about_gallery_1', 'about_gallery_2', 'about_gallery_3', 'about_gallery_4', 'about_gallery_5', 'about_gallery_6'])
+                    ->map(fn (string $key) => ['url' => site_img($key), 'isMember' => false])
+                    ->filter(fn (array $tile) => $tile['url'] !== '')
+            );
+    @endphp
+
     <div class="flex gap-4 px-5 lg:px-8 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
-        @foreach(['about_gallery_1','about_gallery_2','about_gallery_3','about_gallery_4','about_gallery_5','about_gallery_6'] as $imgKey)
+        @foreach($tiles as $tile)
         <div class="snap-start flex-shrink-0 rounded-2xl overflow-hidden" style="width:280px;height:200px;">
-            <img src="{{ site_img($imgKey) }}" alt="Moment de vie de la communauté Femme Sans Limites" loading="lazy" class="w-full h-full object-cover">
+            {{-- Les portraits de membres sont cadrés par le haut : un cadrage centré
+                 couperait les visages sur une vignette en format paysage. --}}
+            <img src="{{ $tile['url'] }}"
+                 alt="{{ $tile['isMember'] ? 'Membre de la communauté Femme Sans Limites' : 'Moment de vie de la communauté Femme Sans Limites' }}"
+                 loading="lazy"
+                 class="w-full h-full object-cover {{ $tile['isMember'] ? 'object-top' : '' }}">
         </div>
         @endforeach
     </div>
