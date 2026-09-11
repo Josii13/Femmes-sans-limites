@@ -51,22 +51,43 @@
                     <img src="{{ $avatar }}" class="w-9 h-9 rounded-full object-cover object-top border-2 border-white/20" alt="">
                     @endforeach
                 </div>
+                @php
+                    // Accord fait à la main : Str::plural applique des règles anglaises,
+                    // qui malmènent « pays ».
+                    $members = site_stats()->activeMembers();
+                    $countries = site_stats()->countries();
+                @endphp
                 <div>
-                    <p class="text-sm font-semibold text-white">500+ femmes accompagnées</p>
-                    <p class="text-xs" style="color:rgba(255,255,255,0.45);">Afrique & diaspora · 15+ pays</p>
+                    <p class="text-sm font-semibold text-white">
+                        {{ $members }} {{ $members > 1 ? 'membres actives' : 'membre active' }}
+                    </p>
+                    {{-- Expression plutôt qu'un @if : collé à un mot (« diaspora@if »),
+                         Blade ne reconnaît pas la directive et laisse un @endif orphelin. --}}
+                    <p class="text-xs" style="color:rgba(255,255,255,0.45);">
+                        Afrique &amp; diaspora{{ $countries > 0 ? ' · '.$countries.' pays' : '' }}
+                    </p>
                 </div>
             </div>
         </div>
 
-        {{-- Métriques bas --}}
-        <div class="relative z-10 grid grid-cols-3 gap-6 pt-8" style="border-top:1px solid rgba(255,255,255,0.07);">
-            @foreach([['500+','Membres actives'],['15+','Pays'],['50+','Événements']] as [$n,$l])
+        {{-- Métriques bas — chiffres réels, les valeurs nulles n'apparaissent pas. --}}
+        @php
+            $metrics = array_values(array_filter([
+                ['value' => $members, 'label' => 'Membres actives'],
+                ['value' => $countries, 'label' => 'Pays'],
+                ['value' => site_stats()->events(), 'label' => 'Événements'],
+            ], fn (array $metric) => $metric['value'] > 0));
+        @endphp
+        @if($metrics)
+        <div class="relative z-10 flex flex-wrap gap-x-10 gap-y-5 pt-8" style="border-top:1px solid rgba(255,255,255,0.07);">
+            @foreach($metrics as $metric)
             <div>
-                <p class="text-2xl font-bold text-white" style="font-family:'Playfair Display',serif;">{{ $n }}</p>
-                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,0.4);">{{ $l }}</p>
+                <p class="text-2xl font-bold text-white" style="font-family:'Playfair Display',serif;">{{ $metric['value'] }}</p>
+                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,0.4);">{{ $metric['label'] }}</p>
             </div>
             @endforeach
         </div>
+        @endif
     </div>
 
     {{-- ── Panneau droit : formulaire ── --}}

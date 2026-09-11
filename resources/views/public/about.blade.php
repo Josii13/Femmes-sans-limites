@@ -224,27 +224,7 @@
 </section>
 
 {{-- ══════════════════ IMPACT ══════════════════ --}}
-<!-- <section class="py-20" style="background:var(--dark);">
-    <div class="max-w-7xl mx-auto px-5 lg:px-8">
-        <div class="text-center mb-12 fade-up">
-            <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--gold);">Nos résultats</span>
-            <h2 class="text-3xl font-bold mt-2 text-white" style="font-family:'Playfair Display',serif;">L'impact en chiffres</h2>
-        </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8" data-stagger="120">
-            @foreach([
-                ['500', '+', 'Femmes accompagnées'],
-                ['15',  '+', 'Pays représentés'],
-                ['50',  '+', 'Événements organisés'],
-                ['1000','+', 'Heures de formation'],
-            ] as [$target,$suffix,$l])
-            <div class="text-center fade-up">
-                <p class="text-4xl font-bold mb-1 counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
-                <p class="text-sm" style="color:rgba(255,255,255,0.5);">{{ $l }}</p>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section> -->
+<x-stats-band eyebrow="Nos résultats" title="L'impact en chiffres" />
 
 {{-- ══════════════════ CTA ══════════════════ --}}
 <section class="py-24 bg-white">

@@ -127,23 +127,7 @@
 </section>
 
 {{-- ══════════════════ BANDE CHIFFRES ══════════════════ --}}
-<!-- <section class="py-14" style="background:var(--dark);">
-    <div class="max-w-7xl mx-auto px-5 lg:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8" data-stagger="120">
-            @foreach([
-                ['500', '+', 'Femmes accompagnées','var(--rose)'],
-                ['15',  '+', 'Pays d\'Afrique & diaspora','var(--gold)'],
-                ['50',  '+', 'Événements organisés','var(--rose)'],
-                ['1000','+', 'Heures de formation','var(--gold)'],
-            ] as [$target,$suffix,$l,$c])
-            <div class="text-center fade-up">
-                <p class="text-4xl font-bold mb-2 counter" data-target="{{ $target }}" data-suffix="{{ $suffix }}" style="color:{{ $c }};font-family:'Playfair Display',serif;">{{ $target }}{{ $suffix }}</p>
-                <p class="text-sm" style="color:rgba(255,255,255,0.45);">{{ $l }}</p>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section> -->
+<x-stats-band />
 
 {{-- ══════════════════ COMMUNAUTÉ ══════════════════ --}}
 <section class="py-20 lg:py-28 overflow-hidden" style="background:var(--warm);">

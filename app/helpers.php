@@ -2,6 +2,7 @@
 
 use App\Models\Member;
 use App\Models\SiteImage;
+use App\Services\SiteStats;
 use Illuminate\Support\Facades\Storage;
 
 if (! function_exists('mb_ucfirst')) {
@@ -91,5 +92,19 @@ if (! function_exists('community_photos')) {
                 return [];
             }
         });
+    }
+}
+
+if (! function_exists('site_stats')) {
+    /**
+     * Chiffres réels de l'association (membres actives, pays, événements,
+     * participations), calculés depuis la base.
+     *
+     * Instance partagée le temps de la requête : la bande de la page d'accueil et
+     * la page de connexion interrogent la base une seule fois par chiffre.
+     */
+    function site_stats(): SiteStats
+    {
+        return fsl_remember('fsl.site_stats', fn () => new SiteStats);
     }
 }
