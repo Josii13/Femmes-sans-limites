@@ -32,6 +32,99 @@
     @endif
 </div>
 
+{{--
+    Ce qui réclame une action. Placé avant les compteurs : un tableau de bord
+    doit d'abord dire quoi faire, pas seulement où l'on en est.
+--}}
+@if(! empty($attention))
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+    @foreach($attention as $item)
+    @php
+        [$bg, $border, $fg] = match ($item['tone']) {
+            'urgent' => ['rgba(217,30,110,0.06)', 'rgba(217,30,110,0.2)', 'var(--rose)'],
+            'warning' => ['#FFFBEB', '#FCD34D', '#B45309'],
+            default => ['#F8FAFC', '#E2E8F0', '#64748B'],
+        };
+    @endphp
+    <a href="{{ $item['route'] }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all"
+       style="background:{{ $bg }};border:1px solid {{ $border }};color:{{ $fg }};">
+        <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:{{ $fg }};"></span>
+        <span class="font-medium flex-1">{{ $item['label'] }}</span>
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+    @endforeach
+</div>
+@endif
+
+{{-- ══ Recettes ══ (masquées au rôle « éditrice ») --}}
+@if($seesOperations && $revenue)
+@php $fmt = fn ($amount) => number_format($amount, 0, ',', ' '); @endphp
+<div class="bg-white rounded-2xl p-5 lg:p-6 mb-6" style="border:1px solid #EEEBF0;box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+
+    <div class="flex flex-wrap items-start justify-between gap-4 mb-5">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--gray);">Recettes encaissées</p>
+            <p class="text-3xl font-bold mt-1" style="color:var(--dark);font-family:'Playfair Display',serif;">
+                {{ $fmt($revenue['total']) }}
+                <span class="text-base font-semibold" style="color:var(--gray);">{{ $revenue['currency'] }}</span>
+            </p>
+            {{-- Seuls les paiements aboutis comptent : un paiement abandonné n'est pas une recette. --}}
+            <p class="text-xs mt-1" style="color:var(--gray);">Depuis le lancement, paiements confirmés uniquement.</p>
+        </div>
+
+        <div class="text-right">
+            <p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--gray);">Ce mois-ci</p>
+            <p class="text-2xl font-bold mt-1" style="color:var(--dark);font-family:'Playfair Display',serif;">{{ $fmt($revenue['this_month']) }}</p>
+            @if($revenue['trend'] !== null)
+            <p class="text-xs mt-0.5 font-medium" style="color:{{ $revenue['trend'] >= 0 ? '#059669' : '#DC2626' }};">
+                {{ $revenue['trend'] >= 0 ? '+' : '' }}{{ $revenue['trend'] }} % vs mois dernier
+            </p>
+            @elseif($revenue['last_month'] <= 0 && $revenue['this_month'] > 0)
+            <p class="text-xs mt-0.5" style="color:var(--gray);">Premier mois avec des recettes</p>
+            @endif
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 pt-4" style="border-top:1px solid var(--border);">
+        @foreach([
+            ['Adhésions', $revenue['by_type']['memberships'], 'var(--rose)'],
+            ['Ebooks', $revenue['by_type']['ebooks'], 'var(--gold)'],
+            ['Événements', $revenue['by_type']['events'], '#7C3AED'],
+        ] as [$label, $amount, $color])
+        <div>
+            <p class="text-xs" style="color:var(--gray);">{{ $label }}</p>
+            <p class="text-lg font-bold mt-0.5" style="color:{{ $color }};font-family:'Playfair Display',serif;">{{ $fmt($amount) }}</p>
+        </div>
+        @endforeach
+    </div>
+
+    @if($revenue['pending_count'] > 0)
+    <p class="text-xs mt-4 pt-3" style="color:var(--gray);border-top:1px solid var(--border);">
+        {{ $revenue['pending_count'] }} paiement{{ $revenue['pending_count'] > 1 ? 's' : '' }} en cours, non compté{{ $revenue['pending_count'] > 1 ? 's' : '' }} ci-dessus.
+    </p>
+    @endif
+</div>
+@endif
+
+{{-- ══ Évolution des adhésions ══ --}}
+@if($seesOperations && ! empty($growth))
+@php $peak = max(1, max(array_column($growth, 'count'))); @endphp
+<div class="bg-white rounded-2xl p-5 lg:p-6 mb-6" style="border:1px solid #EEEBF0;box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+    <p class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--gray);">Nouvelles adhésions — 6 derniers mois</p>
+
+    <div class="flex items-end justify-between gap-2" style="height:120px;">
+        @foreach($growth as $month)
+        <div class="flex-1 flex flex-col items-center justify-end h-full gap-2">
+            <span class="text-xs font-bold" style="color:var(--dark);">{{ $month['count'] }}</span>
+            {{-- Hauteur relative au mois le plus fourni : une barre nulle reste visible. --}}
+            <div class="w-full rounded-t-lg" style="height:{{ max(2, (int) round($month['count'] / $peak * 80)) }}px;background:{{ $month['count'] > 0 ? 'var(--rose)' : 'var(--border)' }};"></div>
+            <span class="text-[10px] uppercase" style="color:var(--gray);">{{ $month['label'] }}</span>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 {{-- ══ KPIs ══ --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     {{-- Membres --}}
