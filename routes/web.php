@@ -22,6 +22,7 @@ use App\Http\Controllers\MemberVerifyController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TrackingController;
 use App\Models\ActivityLog;
 use App\Models\Event;
@@ -78,6 +79,30 @@ Route::post('/ebooks-mes-achats', [EbookPurchaseController::class, 'resend'])
 
 // Webhook GeniusPay (signé HMAC, exempté de CSRF)
 Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');
+
+// Plan du site et robots : servis par l’application plutôt que par des fichiers
+// statiques, pour que le domaine suive APP_URL et que le plan reste à jour.
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        '',
+        '# Espaces privés et pages sans intérêt pour l’indexation',
+        'Disallow: /admin',
+        'Disallow: /login',
+        'Disallow: /espace-membre',
+        'Disallow: /paiement/',
+        'Disallow: /ebooks/telechargement/',
+        'Disallow: /membre/',
+        'Disallow: /newsletter/',
+        'Disallow: /communication/',
+        '',
+        'Sitemap: '.route('sitemap'),
+    ];
+
+    return response(implode(PHP_EOL, $lines).PHP_EOL)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots');
 
 // Pages légales
 Route::get('/mentions-legales', fn () => view('public.legal.mentions-legales'))->name('legal.mentions');

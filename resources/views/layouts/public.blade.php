@@ -63,6 +63,8 @@
     @keyframes fsl-p{from{width:0%}to{width:90%}}
     @keyframes fsl-s{from{background-position:0% 0}to{background-position:-200% 0}}
     </style>
+    {{-- Mesure d'audience (uniquement si configurée, et jamais hors production). --}}
+    <x-analytics />
 </head>
 <body x-data class="antialiased">
 <div id="fsl-bar" aria-hidden="true"></div>

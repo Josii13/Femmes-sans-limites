@@ -42,4 +42,17 @@ return [
         'currency' => env('GENIUSPAY_CURRENCY', 'XOF'),
     ],
 
+    /*
+    | Mesure d’audience. Aucun traceur n’est chargé tant que rien n’est configuré :
+    | le site reste sans cookie tiers par défaut, ce qui simplifie la conformité.
+    | Plausible et Matomo sont sans cookie ; GA4 en dépose.
+    */
+    'analytics' => [
+        'provider' => env('ANALYTICS_PROVIDER'), // plausible | matomo | ga4 | null
+        'domain' => env('ANALYTICS_DOMAIN'),     // plausible
+        'url' => env('ANALYTICS_URL'),           // matomo : URL de l’instance
+        'site_id' => env('ANALYTICS_SITE_ID'),   // matomo
+        'measurement_id' => env('ANALYTICS_MEASUREMENT_ID'), // ga4 : G-XXXXXXX
+    ],
+
 ];
