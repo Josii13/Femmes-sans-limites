@@ -27,12 +27,26 @@ class EventController extends Controller
             ->orderBy('event_date')
             ->get();
 
-        return view('public.events.index', compact('events'));
+        // Les éditions passées disparaissaient du site : c'est pourtant la preuve
+        // la plus concrète de l'activité de l'association. Elles restent visibles,
+        // en archive, avec leur affluence réelle.
+        $pastEvents = Event::whereIn('status', ['published', 'completed'])
+            ->where('event_date', '<', now())
+            ->withActiveRegistrationsCount()
+            ->orderByDesc('event_date')
+            ->limit(12)
+            ->get();
+
+        return view('public.events.index', compact('events', 'pastEvents'));
     }
 
     public function show(string $slug)
     {
-        $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        // « completed » inclus : une édition passée garde sa page, sinon les liens
+        // de l'archive et ceux déjà partagés renverraient un 404.
+        $event = Event::where('slug', $slug)
+            ->whereIn('status', ['published', 'completed'])
+            ->firstOrFail();
 
         return view('public.events.show', compact('event'));
     }

@@ -114,4 +114,62 @@
     </div>
 </section>
 
+{{--
+    Éditions passées. Elles disparaissaient entièrement du site alors qu'elles
+    constituent la preuve la plus concrète de l'activité de l'association :
+    une visiteuse qui hésite regarde ce qui a déjà eu lieu.
+--}}
+@if($pastEvents->isNotEmpty())
+<section class="py-16 lg:py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-5 lg:px-8">
+
+        <div class="mb-10 fade-up">
+            <span class="section-label">Déjà passés</span>
+            <h2 class="text-2xl lg:text-3xl font-bold mt-3" style="color:var(--dark);font-family:'Playfair Display',serif;">
+                Nos éditions précédentes
+            </h2>
+            <p class="text-sm mt-2" style="color:var(--gray);">
+                {{ $pastEvents->count() }} rendez-vous déjà organisés par la communauté.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" data-stagger="90">
+            @foreach($pastEvents as $event)
+            <a href="{{ route('events.show', $event->slug) }}" class="card-hover flex gap-4 p-4 fade-up group">
+
+                <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 relative">
+                    @if($event->image)
+                    <img src="{{ asset('storage/'.$event->image) }}" alt="{{ $event->title }}" loading="lazy"
+                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    @else
+                    <div class="w-full h-full flex flex-col items-center justify-center" style="background:var(--warm);">
+                        <p class="text-lg font-bold leading-none" style="color:var(--rose);font-family:'Playfair Display',serif;">{{ $event->event_date->format('d') }}</p>
+                        <p class="text-[10px] uppercase font-semibold mt-0.5" style="color:var(--gray);">{{ $event->event_date->translatedFormat('M') }}</p>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="min-w-0 flex flex-col justify-center">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--gray);">
+                        {{ $event->event_date->translatedFormat('d F Y') }}
+                    </p>
+                    <h3 class="text-sm font-bold leading-snug line-clamp-2 mt-0.5" style="color:var(--dark);">{{ $event->title }}</h3>
+
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]" style="color:var(--gray);">
+                        @if($event->city)
+                        <span>{{ $event->city }}</span>
+                        @endif
+                        {{-- Affluence réelle : un chiffre mesuré, pas une estimation. --}}
+                        @if($event->active_registrations_count > 0)
+                        <span style="color:var(--rose);">{{ $event->active_registrations_count }} participante{{ $event->active_registrations_count > 1 ? 's' : '' }}</span>
+                        @endif
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 @endsection
