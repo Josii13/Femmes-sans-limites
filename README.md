@@ -80,6 +80,37 @@ Activez l'ordonnanceur Laravel côté serveur :
 * * * * * cd /chemin/projet && php artisan schedule:run >> /dev/null 2>&1
 ```
 
+## Déploiement
+
+Toujours ces quatre commandes, dans cet ordre :
+
+```bash
+cd /chemin/projet
+git pull origin main
+php artisan migrate --force
+php artisan optimize:clear     # vide config, routes, vues, événements
+php artisan optimize           # les régénère toutes
+```
+
+> **`optimize` plutôt qu'une liste de `:cache`.** Les caches de configuration, de
+> routes et de vues doivent être régénérés **ensemble**. En vider une partie
+> seulement produit une incohérence silencieuse : une vue recompilée qui appelle
+> `route('nouvelle.route')` alors que la table de routes en cache date d'avant
+> fait tomber **tout le site** en `RouteNotFoundException`. `optimize` ne peut pas
+> être fait à moitié ; une liste recopiée à la main, si.
+
+Après un déploiement qui ajoute une dépendance : `composer install --no-dev --optimize-autoloader`.
+
+Les assets (`public/build`) sont **versionnés** : ils se compilent en local avec
+`npm run build` puis se committent. Ne pas lancer `npm` sur le serveur.
+
+Vérification rapide après mise en ligne :
+
+```bash
+php artisan route:list | grep -c .   # la table de routes se reconstruit
+php artisan fsl:diagnose-sales       # chaîne de vente (lecture seule)
+```
+
 ## Qualité
 
 ```bash
