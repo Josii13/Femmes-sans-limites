@@ -8,9 +8,14 @@
 --}}
 @props(['variant' => 'full'])
 
-@php $compact = $variant === 'compact'; @endphp
+@php
+    $compact = $variant === 'compact';
+    // Une classe fournie REMPLACE la disposition par défaut au lieu de s'y ajouter :
+    // fusionner « space-y-* » avec une grille cumulerait marges et gouttières.
+    $layout = $compact ? 'space-y-4' : 'space-y-8';
+@endphp
 
-<ol {{ $attributes->merge(['class' => $compact ? 'space-y-4' : 'space-y-8']) }}>
+<ol {{ $attributes->has('class') ? $attributes : $attributes->merge(['class' => $layout]) }}>
     @foreach(\App\Support\CommunityRules::all() as $index => $rule)
     <li class="flex gap-4">
         <span class="flex-shrink-0 rounded-full flex items-center justify-center font-bold text-white

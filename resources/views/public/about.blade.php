@@ -151,6 +151,43 @@
     </div>
 </section>
 
+{{--
+    ══════════════════ RÈGLES DE LA COMMUNAUTÉ ══════════════════
+
+    Placées juste après les valeurs, dont elles sont le pendant concret : les
+    valeurs disent ce en quoi on croit, les règles comment on vit ensemble.
+
+    Seuls les intitulés figurent ici — le texte complet vit sur sa propre page,
+    alimentée par le même composant : une règle ne peut pas diverger d'un endroit
+    à l'autre.
+--}}
+<section class="py-24 lg:py-28" style="background:var(--rose-pale);">
+    <div class="max-w-5xl mx-auto px-5 lg:px-8">
+
+        <div class="text-center mb-12 fade-up">
+            <span class="section-label">Ce qui nous engage</span>
+            <h2 class="text-4xl font-bold mt-3 mb-4" style="color:var(--dark);font-family:'Playfair Display',serif;">
+                Les règles de la communauté
+            </h2>
+            <p class="text-base leading-relaxed mx-auto" style="color:var(--gray);max-width:620px;">
+                Sept règles simples, que chaque membre s’engage à respecter en nous rejoignant.
+                Ce sont elles qui font de FSL un espace où l’on peut s’exprimer sans crainte.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm fade-up" style="border:1px solid var(--border);">
+            <x-community-rules variant="compact" class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5" />
+
+            <div class="mt-8 pt-6 text-center" style="border-top:1px solid var(--border);">
+                <a href="{{ route('legal.charte') }}" class="btn-rose inline-flex items-center gap-2.5 px-8 py-3.5">
+                    Lire la charte complète
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {{-- ══════════════════ LA FONDATRICE ══════════════════ --}}
 <section class="py-24 lg:py-32 bg-white">
     <div class="max-w-7xl mx-auto px-5 lg:px-8">

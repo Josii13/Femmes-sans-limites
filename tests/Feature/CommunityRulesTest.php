@@ -69,6 +69,39 @@ class CommunityRulesTest extends TestCase
         $this->assertStringContainsString(route('legal.charte'), $html);
     }
 
+    /**
+     * La page À propos présente les sept intitulés et renvoie à la charte
+     * complète. Elle n'en reproduit pas le texte : une visiteuse qui lit les
+     * règles doit les lire à leur source, pas dans une copie qui pourrait dériver.
+     */
+    public function test_the_about_page_summarises_the_charter_and_links_to_it(): void
+    {
+        $html = $this->get(route('about'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Les règles de la communauté', $html);
+        $this->assertStringContainsString(route('legal.charte'), $html);
+
+        foreach (CommunityRules::all() as $rule) {
+            $this->assertStringContainsString($rule['title'], $html);
+        }
+
+        // Variante compacte : les intitulés, pas les paragraphes.
+        $this->assertStringNotContainsString(CommunityRules::all()[0]['body'][0], $html);
+    }
+
+    /**
+     * Une classe fournie au composant remplace sa disposition par défaut :
+     * fusionner « space-y-* » avec une grille cumulerait marges et gouttières.
+     */
+    public function test_the_component_layout_can_be_overridden(): void
+    {
+        $html = $this->get(route('about'))->assertOk()->getContent();
+        $section = substr($html, (int) strpos($html, 'Les règles de la communauté'));
+
+        $this->assertMatchesRegularExpression('/<ol class="grid[^"]*"/', $section);
+        $this->assertDoesNotMatchRegularExpression('/<ol class="[^"]*space-y-[^"]*"/', $section);
+    }
+
     // ── Acceptation à l'adhésion ────────────────────────────────
 
     public function test_an_application_records_the_acceptance(): void
