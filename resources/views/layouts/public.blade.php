@@ -219,6 +219,7 @@
         <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3" style="border-top:1px solid rgba(255,255,255,0.07);">
             <p class="text-xs" style="color:rgba(255,255,255,0.25);">© {{ date('Y') }} Femme Sans Limites. Tous droits réservés.</p>
             <div class="flex items-center gap-5">
+                <a href="{{ route('legal.charte') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Règles de la communauté</a>
                 <a href="{{ route('legal.cgu') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">CGU</a>
                 <a href="{{ route('legal.mentions') }}" class="text-xs transition-colors" style="color:rgba(255,255,255,0.25);" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Mentions légales</a>
             </div>
@@ -334,6 +335,22 @@
                         <span x-text="motiv.length + ' / 30'" :style="motiv.length < 30 ? 'color:var(--gray)' : 'color:#059669'"></span>
                     </p>
                 </div>
+                {{--
+                    Acceptation de la charte. La règle 7 prévoit jusqu'à l'exclusion en cas
+                    de manquement répété : cet engagement doit être pris explicitement, et
+                    sa date conservée, plutôt que supposé.
+                --}}
+                <label class="flex items-start gap-3 p-3 rounded-xl cursor-pointer" style="background:var(--rose-pale);border:1px solid var(--rose-mid);">
+                    <input type="checkbox" name="accept_rules" value="1" class="mt-0.5" required
+                           @checked(old('accept_rules'))>
+                    <span class="text-xs leading-relaxed" style="color:var(--gray);">
+                        J’ai pris connaissance des
+                        <a href="{{ route('legal.charte') }}" target="_blank" rel="noopener"
+                           class="font-semibold underline" style="color:var(--rose);">règles de la communauté</a>
+                        et je m’engage à les respecter. <span style="color:var(--rose)">*</span>
+                    </span>
+                </label>
+
                 <p class="text-xs leading-relaxed" style="color:var(--gray);">Ton adhésion démarre au niveau <strong>Standard</strong>. Notre équipe te contactera sous 48h ouvrées pour valider ta candidature.</p>
                 <button type="submit" class="btn-rose w-full py-3.5" :disabled="submitting" :class="submitting ? 'opacity-70 cursor-not-allowed' : ''">
                     <template x-if="!submitting">

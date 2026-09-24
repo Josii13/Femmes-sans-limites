@@ -198,6 +198,7 @@ class CommunityGalleryTest extends TestCase
             'country' => 'Cote Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite rejoindre cette communauté de femmes inspirantes et engagées.',
+            'accept_rules' => '1',
             'photo' => UploadedFile::fake()->image('awa.jpg'),
         ])->assertRedirect(route('membership.success'));
 

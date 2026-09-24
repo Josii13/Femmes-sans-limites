@@ -40,6 +40,10 @@ Route::prefix('espace-membre')->name('member.')->group(function () {
 
         Route::get('/annuaire', [DirectoryController::class, 'index'])->name('directory');
 
+        // Charte de la communauté : consultable et acceptable depuis son espace
+        Route::get('/regles', [PortalController::class, 'rules'])->name('rules');
+        Route::post('/regles', [PortalController::class, 'acceptRules'])->name('rules.accept');
+
         Route::get('/mon-profil', [PortalController::class, 'editProfile'])->name('profile');
         Route::put('/mon-profil', [PortalController::class, 'updateProfile'])->name('profile.update');
         Route::put('/mon-mot-de-passe', [PortalController::class, 'updatePassword'])->name('password.update');

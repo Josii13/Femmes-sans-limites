@@ -111,6 +111,7 @@ Route::get('/robots.txt', function () {
 // Pages légales
 Route::get('/mentions-legales', fn () => view('public.legal.mentions-legales'))->name('legal.mentions');
 Route::get('/conditions-generales-utilisation', fn () => view('public.legal.cgu'))->name('legal.cgu');
+Route::get('/regles-de-la-communaute', fn () => view('public.legal.charte'))->name('legal.charte');
 
 // Espace membre (guard « member », distinct de celui du back-office)
 require __DIR__.'/member.php';

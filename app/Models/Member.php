@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Mail\MemberPasswordSetupMail;
+use App\Support\CommunityRules;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -22,6 +23,7 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
 
     protected $fillable = [
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
+        'rules_accepted_at', 'rules_version',
         'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
     ];
@@ -56,8 +58,30 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
             'expires_at' => 'datetime',
             'renewal_reminded_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'rules_accepted_at' => 'datetime',
             'show_in_gallery' => 'boolean',
         ];
+    }
+
+    /**
+     * A accepté la charte dans sa version en vigueur.
+     *
+     * Une acceptation portant sur une version antérieure ne vaut pas pour la
+     * version actuelle : la membre doit être réinvitée à en prendre connaissance.
+     */
+    public function hasAcceptedCurrentRules(): bool
+    {
+        return $this->rules_accepted_at !== null
+            && $this->rules_version === CommunityRules::VERSION;
+    }
+
+    /** Enregistre l'acceptation de la charte dans sa version courante. */
+    public function acceptCommunityRules(): void
+    {
+        $this->forceFill([
+            'rules_accepted_at' => now(),
+            'rules_version' => CommunityRules::VERSION,
+        ])->save();
     }
 
     /**

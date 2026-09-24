@@ -37,6 +37,7 @@
                         ['member.registrations', 'Mes événements'],
                         ['member.purchases', 'Mes ebooks'],
                         ['member.directory', 'Annuaire'],
+                        ['member.rules', 'Règles'],
                         ['member.profile', 'Mon profil'],
                     ] as [$route, $label])
                     <a href="{{ route($route) }}"
@@ -70,6 +71,7 @@
                 ['member.registrations', 'Mes événements'],
                 ['member.purchases', 'Mes ebooks'],
                 ['member.directory', 'Annuaire'],
+                ['member.rules', 'Règles de la communauté'],
                 ['member.profile', 'Mon profil'],
             ] as [$route, $label])
             <a href="{{ route($route) }}" class="block text-sm px-3 py-2.5 rounded-lg {{ request()->routeIs($route) ? 'font-semibold' : '' }}"

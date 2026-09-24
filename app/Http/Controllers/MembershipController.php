@@ -7,6 +7,7 @@ use App\Mail\MembershipConfirmationMail;
 use App\Mail\NewMembershipMail;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\CommunityRules;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
@@ -41,6 +42,8 @@ class MembershipController extends Controller
                 'country' => 'required|string|max:100',
                 'city' => 'required|string|max:100',
                 'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:3072',
+                // La charte se termine par un engagement : il doit être pris, pas supposé.
+                'accept_rules' => 'accepted',
             ], [
                 'name.required' => 'Merci d\'indiquer ton nom complet.',
                 'email.required' => 'Merci d\'indiquer ton adresse email.',
@@ -57,6 +60,7 @@ class MembershipController extends Controller
                 'photo.image' => 'Le fichier choisi doit être une image.',
                 'photo.mimes' => 'La photo doit être au format JPG, PNG ou WEBP.',
                 'photo.max' => 'La photo ne doit pas dépasser 3 Mo.',
+                'accept_rules.accepted' => 'Merci de prendre connaissance des règles de la communauté et de les accepter.',
             ], [
                 'name' => 'nom complet',
                 'email' => 'email',
@@ -73,6 +77,11 @@ class MembershipController extends Controller
                 ->withInput()
                 ->with('modal', 'join');
         }
+
+        // Trace horodatée et versionnée : sans elle, l’engagement n’existe pas.
+        $validated['rules_accepted_at'] = now();
+        $validated['rules_version'] = CommunityRules::VERSION;
+        unset($validated['accept_rules']);
 
         $validated['type'] = 'standard';
         $validated['status'] = 'pending';

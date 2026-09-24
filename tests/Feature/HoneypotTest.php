@@ -123,6 +123,7 @@ class HoneypotTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite rejoindre cette communauté de femmes inspirantes et engagées.',
+            'accept_rules' => '1',
             'photo' => UploadedFile::fake()->image('awa.jpg'),
         ];
 

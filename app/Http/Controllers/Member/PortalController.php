@@ -77,6 +77,25 @@ class PortalController extends Controller
         );
     }
 
+    /**
+     * Charte de la communauté, consultable depuis son espace.
+     *
+     * Les membres inscrites avant la mise en place de la charte n’ont rien
+     * accepté : on le leur signale plutôt que de supposer leur accord.
+     */
+    public function rules()
+    {
+        return view('member.rules', ['member' => $this->member()]);
+    }
+
+    public function acceptRules(): RedirectResponse
+    {
+        $this->member()->acceptCommunityRules();
+
+        return redirect()->route('member.rules')
+            ->with('success', 'Merci. Votre engagement est enregistré.');
+    }
+
     // ── Profil ──────────────────────────────────────────────────
 
     public function editProfile()

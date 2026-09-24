@@ -74,6 +74,7 @@ class MemberLifecycleTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite rejoindre cette belle communauté de femmes inspirantes.',
+            'accept_rules' => '1',
         ])->assertRedirect(route('membership.success'));
 
         $member = Member::where('email', 'awa@example.com')->first();
@@ -105,6 +106,7 @@ class MemberLifecycleTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite sincèrement contribuer à cette communauté inspirante de femmes.',
+            'accept_rules' => '1',
         ])->assertRedirect(route('membership.success'));
 
         $this->assertDatabaseHas('members', ['email' => 'reuse@example.com', 'deleted_at' => null]);
@@ -127,6 +129,7 @@ class MemberLifecycleTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite réellement intégrer cette communauté de femmes ambitieuses.',
+            'accept_rules' => '1',
         ])->assertRedirect(route('membership.success'));
 
         $this->assertDatabaseHas('members', ['email' => 'legacy@example.com', 'deleted_at' => null]);
@@ -144,6 +147,7 @@ class MemberLifecycleTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je veux rejoindre cette communauté pour partager et grandir ensemble.',
+            'accept_rules' => '1',
             'photo' => UploadedFile::fake()->image('moi.jpg', 600, 600),
         ])->assertRedirect(route('membership.success'));
 
@@ -163,6 +167,7 @@ class MemberLifecycleTest extends TestCase
             'country' => 'Côte d\'Ivoire',
             'city' => 'Abidjan',
             'motivation' => 'Je souhaite rejoindre cette communauté de femmes inspirantes et engagées.',
+            'accept_rules' => '1',
         ])->assertSessionHasErrors('photo');
 
         $this->assertDatabaseMissing('members', ['email' => 'sansphoto@example.com']);
@@ -174,6 +179,7 @@ class MemberLifecycleTest extends TestCase
             'name' => 'Test', 'email' => 'court@example.com',
             'profession' => 'Coach', 'country' => 'CI', 'city' => 'Abidjan',
             'motivation' => 'Trop court.',
+            'accept_rules' => '1',
         ])->assertSessionHasErrors('motivation');
     }
 
