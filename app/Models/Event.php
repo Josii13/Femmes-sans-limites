@@ -24,16 +24,49 @@ class Event extends Model
         'price' => 'decimal:2',
     ];
 
+    /**
+     * Les inscriptions sont-elles ouvertes ?
+     *
+     * La date de l'événement fait partie du test. Sans elle, un événement passé
+     * sans date de clôture restait « ouvert » : la fiche affichait « Réserver »
+     * et le formulaire s'ouvrait, pour n'être refusé qu'au moment de l'envoi.
+     * Devenu très visible depuis que les éditions passées figurent en archive.
+     */
     public function getRegistrationOpenAttribute(): bool
     {
+        if ($this->status !== 'published') {
+            return false;
+        }
+
+        if ($this->hasTakenPlace()) {
+            return false;
+        }
+
         if ($this->is_sold_out) {
             return false;
         }
+
         if ($this->registration_closes_at && now()->gt($this->registration_closes_at)) {
             return false;
         }
 
         return true;
+    }
+
+    /** L'événement a déjà eu lieu : plus rien ne doit s'y rattacher. */
+    public function hasTakenPlace(): bool
+    {
+        return $this->event_date !== null && $this->event_date->isPast();
+    }
+
+    /**
+     * Événement réellement payant : « payant » coché ET un tarif strictement
+     * positif. Un tarif à zéro ferait basculer l'inscription dans le circuit
+     * gratuit — place confirmée sans encaissement.
+     */
+    public function isPaidEvent(): bool
+    {
+        return (bool) $this->is_paid && $this->price !== null && (float) $this->price > 0;
     }
 
     protected static function booted(): void

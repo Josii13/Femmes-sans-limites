@@ -22,8 +22,13 @@
 
 @section('content')
 @php
-    $closed = $event->registration_closes_at && now()->gt($event->registration_closes_at);
-    $canRegister = ! $event->is_sold_out && ! $closed;
+    // Une seule règle d'ouverture, portée par le modèle : la vue recalculait la
+    // sienne et oubliait la date, si bien qu'un événement passé affichait encore
+    // « Réserver ».
+    $canRegister = $event->registration_open;
+    $hasTakenPlace = $event->hasTakenPlace();
+    // La liste d'attente n'a de sens que sur un événement à venir et complet.
+    $canJoinWaitingList = $event->is_sold_out && ! $hasTakenPlace;
     $autoOpen = $errors->any() || session('error');
 @endphp
 
@@ -98,10 +103,12 @@
                     <button @click="reg = true" class="btn-rose flex-1 justify-center text-base py-4">
                         {{ $event->is_paid ? 'Réserver — '.number_format($event->price, 0, ',', ' ').' '.$event->currency : "S'inscrire gratuitement" }}
                     </button>
-                    @elseif($event->is_sold_out)
+                    @elseif($canJoinWaitingList)
                     <button @click="reg = true" class="btn-gold flex-1 justify-center text-base py-4">Liste d'attente</button>
                     @else
-                    <span class="flex-1 text-center text-sm rounded-xl py-4 px-4" style="background:#F3F4F6;color:var(--gray);">Les inscriptions sont closes.</span>
+                    <span class="flex-1 text-center text-sm rounded-xl py-4 px-4" style="background:#F3F4F6;color:var(--gray);">
+                        {{ $hasTakenPlace ? 'Cet événement a déjà eu lieu.' : 'Les inscriptions sont closes.' }}
+                    </span>
                     @endif
 
                     <button @click="details = true" class="btn-outline justify-center text-sm py-4 px-6">Détails</button>
@@ -139,7 +146,7 @@
     <div class="modal-box" @keydown.escape.window="reg = false">
         <div class="flex items-center justify-between px-6 py-4" style="border-bottom:1px solid var(--border);">
             <h2 class="text-lg font-bold" style="color:var(--dark);font-family:'Playfair Display',serif;">
-                {{ $event->is_sold_out ? "Liste d'attente" : 'Réserve ta place' }}
+                {{ $canJoinWaitingList ? "Liste d'attente" : 'Réserve ta place' }}
             </h2>
             <button @click="reg = false" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
         </div>
@@ -154,13 +161,14 @@
             </div>
             @endif
 
-            @if($event->is_paid && ! $event->is_sold_out)
+            @if($event->isPaidEvent() && $canRegister)
             <div class="rounded-xl px-4 py-3 text-sm mb-4" style="background:var(--rose-pale);color:var(--dark);">
                 <strong>{{ number_format($event->price, 0, ',', ' ') }} {{ $event->currency }}</strong> — tu seras redirigée vers le paiement sécurisé, puis tu recevras ton reçu et ton QR d'accès par email.
             </div>
             @endif
 
-            <form action="{{ $event->is_sold_out ? route('events.waiting-list', $event->slug) : route('events.register', $event->slug) }}"
+            @if($canRegister || $canJoinWaitingList)
+            <form action="{{ $canJoinWaitingList ? route('events.waiting-list', $event->slug) : route('events.register', $event->slug) }}"
                   method="POST" class="space-y-4" x-data="{ submitting: false }" @submit="submitting = true">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,14 +192,23 @@
 
                 <button type="submit" class="{{ $event->is_sold_out ? 'btn-gold' : 'btn-rose' }} w-full justify-center py-3.5" :disabled="submitting" :class="submitting ? 'opacity-70' : ''">
                     <template x-if="!submitting"><span>
-                        @if($event->is_sold_out) Rejoindre la liste d'attente
+                        @if($canJoinWaitingList) Rejoindre la liste d'attente
                         @elseif($event->is_paid) Payer et réserver →
                         @else Confirmer mon inscription @endif
                     </span></template>
                     <template x-if="submitting"><span class="inline-flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> Patiente…</span></template>
                 </button>
                 <p class="text-xs text-center" style="color:var(--gray);">En t'inscrivant, tu acceptes d'être contactée par l'équipe FSL pour cet événement.</p>
+
+                {{-- Piège anti-bot : sans lui, un robot pouvait remplir la capacité
+                     de l'événement avec des inscriptions en attente. --}}
+                <x-honeypot />
             </form>
+            @else
+            <p class="text-sm text-center py-4" style="color:var(--gray);">
+                {{ $hasTakenPlace ? 'Cet événement a déjà eu lieu.' : 'Les inscriptions sont closes.' }}
+            </p>
+            @endif
         </div>
     </div>
 </div>

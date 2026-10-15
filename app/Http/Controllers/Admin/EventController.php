@@ -56,13 +56,17 @@ class EventController extends Controller
             'city' => 'nullable|string|max:100',
             'capacity' => 'nullable|integer|min:1',
             'is_paid' => 'boolean',
-            'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
+            // « gt:0 » et non « min:0 » : un tarif à zéro sur un événement coché
+            // payant ferait basculer les inscriptions dans le circuit gratuit,
+            // place confirmée sans encaissement.
+            'price' => 'nullable|required_if:is_paid,1|numeric|gt:0',
             'currency' => 'nullable|string|max:20',
             'payment_link' => 'nullable|url|max:500',
             'status' => 'required|in:draft,published,cancelled',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ], [
             'price.required_if' => 'Le tarif est obligatoire pour un événement payant.',
+            'price.gt' => 'Le tarif doit être supérieur à 0. Pour un événement gratuit, décochez « payant ».',
             'payment_link.required_if' => 'Le lien de paiement est obligatoire pour un événement payant.',
             'event_date.after' => 'La date de l\'événement doit être dans le futur.',
         ]);
@@ -116,13 +120,17 @@ class EventController extends Controller
             'city' => 'nullable|string|max:100',
             'capacity' => 'nullable|integer|min:1',
             'is_paid' => 'boolean',
-            'price' => 'nullable|required_if:is_paid,1|numeric|min:0',
+            // « gt:0 » et non « min:0 » : un tarif à zéro sur un événement coché
+            // payant ferait basculer les inscriptions dans le circuit gratuit,
+            // place confirmée sans encaissement.
+            'price' => 'nullable|required_if:is_paid,1|numeric|gt:0',
             'currency' => 'nullable|string|max:20',
             'payment_link' => 'nullable|url|max:500',
             'status' => 'required|in:draft,published,cancelled,completed',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ], [
             'price.required_if' => 'Le tarif est obligatoire pour un événement payant.',
+            'price.gt' => 'Le tarif doit être supérieur à 0. Pour un événement gratuit, décochez « payant ».',
             'payment_link.required_if' => 'Le lien de paiement est obligatoire pour un événement payant.',
         ]);
 

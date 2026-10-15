@@ -96,6 +96,10 @@ class EbookPurchaseController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
+            // Sans cela le paiement restait « en attente » indéfiniment : il polluait
+            // le tableau de bord et la réconciliation le reprenait sans fin.
+            $payment->update(['status' => 'failed']);
+
             return back()->with('error', "Le paiement n'a pas pu être initié. Réessaie dans un instant.")->withInput();
         }
 
@@ -116,6 +120,10 @@ class EbookPurchaseController extends Controller
     /** Renvoie le lien de téléchargement pour tous les ebooks achetés avec cet email. */
     public function resend(Request $request)
     {
+        if ($this->isBotSubmission($request, 'ebook.resend')) {
+            return back()->with('resent', true);
+        }
+
         $request->validate(['email' => 'required|email']);
         $email = mb_strtolower(trim($request->email));
 

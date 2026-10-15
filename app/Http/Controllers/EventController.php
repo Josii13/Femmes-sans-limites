@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\DetectsBots;
 use App\Models\Event;
 use App\Models\Payment;
 use App\Models\Registration;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
+    use DetectsBots;
+
     public function __construct(
         private GeniusPayService $genius,
         private PaymentFulfiller $fulfiller,
@@ -55,7 +58,13 @@ class EventController extends Controller
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
-        if ($event->event_date->isPast()) {
+        // Un robot qui soumet en boucle remplirait la capacité de l'événement avec
+        // des inscriptions en attente : il se verrait « complet » dès le lancement.
+        if ($this->isBotSubmission($request, 'event.register')) {
+            return back()->with('success', 'Inscription enregistrée.');
+        }
+
+        if ($event->hasTakenPlace()) {
             return back()->with('error', 'Cet événement est terminé, les inscriptions sont closes.');
         }
 
@@ -91,7 +100,7 @@ class EventController extends Controller
                     return ['error' => 'Vous êtes déjà inscrit(e) à cet événement avec cet email.'];
                 }
                 // Inscription payante restée impayée → on propose de REPRENDRE le paiement.
-                if ($event->is_paid && (float) $event->price > 0) {
+                if ($event->isPaidEvent()) {
                     return ['resume' => $existing];
                 }
 
@@ -115,7 +124,7 @@ class EventController extends Controller
         }
 
         // Événement payant → paiement en ligne (GeniusPay).
-        if ($event->is_paid && (float) $event->price > 0) {
+        if ($event->isPaidEvent()) {
             return $this->initiateEventPayment($event, $result['registration']);
         }
 
@@ -177,6 +186,14 @@ class EventController extends Controller
     public function joinWaitingList(Request $request, string $slug)
     {
         $event = Event::where('slug', $slug)->where('status', 'published')->firstOrFail();
+
+        if ($this->isBotSubmission($request, 'event.waiting-list')) {
+            return back()->with('success', 'Vous êtes ajouté(e) à la liste d’attente.');
+        }
+
+        if ($event->hasTakenPlace()) {
+            return back()->with('error', 'Cet événement est terminé.');
+        }
 
         if (! $event->is_sold_out) {
             return redirect()->route('events.show', $slug)

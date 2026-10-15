@@ -33,6 +33,7 @@
                 </div>
                 <button type="submit" class="btn-rose w-full py-3.5">Renvoyer mon lien</button>
                 <a href="{{ route('ebooks.index') }}" class="block text-center text-xs" style="color:var(--gray);">← Retour à la bibliothèque</a>
+                <x-honeypot />
             </form>
             @endif
         </div>

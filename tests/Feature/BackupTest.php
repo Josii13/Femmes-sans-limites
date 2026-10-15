@@ -6,10 +6,12 @@ use App\Mail\BackupFailedMail;
 use App\Models\Ebook;
 use App\Models\Member;
 use App\Models\User;
+use App\Services\DatabaseBackup;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -121,14 +123,20 @@ class BackupTest extends TestCase
         $this->assertStringNotContainsString('Données de `jobs`', $sql);
     }
 
+    /**
+     * L'échec est simulé au niveau du service, pas en malmenant le disque :
+     * placer un fichier à l'emplacement du dossier laissait un résidu que les
+     * autres tests ne pouvaient plus supprimer sous Windows, rendant la suite
+     * instable. Ce qui compte ici est l'alerte, pas la cause de la panne.
+     */
     public function test_a_failure_alerts_the_administrators(): void
     {
         Mail::fake();
         User::factory()->create(['is_admin' => true, 'email' => 'admin@fsl.test']);
 
-        // Dossier rendu inaccessible : un fichier occupe la place du répertoire.
-        File::ensureDirectoryExists(dirname($this->directory));
-        File::put($this->directory, 'ceci est un fichier, pas un dossier');
+        $this->mock(DatabaseBackup::class, function ($mock) {
+            $mock->shouldReceive('dumpTo')->andThrow(new RuntimeException('disque plein'));
+        });
 
         $this->artisan('fsl:backup', ['--no-files' => true])->assertFailed();
 

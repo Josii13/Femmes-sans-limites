@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\PaymentLinkMail;
 use App\Mail\QrCodeMail;
-use App\Mail\WaitingListSpotMail;
 use App\Models\ActivityLog;
 use App\Models\Event;
 use App\Models\Registration;
 use App\Services\QrCodeService;
+use App\Services\WaitingListNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +20,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RegistrationController extends Controller
 {
-    public function __construct(private QrCodeService $qrService) {}
+    public function __construct(
+        private QrCodeService $qrService,
+        private WaitingListNotifier $waitingList,
+    ) {}
 
     public function index(Event $event, Request $request)
     {
@@ -119,7 +122,9 @@ class RegistrationController extends Controller
     {
         $registration->update(['status' => 'cancelled']);
 
-        $this->notifyNextOnWaitingList($registration->event);
+        // Même service que l'expiration automatique : une seule règle décide qui
+        // est prévenu, et combien de personnes pour combien de places.
+        $this->waitingList->notifyNext($registration->event);
 
         return back()->with('success', 'Inscription annulée.');
     }
@@ -138,32 +143,6 @@ class RegistrationController extends Controller
             Log::warning("Inscriptions: échec mise en file {$label}", ['to' => $to, 'error' => $e->getMessage()]);
 
             return false;
-        }
-    }
-
-    /**
-     * Quand une place se libère, prévient le prochain inscrit sur la liste d'attente.
-     */
-    private function notifyNextOnWaitingList(Event $event): void
-    {
-        // Pas de capacité = pas de liste d'attente ; et seulement s'il reste une place.
-        if (! $event->capacity || $event->fresh()->is_sold_out) {
-            return;
-        }
-
-        $next = $event->waitingList()->where('notified', false)->oldest()->first();
-
-        if (! $next) {
-            return;
-        }
-
-        try {
-            Mail::to($next->email)->queue(new WaitingListSpotMail($event, $next));
-            $next->update(['notified' => true]);
-        } catch (\Throwable $e) {
-            Log::warning('Liste d\'attente: échec notification', [
-                'event_id' => $event->id, 'email' => $next->email, 'error' => $e->getMessage(),
-            ]);
         }
     }
 
