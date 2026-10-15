@@ -6,6 +6,7 @@ use App\Models\MailLog;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Journalise chaque email qui sort de l'application.
@@ -31,13 +32,20 @@ class RecordMailActivity
         try {
             $headers = $event->message->getHeaders();
 
-            $to = array_map(fn ($a) => $a->getAddress(), $event->message->getTo());
+            $addresses = array_map(
+                fn ($a) => $a->getAddress(),
+                // Un envoi en copie cachée seule n'a pas de destinataire « to ».
+                $event->message->getTo() ?: ($event->message->getCc() ?: $event->message->getBcc())
+            );
 
             $log = MailLog::create([
                 'mailable' => $event->data['__laravel_mailable'] ?? null,
-                'subject' => $event->message->getSubject(),
-                'recipient' => $to[0] ?? null,
-                'recipients_count' => max(1, count($to)),
+                // Tronqué avant l'insertion : en MySQL strict, un sujet trop
+                // long fait échouer la requête, et la trace se perd en silence
+                // — exactement le contraire de ce que ce journal doit faire.
+                'subject' => Str::limit((string) $event->message->getSubject(), 290),
+                'recipient' => Str::limit($addresses[0] ?? '', 185) ?: null,
+                'recipients_count' => max(1, count($addresses)),
                 'status' => 'sending',
                 'is_test' => $headers->has(self::TEST_HEADER),
             ]);

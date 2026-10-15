@@ -208,6 +208,73 @@ class MailLogTest extends TestCase
         $this->assertTrue(true, 'L\'envoi a abouti malgré le journal indisponible.');
     }
 
+    // ── Les cas qui font perdre une trace ───────────────────────
+
+    public function test_a_real_smtp_failure_still_leaves_a_trace(): void
+    {
+        // Hôte joignable, port fermé : l'envoi lève pour de bon.
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.host' => '127.0.0.1',
+            'mail.mailers.smtp.port' => 2,
+            'mail.mailers.smtp.timeout' => 1,
+        ]);
+
+        try {
+            Mail::to('awa@example.com')->sendNow(MailSamples::make('qr-code'));
+        } catch (\Throwable) {
+            // L'exception remonte à l'appelant, c'est voulu.
+        }
+
+        // La trace existe même si l'envoi a échoué : sans elle, un SMTP cassé
+        // ne laisserait rien derrière lui.
+        $log = MailLog::firstOrFail();
+        $this->assertSame('sending', $log->status);
+        $this->assertSame('awa@example.com', $log->recipient);
+
+        $log->forceFill(['created_at' => now()->subMinutes(MailLog::STALE_AFTER_MINUTES + 1)])->save();
+        $this->artisan('mail-logs:prune');
+
+        $this->assertSame('failed', $log->fresh()->status);
+    }
+
+    public function test_an_overlong_subject_does_not_lose_the_trace(): void
+    {
+        // En MySQL strict, un sujet dépassant la colonne fait échouer
+        // l'insertion : la trace se perdrait en silence, soit l'exact
+        // contraire de ce que ce journal doit faire.
+        Mail::raw('x', fn ($m) => $m->to('awa@example.com')->subject(str_repeat('Sujet interminable ', 40)));
+
+        $log = MailLog::firstOrFail();
+        $this->assertLessThanOrEqual(300, mb_strlen($log->subject));
+    }
+
+    public function test_a_blind_copy_only_send_is_still_attributed(): void
+    {
+        Mail::send([], [], fn ($m) => $m->bcc('cachee@example.com')->subject('Copie cachée')->html('x'));
+
+        $this->assertSame('cachee@example.com', MailLog::firstOrFail()->recipient);
+    }
+
+    public function test_a_raw_email_without_mailable_is_traced(): void
+    {
+        // fsl:diagnose-emails passe par Mail::raw : pas de classe de mailable.
+        Mail::raw('Test', fn ($m) => $m->to('awa@example.com')->subject('Brut'));
+
+        $log = MailLog::firstOrFail();
+        $this->assertNull($log->mailable);
+        $this->assertSame('Inconnu', $log->typeLabel());
+        $this->assertSame('sent', $log->status);
+    }
+
+    public function test_the_diagnostic_test_email_is_flagged(): void
+    {
+        $this->artisan('fsl:diagnose-emails', ['--test' => 'awa@example.com']);
+
+        // Sinon un diagnostic ferait croire que le système tourne.
+        $this->assertTrue(MailLog::firstOrFail()->is_test);
+    }
+
     public function test_the_listener_exposes_its_test_header(): void
     {
         $this->assertSame('X-FSL-Test', RecordMailActivity::TEST_HEADER);

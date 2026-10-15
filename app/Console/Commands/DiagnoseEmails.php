@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Listeners\RecordMailActivity;
 use App\Models\Registration;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -215,7 +216,13 @@ class DiagnoseEmails extends Command
         try {
             Mail::raw(
                 "Test d'envoi depuis Femme Sans Limites.\nSi vous lisez ceci, le SMTP fonctionne.",
-                fn ($message) => $message->to($address)->subject('Test d\'envoi — FSL')
+                function ($message) use ($address) {
+                    $message->to($address)->subject('Test d\'envoi — FSL');
+                    // Marqué comme test : le journal des envois l'écarte, sinon
+                    // un diagnostic ferait croire que le système tourne.
+                    $message->getSymfonyMessage()->getHeaders()
+                        ->addTextHeader(RecordMailActivity::TEST_HEADER, '1');
+                }
             );
             $this->ok("Email accepté par le serveur SMTP pour {$address}.");
             $this->line('    S\'il n\'arrive pas, le problème est la délivrabilité (SPF/DKIM, spam),');
