@@ -242,9 +242,10 @@
                 @foreach($member->registrations->sortByDesc('created_at') as $reg)
                 @php
                     $statusColors = ['pending'=>'#6B7280','payment_sent'=>'#C9A84C','paid'=>'#059669','attended'=>'#7C3AED','cancelled'=>'#DC2626'];
-                    $statusLabels = ['pending'=>'En attente','payment_sent'=>'Lien envoyé','paid'=>'Payé','attended'=>'Présent','cancelled'=>'Annulé'];
                     $sc = $statusColors[$reg->status] ?? '#999';
-                    $sl = $statusLabels[$reg->status] ?? $reg->status;
+                    // Le libellé dépend de l'événement : « Payé » sur un événement gratuit
+                    // laisserait croire à un encaissement qui n'a jamais eu lieu.
+                    $sl = $reg->statusLabel();
                 @endphp
                 <div class="flex items-center justify-between py-2.5 px-3 rounded-xl" style="background:#F8F7F9;">
                     <div>

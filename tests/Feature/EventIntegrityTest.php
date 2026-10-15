@@ -272,4 +272,83 @@ class EventIntegrityTest extends TestCase
 
         Mail::assertNotQueued(WaitingListSpotMail::class);
     }
+
+    // ── Libellés : « Payé » n'a de sens que s'il y a eu un tarif ─
+
+    public function test_a_free_event_never_labels_a_registration_as_paid(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'role' => User::ROLE_OWNER]);
+        $event = Event::factory()->create([
+            'status' => 'published', 'event_date' => now()->addMonth(),
+            'is_paid' => false, 'price' => null,
+        ]);
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'Awa', 'last_name' => 'Traoré',
+            'email' => 'awa@example.com', 'status' => 'paid',
+        ]);
+
+        // En interne « paid » veut dire « accès confirmé » : c'est lui qui déclenche
+        // le QR, y compris sans tarif. Affiché « Payé », il annonçait un encaissement
+        // qui n'a jamais eu lieu.
+        $html = $this->actingAs($admin)->get(route('admin.registrations.index', $event))
+            ->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Payé', $html);
+        $this->assertStringContainsString('Confirmée', $html);
+    }
+
+    public function test_a_paid_event_still_labels_a_registration_as_paid(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'role' => User::ROLE_OWNER]);
+        $event = Event::factory()->create([
+            'status' => 'published', 'event_date' => now()->addMonth(),
+            'is_paid' => true, 'price' => 5000,
+        ]);
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'Awa', 'last_name' => 'Traoré',
+            'email' => 'awa@example.com', 'status' => 'paid',
+        ]);
+
+        $html = $this->actingAs($admin)->get(route('admin.registrations.index', $event))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('Payé', $html);
+    }
+
+    public function test_the_csv_export_follows_the_same_labels(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'role' => User::ROLE_OWNER]);
+        $event = Event::factory()->create([
+            'status' => 'published', 'event_date' => now()->addMonth(), 'is_paid' => false,
+        ]);
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'Awa', 'last_name' => 'Traoré',
+            'email' => 'awa@example.com', 'status' => 'paid',
+        ]);
+
+        $csv = $this->actingAs($admin)->get(route('admin.registrations.export-csv', $event))
+            ->assertOk()->streamedContent();
+
+        $this->assertStringContainsString('Confirmée', $csv);
+        $this->assertStringNotContainsString('Payé', $csv);
+    }
+
+    public function test_an_event_priced_at_zero_is_treated_as_free_in_the_back_office(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'role' => User::ROLE_OWNER]);
+        // Cas réel : la case « payant » est cochée mais le tarif est resté vide.
+        $event = Event::factory()->create([
+            'status' => 'published', 'event_date' => now()->addMonth(),
+            'is_paid' => true, 'price' => 0,
+        ]);
+        Registration::create([
+            'event_id' => $event->id, 'first_name' => 'Awa', 'last_name' => 'Traoré',
+            'email' => 'awa@example.com', 'status' => 'paid',
+        ]);
+
+        $html = $this->actingAs($admin)->get(route('admin.registrations.index', $event))
+            ->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Payé', $html);
+    }
 }

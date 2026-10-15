@@ -11,7 +11,7 @@
 @section('content')
 
 {{-- Info paiement en ligne --}}
-@if($event->is_paid)
+@if($event->isPaidEvent())
 <div class="rounded-xl px-4 py-3 mb-5 text-sm flex items-start gap-2" style="background:#EFF6FF;color:#1D4ED8;">
     <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
     <span>Le paiement se fait <strong>en ligne (GeniusPay)</strong> : les inscrites paient directement et reçoivent leur reçu + QR automatiquement. Les boutons « manuel » ci-dessous ne servent qu'en secours.</span>
@@ -19,7 +19,7 @@
 @endif
 
 {{-- Revenue banner (paid events only) --}}
-@if($event->is_paid && $totalRevenue > 0)
+@if($event->isPaidEvent() && $totalRevenue > 0)
 <div class="rounded-2xl p-4 mb-5 flex items-center justify-between" style="background:linear-gradient(135deg,rgba(201,168,76,0.12) 0%,rgba(201,168,76,0.04) 100%);border:1px solid rgba(201,168,76,0.3);">
     <div>
         <p class="text-xs font-semibold uppercase tracking-wide mb-0.5" style="color:var(--gold);">Revenus confirmés</p>
@@ -33,16 +33,20 @@
     </div>
 </div>
 @endif
-
 {{-- Status filter cards --}}
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-    @foreach([
-        ['pending',      'En attente',  $totals['pending'],      '#6B7280'],
-        ['payment_sent', 'Lien envoyé', $totals['payment_sent'], '#C9A84C'],
-        ['paid',         'Payé',        $totals['paid'],         '#059669'],
-        ['attended',     'Présent',     $totals['attended'],     '#7C3AED'],
-        ['cancelled',    'Annulé',      $totals['cancelled'],    '#DC2626'],
-    ] as [$statusKey, $label, $count, $color])
+@php
+    // Un seul endroit décide des libellés : « Payées » n'a aucun sens sur un
+    // événement gratuit, où le statut interne « paid » signifie « confirmée ».
+    $labels = \App\Models\Registration::statusLabels($event);
+    $colors = ['pending' => '#6B7280', 'payment_sent' => '#C9A84C', 'paid' => '#059669', 'attended' => '#7C3AED', 'cancelled' => '#DC2626'];
+    // Le lien de paiement ne concerne que les événements payants.
+    $cards = $event->isPaidEvent() ? array_keys($labels) : ['pending', 'paid', 'attended', 'cancelled'];
+    // Classes écrites en toutes lettres : Tailwind ne voit pas les noms construits.
+    $cardsGrid = count($cards) === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4';
+@endphp
+<div class="grid grid-cols-2 sm:grid-cols-3 {{ $cardsGrid }} gap-3 mb-6">
+    @foreach($cards as $statusKey)
+    @php $label = $labels[$statusKey]; $count = $totals[$statusKey]; $color = $colors[$statusKey]; @endphp
     @php $isActive = request('status') === $statusKey; @endphp
     <a href="{{ route('admin.registrations.index', [$event, 'status' => $statusKey]) }}"
        class="admin-card py-3 px-4 text-center transition-all cursor-pointer hover:shadow-md {{ $isActive ? 'ring-2' : '' }}"
@@ -57,7 +61,7 @@
 @if(request('status'))
 <div class="flex items-center gap-2 mb-4">
     <span class="text-sm text-gray-500">Filtre actif :</span>
-    <span class="text-sm font-medium px-3 py-1 rounded-full" style="background:var(--rose-pale);color:var(--rose);">{{ request('status') }}</span>
+    <span class="text-sm font-medium px-3 py-1 rounded-full" style="background:var(--rose-pale);color:var(--rose);">{{ $labels[request('status')] ?? request('status') }}</span>
     <a href="{{ route('admin.registrations.index', $event) }}" class="text-xs text-gray-400 hover:text-gray-600 underline">Tout afficher</a>
 </div>
 @endif
@@ -90,14 +94,10 @@
         <tbody class="divide-y divide-gray-50">
             @forelse($registrations as $reg)
             @php
-                $statusConfig = [
-                    'pending'      => ['En attente', '#6B7280'],
-                    'payment_sent' => ['Lien envoyé', '#C9A84C'],
-                    'paid'         => ['Payé ✓', '#059669'],
-                    'attended'     => ['Présent ✓', '#7C3AED'],
-                    'cancelled'    => ['Annulé', '#DC2626'],
-                ];
-                [$statusLabel, $statusColor] = $statusConfig[$reg->status] ?? ['—','#999'];
+                // L'événement est passé explicitement : sans lui, chaque ligne
+                // déclencherait une requête pour retrouver son événement.
+                $statusLabel = $reg->statusLabel($event);
+                $statusColor = ['pending' => '#6B7280', 'payment_sent' => '#C9A84C', 'paid' => '#059669', 'attended' => '#7C3AED', 'cancelled' => '#DC2626'][$reg->status] ?? '#999';
             @endphp
             <tr class="hover:bg-gray-50">
                 <td class="px-5 py-4">
@@ -119,7 +119,7 @@
                     <div class="flex items-center justify-end gap-2">
 
                         {{-- Payment link: show for pending AND payment_sent --}}
-                        @if(in_array($reg->status, ['pending','payment_sent']) && $event->is_paid && $event->payment_link)
+                        @if(in_array($reg->status, ['pending','payment_sent']) && $event->isPaidEvent() && $event->payment_link)
                         <form x-ref="payment_{{ $reg->id }}" action="{{ route('admin.registrations.send-payment', $reg) }}" method="POST">@csrf</form>
                         <button type="button"
                             @click="confirm = { title: 'Envoyer le lien de paiement ?', body: 'Un email sera envoyé à {{ $reg->email }}.' }; confirmAction = 'payment_{{ $reg->id }}'"
@@ -128,13 +128,20 @@
                         </button>
                         @endif
 
-                        {{-- Confirm payment --}}
+                        {{-- Confirm: sur un événement gratuit il n'y a aucun paiement à confirmer, --}}
+                        {{-- seulement une place à valider — le QR part dans les deux cas. --}}
                         @if(in_array($reg->status, ['pending','payment_sent']))
+                        @php
+                            $confirmTitle = $event->isPaidEvent() ? 'Confirmer le paiement manuellement ?' : 'Confirmer cette inscription ?';
+                            $confirmBody = $event->isPaidEvent()
+                                ? 'À utiliser seulement si le paiement en ligne n\'a pas abouti. Le QR sera généré et envoyé à '.$reg->email.'.'
+                                : 'Le QR d\'accès sera généré et envoyé à '.$reg->email.'.';
+                        @endphp
                         <form x-ref="confirm_{{ $reg->id }}" action="{{ route('admin.registrations.confirm-payment', $reg) }}" method="POST">@csrf</form>
                         <button type="button"
-                            @click="confirm = { title: 'Confirmer le paiement manuellement ?', body: 'À utiliser seulement si le paiement en ligne n\'a pas abouti. Le QR sera généré et envoyé à {{ $reg->email }}.' }; confirmAction = 'confirm_{{ $reg->id }}'"
+                            @click="confirm = { title: {{ \Illuminate\Support\Js::from($confirmTitle) }}, body: {{ \Illuminate\Support\Js::from($confirmBody) }} }; confirmAction = 'confirm_{{ $reg->id }}'"
                             class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
-                            ✓ Confirmer (manuel)
+                            {{ $event->isPaidEvent() ? '✓ Confirmer (manuel)' : '✓ Confirmer' }}
                         </button>
                         @endif
 

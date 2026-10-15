@@ -167,26 +167,19 @@ class RegistrationController extends Controller
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function () use ($registrations) {
+        $callback = function () use ($registrations, $event) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8 (fwrite : pas de format à interpréter)
 
-            fputcsv($handle, ['Prénom', 'Nom', 'Email', 'Téléphone', 'Statut', 'Inscrit le', 'Payé le'], ';');
+            fputcsv($handle, ['Prénom', 'Nom', 'Email', 'Téléphone', 'Statut', 'Inscrit le', $event->isPaidEvent() ? 'Payé le' : 'Confirmée le'], ';');
 
             foreach ($registrations as $r) {
-                $statusMap = [
-                    'pending' => 'En attente',
-                    'payment_sent' => 'Lien envoyé',
-                    'paid' => 'Payé',
-                    'attended' => 'Présent',
-                    'cancelled' => 'Annulé',
-                ];
                 fputcsv($handle, [
                     $r->first_name,
                     $r->last_name,
                     $r->email,
                     $r->phone ?? '',
-                    $statusMap[$r->status] ?? $r->status,
+                    $r->statusLabel($event),
                     $r->created_at->format('d/m/Y H:i'),
                     $r->paid_at ? $r->paid_at->format('d/m/Y H:i') : '',
                 ], ';');
