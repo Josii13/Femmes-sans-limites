@@ -49,6 +49,33 @@
             class="text-xs underline mt-3" style="color:var(--gray);">Régénérer le lien</button>
 </div>
 
+{{-- Envoi du lien par email à celles dont la date manque --}}
+@if($missing->isNotEmpty())
+<div class="admin-card p-5 mb-6">
+    <h3 class="font-semibold text-sm mb-1" style="color:var(--dark);">Envoyer le lien par email</h3>
+    <p class="text-xs mb-4" style="color:var(--gray);">
+        Pour celles qui ne sont pas dans le groupe WhatsApp, ou qui ont laissé passer le lien.
+        Chacune reçoit un lien qui ouvre directement son propre formulaire.
+        Une membre déjà invitée ne reçoit pas de nouvel email avant {{ \App\Models\Member::BIRTHDAY_INVITE_COOLDOWN_DAYS }} jours,
+        et celles qui ont refusé nos communications ne le reçoivent pas.
+    </p>
+
+    <form x-ref="invite" action="{{ route('admin.birthdays.invite') }}" method="POST">@csrf</form>
+    @if($invitable > 0)
+    <button type="button"
+            @click="confirm = { title: 'Envoyer {{ $invitable }} email(s) ?', body: 'Chaque membre dont la date manque recevra le lien pour l\'indiquer.' }; confirmAction = 'invite'"
+            class="btn-rose text-sm px-5 py-2.5">
+        Envoyer à {{ $invitable }} membre(s)
+    </button>
+    @else
+    <p class="text-sm" style="color:var(--gray);">
+        Personne à relancer pour l'instant : les membres en attente ont été invitées il y a moins de
+        {{ \App\Models\Member::BIRTHDAY_INVITE_COOLDOWN_DAYS }} jours, ou ne reçoivent pas nos communications.
+    </p>
+    @endif
+</div>
+@endif
+
 {{-- Avancement --}}
 @if($total > 0)
 <div class="admin-card p-5 mb-6">
@@ -90,7 +117,12 @@
         @forelse($missing as $member)
         <div class="flex items-center justify-between py-2 px-3 rounded-xl mb-1.5" style="background:#F8F7F9;">
             <a href="{{ route('admin.members.show', $member) }}" class="text-sm font-medium hover:underline" style="color:var(--dark);">{{ $member->name }}</a>
-            <span class="text-xs" style="color:var(--gray);">{{ $member->email }}</span>
+            <span class="text-xs text-right" style="color:var(--gray);">
+                {{ $member->email }}
+                @if($member->birthday_invited_at)
+                <br>invitée le {{ $member->birthday_invited_at->format('d/m') }}
+                @endif
+            </span>
         </div>
         @empty
         <p class="text-sm py-6 text-center" style="color:var(--gray);">Toutes les membres ont répondu 🎉</p>

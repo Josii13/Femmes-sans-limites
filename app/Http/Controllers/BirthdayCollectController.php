@@ -24,13 +24,18 @@ class BirthdayCollectController extends Controller
 {
     use DetectsBots;
 
-    public function show(string $token)
+    public function show(Request $request, string $token)
     {
         $this->assertToken($token);
 
+        $members = Member::missingBirthday()->orderBy('name')->get();
+
         return view('public.birthdays.collect', [
             'token' => $token,
-            'members' => Member::missingBirthday()->orderBy('name')->get(),
+            'members' => $members,
+            // Lien reçu par email : son formulaire s'ouvre directement. Ignoré
+            // si sa date est déjà connue — elle n'est alors plus sur le mur.
+            'preselected' => $members->firstWhere('id', $request->integer('membre')),
             'done' => Member::where('status', 'active')->whereNotNull('birth_day')->count(),
         ]);
     }

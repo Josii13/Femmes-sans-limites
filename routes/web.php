@@ -178,6 +178,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', '2fa'])->gr
         // Collecte des dates de naissance : lien à partager et suivi.
         Route::get('anniversaires', [BirthdayController::class, 'index'])->name('birthdays.index');
         Route::post('anniversaires/nouveau-lien', [BirthdayController::class, 'rotate'])->name('birthdays.rotate');
+        Route::post('anniversaires/inviter', [BirthdayController::class, 'invite'])
+            ->middleware('throttle:5,1')->name('birthdays.invite');
         Route::post('anniversaires/voeux/{wish}/masquer', [BirthdayController::class, 'toggleWish'])->name('birthdays.wish-toggle');
         Route::resource('members', MemberController::class);
         Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');

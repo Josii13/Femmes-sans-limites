@@ -12,7 +12,7 @@
 
 <section class="py-24 px-5" style="background:var(--warm);min-height:70vh;">
     <div class="max-w-4xl mx-auto"
-         x-data="{ open: false, member: null, name: '' }">
+         x-data="{ open: @js((bool) $preselected), member: @js($preselected?->id), name: @js($preselected?->name ?? '') }">
 
         <div class="text-center mb-10">
             <h1 class="text-3xl sm:text-4xl font-bold mb-3" style="color:var(--dark);font-family:'Playfair Display',serif;">

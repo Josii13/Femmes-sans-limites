@@ -25,7 +25,7 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
     protected $fillable = [
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
         'rules_accepted_at', 'rules_version',
-        'birth_day', 'birth_month', 'birth_year', 'birth_date_filled_at',
+        'birth_day', 'birth_month', 'birth_year', 'birth_date_filled_at', 'birthday_invited_at',
         'birthday_token', 'birthday_greeted_at', 'birthday_card_path', 'birthday_digest_sent_at',
         'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
@@ -63,6 +63,7 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
             'last_login_at' => 'datetime',
             'rules_accepted_at' => 'datetime',
             'birth_date_filled_at' => 'datetime',
+            'birthday_invited_at' => 'datetime',
             'birthday_greeted_at' => 'datetime',
             'birthday_digest_sent_at' => 'datetime',
             'show_in_gallery' => 'boolean',
@@ -117,6 +118,38 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
     public function scopeMissingBirthday(Builder $query): Builder
     {
         return $query->where('status', 'active')->whereNull('birth_day');
+    }
+
+    /**
+     * Membres joignables par un email communautaire : adhésion active, adresse
+     * renseignée, et pas d'opposition aux communications (RGPD) — le même
+     * filtre que les campagnes.
+     */
+    public function scopeReachableByEmail(Builder $query): Builder
+    {
+        return $query->where('status', 'active')
+            ->marketable()
+            ->whereNotNull('email')
+            ->where('email', '!=', '');
+    }
+
+    /** Délai minimal entre deux emails demandant la date de naissance. */
+    public const BIRTHDAY_INVITE_COOLDOWN_DAYS = 3;
+
+    /**
+     * Membres à qui l'on peut demander leur date de naissance par email : date
+     * inconnue, joignables, et pas déjà sollicitées ces derniers jours — un
+     * double clic ou deux administratrices le même jour enverraient sinon le
+     * même email deux fois.
+     */
+    public function scopeInvitableForBirthday(Builder $query): Builder
+    {
+        return $query->missingBirthday()
+            ->reachableByEmail()
+            ->where(function (Builder $q) {
+                $q->whereNull('birthday_invited_at')
+                    ->orWhere('birthday_invited_at', '<', now()->subDays(self::BIRTHDAY_INVITE_COOLDOWN_DAYS));
+            });
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\BirthdayAnnouncementMail;
 use App\Mail\BirthdayMail;
 use App\Mail\BirthdayWishesDigestMail;
 use App\Models\ActivityLog;
@@ -13,8 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * Souhaite leur anniversaire aux membres du jour, et renvoie le lendemain
- * le récapitulatif des vœux reçus.
+ * Souhaite leur anniversaire aux membres du jour, prévient les autres avec
+ * le lien du mur de vœux, et renvoie le lendemain le récapitulatif des vœux.
  *
  * Deux garde-fous repris des relances d'adhésion : on ne fête que les
  * adhésions actives — un « joyeux anniversaire » à quelqu'un dont l'adhésion
@@ -27,7 +28,10 @@ class SendBirthdayGreetings extends Command
         {--date= : Forcer une date (Y-m-d), pour tester}
         {--dry : N\'envoie rien, affiche seulement qui serait fêtée}';
 
-    protected $description = 'Envoie la carte d\'anniversaire du jour et le récapitulatif des vœux de la veille';
+    protected $description = 'Envoie la carte d\'anniversaire du jour, prévient les autres membres, et le récapitulatif des vœux de la veille';
+
+    /** Membres fêtées pendant ce passage : ce sont elles que l'on annonce. */
+    private array $celebratedIds = [];
 
     public function handle(BirthdayCardService $cards): int
     {
@@ -35,10 +39,12 @@ class SendBirthdayGreetings extends Command
             ? Carbon::parse($this->option('date'))
             : now();
 
+        $this->celebratedIds = [];
         $greeted = $this->greet($cards, $today);
+        $announced = $this->announce();
         $digests = $this->sendDigests();
 
-        $this->info("Anniversaires souhaités : {$greeted}. Récapitulatifs envoyés : {$digests}.");
+        $this->info("Anniversaires souhaités : {$greeted}. Membres prévenues : {$announced}. Récapitulatifs envoyés : {$digests}.");
 
         return self::SUCCESS;
     }
@@ -57,6 +63,7 @@ class SendBirthdayGreetings extends Command
                 foreach ($members as $member) {
                     if ($this->option('dry')) {
                         $this->line('  '.$member->name.' — '.$member->email);
+                        $this->celebratedIds[] = $member->id;
                         $sent++;
 
                         continue;
@@ -73,6 +80,7 @@ class SendBirthdayGreetings extends Command
 
                         Mail::to($member->email)->queue(new BirthdayMail($member->fresh()));
                         ActivityLog::record('birthday.greeted', $member, []);
+                        $this->celebratedIds[] = $member->id;
                         $sent++;
                     } catch (\Throwable $e) {
                         // Une carte qui échoue ne doit pas priver les suivantes.
@@ -81,6 +89,59 @@ class SendBirthdayGreetings extends Command
                     }
                 }
             });
+
+        return $sent;
+    }
+
+    /**
+     * Prévient les autres membres, avec le lien du mur de chacune des fêtées.
+     *
+     * Seules les membres fêtées pendant ce passage sont annoncées : si
+     * l'ordonnanceur repasse dans la journée, `birthday_greeted_at` les a déjà
+     * écartées de greet(), et personne ne reçoit l'annonce deux fois.
+     * Celles qui se sont opposées aux communications ne la reçoivent pas.
+     */
+    private function announce(): int
+    {
+        if ($this->celebratedIds === []) {
+            return 0;
+        }
+
+        $celebrants = Member::whereIn('id', $this->celebratedIds)->orderBy('name')->get();
+        $recipients = Member::reachableByEmail()->whereNotIn('id', $this->celebratedIds);
+
+        if ($this->option('dry')) {
+            return $recipients->count();
+        }
+
+        $sent = 0;
+
+        $recipients->chunkById(100, function ($members) use ($celebrants, &$sent) {
+            foreach ($members as $member) {
+                try {
+                    Mail::to($member->email)->queue(new BirthdayAnnouncementMail($member, $celebrants));
+                    $sent++;
+                } catch (\Throwable $e) {
+                    // Une adresse refusée ne doit pas priver les suivantes.
+                    Log::warning('Annonce d\'anniversaire : échec', ['member' => $member->id, 'error' => $e->getMessage()]);
+                }
+            }
+        });
+
+        // Les fêtées nées le même jour se souhaitent aussi : chacune reçoit
+        // l'annonce des autres, jamais la sienne.
+        if ($celebrants->count() > 1) {
+            foreach ($celebrants as $celebrant) {
+                $others = $celebrants->where('id', '!=', $celebrant->id)->values();
+
+                if (! $celebrant->hasOptedOutOfMarketing() && $celebrant->email) {
+                    Mail::to($celebrant->email)->queue(new BirthdayAnnouncementMail($celebrant, $others));
+                    $sent++;
+                }
+            }
+        }
+
+        ActivityLog::record('birthday.announced', null, ['celebrants' => $this->celebratedIds, 'recipients' => $sent]);
 
         return $sent;
     }
