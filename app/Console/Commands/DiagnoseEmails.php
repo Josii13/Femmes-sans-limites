@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Schema;
  */
 class DiagnoseEmails extends Command
 {
-    protected $signature = 'fsl:diagnose-emails';
+    protected $signature = 'fsl:diagnose-emails
+        {--test= : Envoie réellement un email à cette adresse et affiche l\'erreur SMTP exacte}';
 
     protected $description = 'Vérifie que les emails (QR, ebooks, cartes) partent réellement';
 
@@ -33,6 +34,14 @@ class DiagnoseEmails extends Command
         $this->checkMailer();
         $this->checkQueue();
         $this->checkRegistrations();
+        $this->checkRecentFailures();
+
+        if ($this->option('test')) {
+            $this->sendTestMail((string) $this->option('test'));
+        } else {
+            $this->newLine();
+            $this->line('  Ajoutez <options=bold>--test=vous@exemple.com</> pour tenter un envoi réel.');
+        }
 
         $this->newLine();
         if ($this->problems === 0) {
@@ -93,14 +102,22 @@ class DiagnoseEmails extends Command
             return;
         }
 
-        if (! Schema::hasTable('jobs')) {
-            $this->fail_('La table `jobs` est absente : lancez `php artisan migrate --force`.');
+        // Un outil de diagnostic qui s'effondre sur une base injoignable ne
+        // diagnostique rien : on rapporte la panne au lieu de la propager.
+        try {
+            if (! Schema::hasTable('jobs')) {
+                $this->fail_('La table `jobs` est absente : lancez `php artisan migrate --force`.');
+
+                return;
+            }
+
+            $pending = DB::table('jobs')->count();
+            $failed = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0;
+        } catch (\Throwable $e) {
+            $this->fail_('Base de données injoignable : '.$e->getMessage());
 
             return;
         }
-
-        $pending = DB::table('jobs')->count();
-        $failed = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0;
 
         if ($pending > 0) {
             $oldest = DB::table('jobs')->min('created_at');
@@ -127,9 +144,15 @@ class DiagnoseEmails extends Command
     {
         $this->section('Inscriptions confirmées');
 
-        $confirmed = Registration::whereIn('status', ['paid', 'attended'])->count();
-        $withoutToken = Registration::whereIn('status', ['paid', 'attended'])
-            ->whereNull('qr_token')->count();
+        try {
+            $confirmed = Registration::whereIn('status', ['paid', 'attended'])->count();
+            $withoutToken = Registration::whereIn('status', ['paid', 'attended'])
+                ->whereNull('qr_token')->count();
+        } catch (\Throwable $e) {
+            $this->fail_('Base de données injoignable : '.$e->getMessage());
+
+            return;
+        }
 
         $this->line("  Confirmées : <options=bold>{$confirmed}</>");
 
@@ -138,6 +161,68 @@ class DiagnoseEmails extends Command
             $this->fail_("{$withoutToken} inscription(s) confirmée(s) sans QR : accès impossible le jour J.");
         } else {
             $this->ok('Toutes disposent d\'un billet consultable en ligne.');
+        }
+    }
+
+    /**
+     * Les envois sont enveloppés dans un try/catch qui se contente de journaliser :
+     * l'inscrite voit « Inscription confirmée » et ne reçoit rien. Sur mutualisé,
+     * personne ne va lire storage/logs — alors la commande va le lire pour vous.
+     */
+    private function checkRecentFailures(): void
+    {
+        $this->section('Échecs récents');
+
+        $log = storage_path('logs/laravel.log');
+        if (! is_file($log)) {
+            $this->ok('Aucun fichier de log.');
+
+            return;
+        }
+
+        // On ne lit que la fin : un log de production pèse vite plusieurs Mo.
+        $handle = fopen($log, 'r');
+        $size = filesize($log);
+        fseek($handle, max(0, $size - 400_000));
+        $tail = (string) fread($handle, 400_000);
+        fclose($handle);
+
+        $needles = ['échec envoi', 'échec régénération', 'Failed to authenticate',
+            'Connection could not be established', 'TransportException'];
+
+        $hits = array_values(array_filter(
+            explode("\n", $tail),
+            fn ($line) => array_filter($needles, fn ($n) => str_contains($line, $n))
+        ));
+
+        if ($hits === []) {
+            $this->ok('Aucun échec d\'envoi journalisé.');
+
+            return;
+        }
+
+        $this->fail_(count($hits).' échec(s) d\'envoi journalisé(s). Les 3 derniers :');
+        foreach (array_slice($hits, -3) as $line) {
+            $this->line('    '.mb_substr(trim($line), 0, 180));
+        }
+    }
+
+    private function sendTestMail(string $address): void
+    {
+        $this->section('Envoi de test');
+
+        try {
+            Mail::raw(
+                "Test d'envoi depuis Femme Sans Limites.\nSi vous lisez ceci, le SMTP fonctionne.",
+                fn ($message) => $message->to($address)->subject('Test d\'envoi — FSL')
+            );
+            $this->ok("Email accepté par le serveur SMTP pour {$address}.");
+            $this->line('    S\'il n\'arrive pas, le problème est la délivrabilité (SPF/DKIM, spam),');
+            $this->line('    pas la configuration : vérifiez le dossier indésirables.');
+        } catch (\Throwable $e) {
+            // Le message brut du transport est ce qui manquait : « authentification
+            // refusée » et « port bloqué » appellent deux corrections différentes.
+            $this->fail_('Envoi refusé : '.$e->getMessage());
         }
     }
 
