@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BirthdayController;
 use App\Http\Controllers\Admin\CampaignTemplateController;
 use App\Http\Controllers\Admin\CommunicationController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\SiteImageController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\BirthdayCollectController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EbookController;
 use App\Http\Controllers\EbookPurchaseController;
@@ -90,6 +92,12 @@ Route::get('/mon-billet', [TicketController::class, 'findForm'])->name('tickets.
 Route::post('/mon-billet', [TicketController::class, 'send'])
     ->middleware('throttle:5,1')->name('tickets.find.store');
 
+// Collecte des dates de naissance, via un lien partagé dans le groupe WhatsApp.
+// Le jeton évite qu'une URL devinable expose l'annuaire des membres.
+Route::get('/anniversaires/{token}', [BirthdayCollectController::class, 'show'])->name('birthdays.collect');
+Route::post('/anniversaires/{token}', [BirthdayCollectController::class, 'store'])
+    ->middleware('throttle:20,1')->name('birthdays.collect.store');
+
 // Webhook GeniusPay (signé HMAC, exempté de CSRF)
 Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');
 
@@ -160,6 +168,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', '2fa'])->gr
         // Members
         Route::post('members/bulk-action', [MemberController::class, 'bulkAction'])->name('members.bulk-action');
         Route::get('members/export-csv', [MemberController::class, 'exportCsv'])->name('members.export-csv');
+        // Collecte des dates de naissance : lien à partager et suivi.
+        Route::get('anniversaires', [BirthdayController::class, 'index'])->name('birthdays.index');
+        Route::post('anniversaires/nouveau-lien', [BirthdayController::class, 'rotate'])->name('birthdays.rotate');
         Route::resource('members', MemberController::class);
         Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
         Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');

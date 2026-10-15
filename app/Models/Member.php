@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Mail\MemberPasswordSetupMail;
 use App\Support\CommunityRules;
+use Carbon\Carbon;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -24,6 +25,7 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
     protected $fillable = [
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
         'rules_accepted_at', 'rules_version',
+        'birth_day', 'birth_month', 'birth_year', 'birth_date_filled_at',
         'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
     ];
@@ -59,8 +61,71 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
             'renewal_reminded_at' => 'datetime',
             'last_login_at' => 'datetime',
             'rules_accepted_at' => 'datetime',
+            'birth_date_filled_at' => 'datetime',
             'show_in_gallery' => 'boolean',
         ];
+    }
+
+    // ── Anniversaires ───────────────────────────────────────────
+
+    public function hasBirthday(): bool
+    {
+        return $this->birth_day !== null && $this->birth_month !== null;
+    }
+
+    /** Membres actives dont la date reste à recueillir. */
+    public function scopeMissingBirthday(Builder $query): Builder
+    {
+        return $query->where('status', 'active')->whereNull('birth_day');
+    }
+
+    /**
+     * Membres actives qui fêtent leur anniversaire ce jour-là.
+     *
+     * Le 29 février est rattaché au 28 : sans cela, une femme née un 29
+     * ne serait fêtée qu'une année sur quatre.
+     */
+    public function scopeBirthdayOn(Builder $query, \DateTimeInterface $date): Builder
+    {
+        $day = (int) $date->format('j');
+        $month = (int) $date->format('n');
+
+        $query->where('status', 'active');
+
+        if ($month === 2 && $day === 28 && ! $this->isLeapYear((int) $date->format('Y'))) {
+            return $query->where('birth_month', 2)->whereIn('birth_day', [28, 29]);
+        }
+
+        return $query->where('birth_month', $month)->where('birth_day', $day);
+    }
+
+    private function isLeapYear(int $year): bool
+    {
+        return ($year % 4 === 0 && $year % 100 !== 0) || $year % 400 === 0;
+    }
+
+    /** Âge atteint ce jour-là, ou null si l'année n'a pas été donnée. */
+    public function ageOn(?\DateTimeInterface $date = null): ?int
+    {
+        if (! $this->birth_year || ! $this->hasBirthday()) {
+            return null;
+        }
+
+        return (int) ($date ? $date->format('Y') : now()->year) - (int) $this->birth_year;
+    }
+
+    /** « 12 mars », ou « 12 mars 1990 » quand l'année est connue. */
+    public function birthdayLabel(): ?string
+    {
+        if (! $this->hasBirthday()) {
+            return null;
+        }
+
+        $date = Carbon::createFromDate($this->birth_year ?: 2000, $this->birth_month, $this->birth_day);
+
+        return $this->birth_year
+            ? $date->translatedFormat('j F Y')
+            : $date->translatedFormat('j F');
     }
 
     /**
