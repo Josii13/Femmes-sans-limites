@@ -34,11 +34,21 @@ class QrCodeMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
-        $disk = Storage::disk('local')->exists($this->registration->qr_code_path) ? 'local' : 'public';
-        $path = Storage::disk($disk)->path($this->registration->qr_code_path);
+        $stored = $this->registration->qr_code_path;
+
+        // Un fichier manquant faisait échouer tout l'envoi, donc privait
+        // l'inscrite y compris du lien vers son billet — qui, lui, suffit à
+        // entrer. La pièce jointe est un confort, pas la condition de l'email.
+        $disk = collect(['local', 'public'])
+            ->first(fn ($d) => $stored && Storage::disk($d)->exists($stored));
+
+        if (! $disk) {
+            return [];
+        }
 
         return [
-            Attachment::fromPath($path)->as('qr-code-acces.svg')->withMime('image/svg+xml'),
+            Attachment::fromPath(Storage::disk($disk)->path($stored))
+                ->as('qr-code-acces.svg')->withMime('image/svg+xml'),
         ];
     }
 }

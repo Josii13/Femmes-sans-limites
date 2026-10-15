@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CommunicationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EbookController as AdminEbookController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\MailTestController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MembershipPlanController;
 use App\Http\Controllers\Admin\RegistrationController;
@@ -178,6 +179,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', '2fa'])->gr
         // Collecte des dates de naissance : lien à partager et suivi.
         Route::get('anniversaires', [BirthdayController::class, 'index'])->name('birthdays.index');
         Route::post('anniversaires/nouveau-lien', [BirthdayController::class, 'rotate'])->name('birthdays.rotate');
+
+        // Banc d'essai des emails : envoi réel vers une adresse choisie.
+        Route::get('emails', [MailTestController::class, 'index'])->name('emails.index');
+        Route::get('emails/{key}/apercu', [MailTestController::class, 'preview'])->name('emails.preview');
+        Route::post('emails/envoyer', [MailTestController::class, 'send'])
+            ->middleware('throttle:10,1')->name('emails.send');
         Route::post('anniversaires/inviter', [BirthdayController::class, 'invite'])
             ->middleware('throttle:5,1')->name('birthdays.invite');
         Route::post('anniversaires/voeux/{wish}/masquer', [BirthdayController::class, 'toggleWish'])->name('birthdays.wish-toggle');
