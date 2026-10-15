@@ -136,18 +136,14 @@ class BirthdayCardService
         $size = mb_strlen($first) > 10 ? 76 : 96;
         $this->text($img, $first, $cx, 710, $size, $serif, $p['name'], 'center');
 
-        $age = $member->ageOn();
-        if ($age !== null && $age > 0) {
-            $this->text($img, $age.' ans', $cx, 775, 34, $sans ?: $bold, $p['soft'], 'center');
-        }
-
+        // Pas d'âge sur la carte : elle est faite pour être partagée, et
+        // personne ne doit avoir à choisir entre la montrer et taire son âge.
         $lines = [
             'Toute la communauté te souhaite',
             'une année à ta hauteur.',
         ];
-        $y = $age !== null && $age > 0 ? 850 : 820;
         foreach ($lines as $i => $line) {
-            $this->text($img, $line, $cx, $y + $i * 44, 28, $sans ?: $bold, $p['soft'], 'center');
+            $this->text($img, $line, $cx, 820 + $i * 44, 28, $sans ?: $bold, $p['soft'], 'center');
         }
     }
 
