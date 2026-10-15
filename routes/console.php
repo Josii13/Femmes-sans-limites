@@ -55,3 +55,8 @@ Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3 --quiet'
 Schedule::command('members:birthday')
     ->dailyAt('07:00')
     ->withoutOverlapping(10);
+
+// Journal des envois : clôt les envois sans confirmation et purge l'ancien.
+Schedule::command('mail-logs:prune')
+    ->hourly()
+    ->withoutOverlapping(5);

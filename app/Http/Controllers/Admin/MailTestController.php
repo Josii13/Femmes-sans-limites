@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Listeners\RecordMailActivity;
 use App\Models\ActivityLog;
 use App\Support\MailSamples;
 use Illuminate\Http\Request;
@@ -56,7 +57,13 @@ class MailTestController extends Controller
                 // sendNow() et non send() : la plupart de ces mailables sont
                 // ShouldQueue, et send() les mettrait en file. On veut l'erreur
                 // SMTP tout de suite, pas un job silencieux qui échouera plus tard.
-                Mail::to($validated['email'])->sendNow(MailSamples::make($key));
+                // Marqué comme test : le journal des envois doit pouvoir les
+                // écarter, ils ne disent rien de la santé du système.
+                $mailable = MailSamples::make($key)->withSymfonyMessage(
+                    fn ($message) => $message->getHeaders()->addTextHeader(RecordMailActivity::TEST_HEADER, '1')
+                );
+
+                Mail::to($validated['email'])->sendNow($mailable);
                 $sent[] = $key;
             } catch (\Throwable $e) {
                 // Le message brut du transport est ce qui sert : « authentification

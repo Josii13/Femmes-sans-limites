@@ -34,44 +34,44 @@ final class MailSamples
     /**
      * Catalogue des emails, groupés comme l'équipe les pense.
      *
-     * @return array<string, array{label: string, group: string, description: string}>
+     * @return array<string, array{mailable: class-string, label: string, group: string, description: string}>
      */
     public static function catalog(): array
     {
         return [
             // ── Adhésion ────────────────────────────────────────
-            'membership-confirmation' => ['group' => 'Adhésion', 'label' => 'Candidature reçue', 'description' => 'Accusé de réception envoyé à la candidate.'],
-            'new-membership' => ['group' => 'Adhésion', 'label' => 'Alerte équipe', 'description' => 'Prévient l\'administration qu\'une candidature est arrivée.'],
-            'member-card' => ['group' => 'Adhésion', 'label' => 'Carte de membre', 'description' => 'Adhésion validée, avec la carte en pièce jointe.'],
-            'membership-rejected' => ['group' => 'Adhésion', 'label' => 'Candidature refusée', 'description' => 'Réponse négative, à relire attentivement.'],
-            'membership-renewal' => ['group' => 'Adhésion', 'label' => 'Relance avant échéance', 'description' => 'Adhésion qui approche de sa fin.'],
-            'membership-expired' => ['group' => 'Adhésion', 'label' => 'Adhésion échue', 'description' => 'Même email, après expiration.'],
-            'member-password' => ['group' => 'Adhésion', 'label' => 'Accès à l\'espace membre', 'description' => 'Invitation à définir son mot de passe.'],
+            'membership-confirmation' => ['mailable' => Mail\MembershipConfirmationMail::class, 'group' => 'Adhésion', 'label' => 'Candidature reçue', 'description' => 'Accusé de réception envoyé à la candidate.'],
+            'new-membership' => ['mailable' => Mail\NewMembershipMail::class, 'group' => 'Adhésion', 'label' => 'Alerte équipe', 'description' => 'Prévient l\'administration qu\'une candidature est arrivée.'],
+            'member-card' => ['mailable' => Mail\MemberCardMail::class, 'group' => 'Adhésion', 'label' => 'Carte de membre', 'description' => 'Adhésion validée, avec la carte en pièce jointe.'],
+            'membership-rejected' => ['mailable' => Mail\MembershipRejectedMail::class, 'group' => 'Adhésion', 'label' => 'Candidature refusée', 'description' => 'Réponse négative, à relire attentivement.'],
+            'membership-renewal' => ['mailable' => Mail\MembershipRenewalMail::class, 'group' => 'Adhésion', 'label' => 'Relance avant échéance', 'description' => 'Adhésion qui approche de sa fin.'],
+            'membership-expired' => ['mailable' => Mail\MembershipRenewalMail::class, 'group' => 'Adhésion', 'label' => 'Adhésion échue', 'description' => 'Même email, après expiration.'],
+            'member-password' => ['mailable' => Mail\MemberPasswordSetupMail::class, 'group' => 'Adhésion', 'label' => 'Accès à l\'espace membre', 'description' => 'Invitation à définir son mot de passe.'],
 
             // ── Événements ──────────────────────────────────────
-            'qr-code' => ['group' => 'Événements', 'label' => 'Billet et QR d\'accès', 'description' => 'Inscription confirmée, avec le QR en pièce jointe.'],
-            'payment-link' => ['group' => 'Événements', 'label' => 'Lien de paiement', 'description' => 'Relance manuelle pour une place non réglée.'],
-            'ticket-link' => ['group' => 'Événements', 'label' => 'Renvoi du billet', 'description' => 'Demandé depuis « Retrouver mon billet ».'],
-            'waiting-list' => ['group' => 'Événements', 'label' => 'Place libérée', 'description' => 'Une place se libère pour la liste d\'attente.'],
+            'qr-code' => ['mailable' => Mail\QrCodeMail::class, 'group' => 'Événements', 'label' => 'Billet et QR d\'accès', 'description' => 'Inscription confirmée, avec le QR en pièce jointe.'],
+            'payment-link' => ['mailable' => Mail\PaymentLinkMail::class, 'group' => 'Événements', 'label' => 'Lien de paiement', 'description' => 'Relance manuelle pour une place non réglée.'],
+            'ticket-link' => ['mailable' => Mail\TicketLinkMail::class, 'group' => 'Événements', 'label' => 'Renvoi du billet', 'description' => 'Demandé depuis « Retrouver mon billet ».'],
+            'waiting-list' => ['mailable' => Mail\WaitingListSpotMail::class, 'group' => 'Événements', 'label' => 'Place libérée', 'description' => 'Une place se libère pour la liste d\'attente.'],
 
             // ── Boutique ────────────────────────────────────────
-            'ebook-delivery' => ['group' => 'Boutique', 'label' => 'Livraison d\'ebook', 'description' => 'Achat réglé, lien de téléchargement.'],
+            'ebook-delivery' => ['mailable' => Mail\EbookDeliveryMail::class, 'group' => 'Boutique', 'label' => 'Livraison d\'ebook', 'description' => 'Achat réglé, lien de téléchargement.'],
 
             // ── Anniversaires ───────────────────────────────────
-            'birthday' => ['group' => 'Anniversaires', 'label' => 'Carte d\'anniversaire', 'description' => 'Le message du jour J, avec sa carte.'],
-            'birthday-announcement' => ['group' => 'Anniversaires', 'label' => 'Annonce à la communauté', 'description' => 'Prévient les autres membres de la fête du jour.'],
-            'birthday-digest' => ['group' => 'Anniversaires', 'label' => 'Récapitulatif des vœux', 'description' => 'Les messages reçus, renvoyés le lendemain.'],
-            'birthday-date-request' => ['group' => 'Anniversaires', 'label' => 'Demande de date', 'description' => 'Invitation à renseigner sa date de naissance.'],
+            'birthday' => ['mailable' => Mail\BirthdayMail::class, 'group' => 'Anniversaires', 'label' => 'Carte d\'anniversaire', 'description' => 'Le message du jour J, avec sa carte.'],
+            'birthday-announcement' => ['mailable' => Mail\BirthdayAnnouncementMail::class, 'group' => 'Anniversaires', 'label' => 'Annonce à la communauté', 'description' => 'Prévient les autres membres de la fête du jour.'],
+            'birthday-digest' => ['mailable' => Mail\BirthdayWishesDigestMail::class, 'group' => 'Anniversaires', 'label' => 'Récapitulatif des vœux', 'description' => 'Les messages reçus, renvoyés le lendemain.'],
+            'birthday-date-request' => ['mailable' => Mail\BirthdayDateRequestMail::class, 'group' => 'Anniversaires', 'label' => 'Demande de date', 'description' => 'Invitation à renseigner sa date de naissance.'],
 
             // ── Communication ───────────────────────────────────
-            'newsletter-confirm' => ['group' => 'Communication', 'label' => 'Confirmation newsletter', 'description' => 'Double opt-in après inscription.'],
-            'new-event' => ['group' => 'Communication', 'label' => 'Annonce d\'événement', 'description' => 'Nouvel événement annoncé aux abonnées.'],
-            'new-ebook' => ['group' => 'Communication', 'label' => 'Annonce d\'ebook', 'description' => 'Nouvelle parution annoncée aux abonnées.'],
-            'campaign' => ['group' => 'Communication', 'label' => 'Campagne', 'description' => 'Email de campagne, avec personnalisation.'],
-            'contact' => ['group' => 'Communication', 'label' => 'Message de contact', 'description' => 'Formulaire public transmis à l\'équipe.'],
+            'newsletter-confirm' => ['mailable' => Mail\NewsletterConfirmMail::class, 'group' => 'Communication', 'label' => 'Confirmation newsletter', 'description' => 'Double opt-in après inscription.'],
+            'new-event' => ['mailable' => Mail\NewEventMail::class, 'group' => 'Communication', 'label' => 'Annonce d\'événement', 'description' => 'Nouvel événement annoncé aux abonnées.'],
+            'new-ebook' => ['mailable' => Mail\NewEbookMail::class, 'group' => 'Communication', 'label' => 'Annonce d\'ebook', 'description' => 'Nouvelle parution annoncée aux abonnées.'],
+            'campaign' => ['mailable' => Mail\CampaignMail::class, 'group' => 'Communication', 'label' => 'Campagne', 'description' => 'Email de campagne, avec personnalisation.'],
+            'contact' => ['mailable' => Mail\ContactMail::class, 'group' => 'Communication', 'label' => 'Message de contact', 'description' => 'Formulaire public transmis à l\'équipe.'],
 
             // ── Technique ───────────────────────────────────────
-            'backup-failed' => ['group' => 'Technique', 'label' => 'Échec de sauvegarde', 'description' => 'Alerte envoyée aux administratrices.'],
+            'backup-failed' => ['mailable' => Mail\BackupFailedMail::class, 'group' => 'Technique', 'label' => 'Échec de sauvegarde', 'description' => 'Alerte envoyée aux administratrices.'],
         ];
     }
 
