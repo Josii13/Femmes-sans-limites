@@ -18,6 +18,9 @@
         </include>
     </source>
     <php>
+        <!-- Les cartes d'anniversaire sont des images 1080x1080 : 4,6 Mo chacune
+             à la création. Sur l'ensemble de la suite, 128 Mo ne suffisent pas. -->
+        <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

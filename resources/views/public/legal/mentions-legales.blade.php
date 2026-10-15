@@ -44,6 +44,7 @@
                     <p><strong style="color:var(--dark);">Forme juridique :</strong> Association</p>
                     <p><strong style="color:var(--dark);">Adresse :</strong> Abidjan, Côte d'Ivoire</p>
                     <p><strong style="color:var(--dark);">Email :</strong> contact@femmessanslimites.com</p>
+                    <p><strong style="color:var(--dark);">Téléphone :</strong> {{ \App\Support\Contact::phoneDisplay() }}</p>
                     <p><strong style="color:var(--dark);">Directrice de la publication :</strong> Équipe FSL</p>
                 </div>
             </div>
