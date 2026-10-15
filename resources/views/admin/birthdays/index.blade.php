@@ -97,5 +97,33 @@
         @endforelse
     </div>
 </div>
+
+{{-- Mur de vœux : modération --}}
+@if($wishes->isNotEmpty())
+<div class="admin-card p-5 mt-6">
+    <h3 class="font-semibold text-sm mb-1" style="color:var(--dark);">Derniers messages reçus</h3>
+    <p class="text-xs mb-4" style="color:var(--gray);">
+        Masquer retire le message du mur sans le détruire : une décision prise vite un jour de fête doit pouvoir se défaire.
+    </p>
+    <div class="space-y-2">
+        @foreach($wishes as $wish)
+        <div class="flex items-start justify-between gap-3 py-2.5 px-3 rounded-xl" style="background:{{ $wish->hidden_at ? '#FEF2F2' : '#F8F7F9' }};">
+            <div class="min-w-0">
+                <p class="text-sm leading-snug {{ $wish->hidden_at ? 'line-through' : '' }}" style="color:var(--dark);">{{ $wish->message }}</p>
+                <p class="text-xs mt-0.5" style="color:var(--gray);">
+                    {{ $wish->author_name }} → {{ $wish->member?->name ?? '—' }} · {{ $wish->created_at->format('d/m/Y H:i') }}
+                </p>
+            </div>
+            <form x-ref="wish_{{ $wish->id }}" action="{{ route('admin.birthdays.wish-toggle', $wish) }}" method="POST">@csrf</form>
+            <button type="button"
+                    @click="confirm = { title: '{{ $wish->hidden_at ? 'Réafficher ce message ?' : 'Masquer ce message ?' }}', body: '{{ $wish->hidden_at ? 'Il redeviendra visible sur le mur.' : 'Il disparaîtra du mur, sans être supprimé.' }}' }; confirmAction = 'wish_{{ $wish->id }}'"
+                    class="text-xs px-3 py-1.5 rounded-lg flex-shrink-0" style="background:#fff;border:1px solid var(--border);color:var(--gray);">
+                {{ $wish->hidden_at ? 'Réafficher' : 'Masquer' }}
+            </button>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 </div>
 @endsection

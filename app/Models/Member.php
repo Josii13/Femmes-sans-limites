@@ -26,6 +26,7 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
         'member_number', 'name', 'email', 'phone', 'motivation', 'profession',
         'rules_accepted_at', 'rules_version',
         'birth_day', 'birth_month', 'birth_year', 'birth_date_filled_at',
+        'birthday_token', 'birthday_greeted_at', 'birthday_card_path', 'birthday_digest_sent_at',
         'country', 'city', 'photo', 'show_in_gallery', 'type', 'status', 'card_path', 'verification_token',
         'marketing_opt_out_at', 'joined_at', 'expires_at', 'renewal_reminded_at',
     ];
@@ -62,6 +63,8 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
             'last_login_at' => 'datetime',
             'rules_accepted_at' => 'datetime',
             'birth_date_filled_at' => 'datetime',
+            'birthday_greeted_at' => 'datetime',
+            'birthday_digest_sent_at' => 'datetime',
             'show_in_gallery' => 'boolean',
         ];
     }
@@ -71,6 +74,43 @@ class Member extends Model implements AuthenticatableContract, CanResetPasswordC
     public function hasBirthday(): bool
     {
         return $this->birth_day !== null && $this->birth_month !== null;
+    }
+
+    public function birthdayWishes()
+    {
+        return $this->hasMany(BirthdayWish::class)->latest();
+    }
+
+    /**
+     * Jeton de sa page d'anniversaire, créé à la première demande.
+     *
+     * Le lien circule dans le groupe le jour J : il doit être impossible à
+     * deviner, sans pour autant exiger un compte de celles qui veulent
+     * simplement laisser un mot.
+     */
+    public function birthdayToken(): string
+    {
+        if (! $this->birthday_token) {
+            $this->forceFill(['birthday_token' => Str::lower(Str::random(32))])->save();
+        }
+
+        return $this->birthday_token;
+    }
+
+    /**
+     * Le mur n'accepte des vœux que pendant la fête.
+     *
+     * Une boîte à messages ouverte toute l'année sur la page d'une membre
+     * finirait en dépotoir à spam, et un mot reçu en juillet pour un
+     * anniversaire de mars ne fait plaisir à personne.
+     */
+    public function birthdayWishesOpen(): bool
+    {
+        if (! $this->birthday_greeted_at) {
+            return false;
+        }
+
+        return $this->birthday_greeted_at->gt(now()->subDays(7));
     }
 
     /** Membres actives dont la date reste à recueillir. */

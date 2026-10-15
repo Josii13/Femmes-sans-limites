@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BirthdayCollectController;
+use App\Http\Controllers\BirthdayPageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EbookController;
 use App\Http\Controllers\EbookPurchaseController;
@@ -98,6 +99,12 @@ Route::get('/anniversaires/{token}', [BirthdayCollectController::class, 'show'])
 Route::post('/anniversaires/{token}', [BirthdayCollectController::class, 'store'])
     ->middleware('throttle:20,1')->name('birthdays.collect.store');
 
+// Page d'anniversaire : la carte et le mur de vœux.
+Route::get('/anniversaire/{token}', [BirthdayPageController::class, 'show'])->name('birthdays.page');
+Route::get('/anniversaire/{token}/carte', [BirthdayPageController::class, 'card'])->name('birthdays.card');
+Route::post('/anniversaire/{token}/voeux', [BirthdayPageController::class, 'storeWish'])
+    ->middleware('throttle:10,1')->name('birthdays.wish');
+
 // Webhook GeniusPay (signé HMAC, exempté de CSRF)
 Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');
 
@@ -171,6 +178,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', '2fa'])->gr
         // Collecte des dates de naissance : lien à partager et suivi.
         Route::get('anniversaires', [BirthdayController::class, 'index'])->name('birthdays.index');
         Route::post('anniversaires/nouveau-lien', [BirthdayController::class, 'rotate'])->name('birthdays.rotate');
+        Route::post('anniversaires/voeux/{wish}/masquer', [BirthdayController::class, 'toggleWish'])->name('birthdays.wish-toggle');
         Route::resource('members', MemberController::class);
         Route::post('members/{member}/send-card', [MemberController::class, 'sendCard'])->name('members.send-card');
         Route::get('members/{member}/download-card', [MemberController::class, 'downloadCard'])->name('members.download-card');

@@ -48,3 +48,10 @@ Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3 --quiet'
     // sinon un verrou de 24 h, et plus aucun email ne part jusqu'au lendemain.
     ->withoutOverlapping(2)
     ->when(fn () => config('queue.default') !== 'sync');
+
+// Anniversaires : carte du jour le matin, récapitulatif des vœux le lendemain.
+// 7 h UTC correspond à 7 h à Abidjan ; les membres de la diaspora reçoivent
+// donc leur message dans la matinée, pas au milieu de la nuit.
+Schedule::command('members:birthday')
+    ->dailyAt('07:00')
+    ->withoutOverlapping(10);
