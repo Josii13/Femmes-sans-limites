@@ -24,7 +24,9 @@ class MailTestController extends Controller
     public function index()
     {
         return view('admin.emails.index', [
-            'catalog' => collect(MailSamples::catalog())->groupBy('group'),
+            // preserveKeys : sans lui, groupBy ré-indexe numériquement et la
+            // vue construisait des liens /emails/1/apercu au lieu de la clé.
+            'catalog' => collect(MailSamples::catalog())->groupBy('group', preserveKeys: true),
         ]);
     }
 

@@ -72,6 +72,21 @@ class MailTestBenchTest extends TestCase
         }
     }
 
+    public function test_the_page_links_to_each_preview_by_its_key(): void
+    {
+        $html = $this->actingAs($this->admin())->get(route('admin.emails.index'))
+            ->assertOk()->getContent();
+
+        // groupBy() ré-indexe numériquement sans preserveKeys : les liens
+        // pointaient vers /emails/1/apercu, et chacun répondait 404.
+        foreach (array_keys(MailSamples::catalog()) as $key) {
+            $this->assertStringContainsString(
+                route('admin.emails.preview', $key), $html,
+                "Aperçu manquant ou mal construit pour « {$key} »."
+            );
+        }
+    }
+
     public function test_an_email_can_be_previewed_without_sending(): void
     {
         Mail::fake();
