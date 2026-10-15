@@ -88,15 +88,29 @@ Déclarées dans `routes/console.php` :
 Un seul cron à activer côté serveur, il déclenche tout le reste :
 
 ```cron
-* * * * * cd /chemin/projet && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd ~/repositories/Femmes-sans-limites && /opt/cpanel/ea-php84/root/usr/bin/php artisan schedule:run >> /dev/null 2>&1
 ```
+
+## Accès au serveur (cPanel, hébergement mutualisé)
+
+Le dépôt n'est **pas** dans `public_html` mais dans `repositories/`, et le `php`
+du `PATH` n'est pas celui du site. Les deux lignes à passer en début de session,
+sous peine de `Could not open input file: artisan` :
+
+```bash
+cd ~/repositories/Femmes-sans-limites
+alias php=/opt/cpanel/ea-php84/root/usr/bin/php
+```
+
+L'alias ne vaut que pour la session en cours. Ajuster `ea-php84` selon la sortie
+de `ls /opt/cpanel/ | grep ea-php`.
 
 ## Déploiement
 
 Toujours ces quatre commandes, dans cet ordre :
 
 ```bash
-cd /chemin/projet
+cd ~/repositories/Femmes-sans-limites
 git pull origin main
 php artisan migrate --force
 php artisan optimize:clear     # vide config, routes, vues, événements
