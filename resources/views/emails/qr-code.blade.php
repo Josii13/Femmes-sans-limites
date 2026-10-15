@@ -45,7 +45,20 @@
         </table>
         @endif
 
-        <p style="color:#aaa;font-size:12px;">QR code également joint en pièce jointe.</p>
+        {{-- Le lien prime sur la pièce jointe : beaucoup de clients mobiles
+             n'ouvrent pas un SVG, et la page affiche le QR à l'écran. --}}
+        @if($registration->qr_token)
+        <a href="{{ route('tickets.show', $registration->qr_token) }}"
+           style="display:inline-block;background:#D91E6E;color:#fff;text-decoration:none;padding:14px 32px;border-radius:999px;font-weight:700;font-size:15px;">
+          Voir mon billet
+        </a>
+        <p style="color:#9CA3AF;font-size:12px;line-height:1.7;margin:16px 0 0;">
+          Ouvre ce lien sur ton téléphone le jour J : le QR s'affiche à l'écran, rien à imprimer.<br>
+          Garde-le pour toi, il vaut billet d'entrée.
+        </p>
+        @endif
+
+        <p style="color:#aaa;font-size:12px;margin-top:20px;">QR code également joint en pièce jointe.</p>
       </td></tr>
       <tr><td style="background:#f9f9f9;padding:20px 40px;border-top:1px solid #eee;text-align:center;">
         <p style="color:#aaa;font-size:12px;margin:0;">© {{ date('Y') }} Femme Sans Limites — À bientôt !</p>

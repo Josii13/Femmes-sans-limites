@@ -95,16 +95,20 @@ class EventController extends Controller
                 ->first();
 
             if ($existing) {
-                // Déjà payé/présent → vraiment inscrit.
+                // Déjà confirmée : on la renvoie vers son billet plutôt que de la
+                // bloquer. C'est précisément quand on ne reçoit pas son QR qu'on
+                // réessaie — et l'ancien message rouge laissait sans issue.
                 if (in_array($existing->status, ['paid', 'attended'], true)) {
-                    return ['error' => 'Vous êtes déjà inscrit(e) à cet événement avec cet email.'];
+                    return ['already' => $existing];
                 }
                 // Inscription payante restée impayée → on propose de REPRENDRE le paiement.
                 if ($event->isPaidEvent()) {
                     return ['resume' => $existing];
                 }
 
-                return ['error' => 'Vous êtes déjà inscrit(e) à cet événement avec cet email.'];
+                // Événement gratuit resté « en attente » : la confirmation a échoué
+                // la première fois. On la rejoue au lieu de renvoyer une erreur.
+                return ['registration' => $existing];
             }
 
             return ['registration' => Registration::create([
@@ -118,6 +122,12 @@ class EventController extends Controller
             return back()->with('error', $result['error']);
         }
 
+        // Déjà inscrite et confirmée : on l'emmène directement à son billet.
+        if (! empty($result['already'])) {
+            return redirect()->route('tickets.show', $result['already']->qr_token)
+                ->with('success', 'Tu es déjà inscrite à cet événement — voici ton billet.');
+        }
+
         // Reprise d'un paiement abandonné : on relance un paiement sur l'inscription existante.
         if (! empty($result['resume'])) {
             return $this->initiateEventPayment($event, $result['resume']);
@@ -128,10 +138,15 @@ class EventController extends Controller
             return $this->initiateEventPayment($event, $result['registration']);
         }
 
-        // Événement gratuit → inscription confirmée immédiatement : QR + email de confirmation.
-        $this->fulfiller->confirmRegistration($result['registration']);
+        // Événement gratuit → inscription confirmée immédiatement : QR + email.
+        $registration = $result['registration'];
+        $this->fulfiller->confirmRegistration($registration);
 
-        return back()->with('success', 'Inscription confirmée ! Ton QR d\'accès vient de t\'être envoyé par email.');
+        // On emmène l'inscrite SUR son billet au lieu de la renvoyer sur la page
+        // de l'événement avec « c'est parti par email » : l'email peut ne jamais
+        // arriver, et elle n'avait alors plus aucun moyen d'accéder à son QR.
+        return redirect()->route('tickets.show', $registration->fresh()->qr_token)
+            ->with('success', 'Inscription confirmée ! Voici ton billet d\'accès.');
     }
 
     /** Crée le paiement GeniusPay pour une inscription et redirige vers le checkout. */

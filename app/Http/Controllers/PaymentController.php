@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\Registration;
 use App\Services\GeniusPayService;
 use App\Services\PaymentFulfiller;
 
@@ -32,9 +33,17 @@ class PaymentController extends Controller
             }
         }
 
+        $payment = $payment->fresh('payable');
+
+        // Inscription à un événement : on donne le lien du billet sur la page de
+        // retour. S'en remettre au seul email, c'était laisser sans recours
+        // quiconque ne le recevait pas.
+        $ticketToken = $payment->payable instanceof Registration ? $payment->payable->qr_token : null;
+
         return view('public.payment.success', [
-            'payment' => $payment->fresh(),
+            'payment' => $payment,
             'type' => $payment->payable_type,
+            'ticketToken' => $ticketToken,
         ]);
     }
 

@@ -51,30 +51,41 @@ composer dev   # serve + queue:listen + pail (logs) + vite, en parallèle
 
 ## Envoi des emails
 
-Par défaut, `QUEUE_CONNECTION=sync` : les emails (cartes, campagnes, newsletters,
-confirmations) partent **immédiatement pendant la requête**. Aucun worker requis —
-idéal en hébergement mutualisé.
+Les emails de confirmation (QR d'accès, ebooks, cartes de membre) partent avec
+`->queue()`. Deux modes possibles :
 
-**Pour de gros envois (campagnes de plusieurs centaines de membres)**, on peut basculer
-en envoi asynchrone afin de ne pas bloquer la requête : mettre `QUEUE_CONNECTION=database`
-puis faire tourner un worker (ou un cron qui vide la file chaque minute) :
+- `QUEUE_CONNECTION=sync` — envoi immédiat pendant la requête, aucun worker requis.
+- `QUEUE_CONNECTION=database` — mise en file, vidée **par l'ordonnanceur** : la tâche
+  `queue:work --stop-when-empty` est déclarée dans `routes/console.php`, donc le cron
+  `schedule:run` ci-dessous suffit. Aucune tâche cron supplémentaire à créer.
+
+> Historique : la file était en base **sans worker**. Les confirmations restaient
+> dans la table `jobs`, le back-office affichait « Confirmée » et l'inscrite ne
+> recevait jamais son QR. D'où la tâche planifiée, et la page de billet en ligne
+> qui ne dépend plus de la bonne réception d'un email.
+
+En cas de doute sur un envoi, en production :
 
 ```bash
-# worker permanent (VPS) :
-php artisan queue:work --queue=emails,default
-
-# ou cron (mutualisé), chaque minute :
-* * * * * cd /chemin/projet && php artisan queue:work --stop-when-empty --max-time=50 --queue=emails,default >> /dev/null 2>&1
+php artisan fsl:diagnose-emails
 ```
+
+Lecture seule. Affiche le transport, l'expéditeur, la connexion de file, le nombre
+d'emails en attente et depuis combien de temps, les échecs, et les inscriptions
+confirmées sans QR.
 
 ## Tâches planifiées (cron)
 
-Deux tâches sont planifiées (`routes/console.php`) :
+Déclarées dans `routes/console.php` :
 
+- `queue:work --stop-when-empty` — vide la file des emails (chaque minute, si la file n'est pas `sync`)
 - `campaigns:dispatch` — envoi des campagnes programmées (chaque minute)
+- `registrations:expire-unpaid` — libère les places impayées (toutes les 10 min)
+- `payments:reconcile` — rattrape les webhooks manqués (toutes les 10 min)
 - `members:expire` — expiration et relance des adhésions échues (quotidien)
+- `fsl:backup` — sauvegarde de la base et des fichiers (quotidien, 14 jours conservés)
 
-Activez l'ordonnanceur Laravel côté serveur :
+Un seul cron à activer côté serveur, il déclenche tout le reste :
 
 ```cron
 * * * * * cd /chemin/projet && php artisan schedule:run >> /dev/null 2>&1

@@ -199,6 +199,9 @@
                     <template x-if="submitting"><span class="inline-flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> Patiente…</span></template>
                 </button>
                 <p class="text-xs text-center" style="color:var(--gray);">En t'inscrivant, tu acceptes d'être contactée par l'équipe FSL pour cet événement.</p>
+                {{-- Issue de secours : sans elle, une inscrite qui n'a pas reçu son QR
+                     se réinscrivait et tombait sur un message d'erreur. --}}
+                <p class="text-xs text-center" style="color:var(--gray);">Déjà inscrite ? <a href="{{ route('tickets.find') }}" style="color:var(--rose);text-decoration:underline;">Retrouver mon billet</a></p>
 
                 {{-- Piège anti-bot : sans lui, un robot pouvait remplir la capacité
                      de l'événement avec des inscriptions en attente. --}}

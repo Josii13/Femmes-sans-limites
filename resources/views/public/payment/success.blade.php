@@ -15,6 +15,8 @@
             Merci {{ $payment->customer_name }} ! Ton paiement a bien été confirmé.
             @if($isEbook)
                 Ton ebook vient de t'être envoyé par email à <strong style="color:var(--charcoal);">{{ $payment->customer_email }}</strong>.
+            @elseif($ticketToken)
+                Ton billet d'accès est prêt — garde-le sous la main pour le jour J.
             @else
                 Ton QR code d'accès t'a été envoyé par email à <strong style="color:var(--charcoal);">{{ $payment->customer_email }}</strong>.
             @endif
@@ -28,7 +30,12 @@
             Ton paiement est en cours de validation. Tu recevras un email dès qu'il sera confirmé (généralement en quelques instants).
         </p>
         @endif
+        @if($ticketToken && $payment->isPaid())
+        <a href="{{ route('tickets.show', $ticketToken) }}" class="btn-rose">Voir mon billet</a>
+        <p class="text-xs mt-5" style="color:var(--gray);">Un email de confirmation part aussi vers {{ $payment->customer_email }}.</p>
+        @else
         <a href="{{ route('home') }}" class="btn-rose">Retour à l'accueil</a>
+        @endif
         @if($isEbook && $payment->isPaid())
         <p class="text-xs mt-5" style="color:var(--gray);">Tu n'as pas reçu l'email ? <a href="{{ route('ebooks.resend') }}" style="color:var(--rose);text-decoration:underline;">Renvoyer mon lien de téléchargement</a></p>
         @endif

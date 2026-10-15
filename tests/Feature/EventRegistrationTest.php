@@ -57,9 +57,15 @@ class EventRegistrationTest extends TestCase
         $this->post(route('events.register', $event->slug), $this->payload(['email' => 'Awa@Example.com ']))
             ->assertSessionHas('success');
 
-        // Même email avec casse/espaces différents → refusé.
+        // Même email avec casse/espaces différents → aucune seconde inscription.
+        // On ne renvoie plus d'erreur pour autant : c'est précisément quand on
+        // n'a pas reçu son QR qu'on réessaie, et l'ancien message rouge laissait
+        // sans issue. La personne est emmenée sur son billet.
+        $registration = Registration::where('event_id', $event->id)->firstOrFail();
+
         $this->post(route('events.register', $event->slug), $this->payload(['email' => 'awa@example.com']))
-            ->assertSessionHas('error');
+            ->assertRedirect(route('tickets.show', $registration->qr_token))
+            ->assertSessionMissing('error');
 
         $this->assertSame(1, Registration::where('event_id', $event->id)->count());
         $this->assertDatabaseHas('registrations', ['email' => 'awa@example.com']);

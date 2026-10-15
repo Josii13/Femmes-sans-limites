@@ -10,7 +10,8 @@ Artisan::command('inspire', function () {
 
 Schedule::command('campaigns:dispatch')
     ->everyMinute()
-    ->withoutOverlapping();
+    // Idem : sans expiration, un arrêt brutal gèle les campagnes 24 h.
+    ->withoutOverlapping(5);
 
 Schedule::command('members:expire')
     ->dailyAt('07:00')
@@ -30,3 +31,20 @@ Schedule::command('payments:reconcile')
 Schedule::command('fsl:backup')
     ->dailyAt('02:30')
     ->withoutOverlapping();
+
+// Vide la file d'attente des emails.
+//
+// Les confirmations partent avec ->queue(). En `QUEUE_CONNECTION=database`
+// sans worker — le cas de l'hébergement mutualisé — elles restaient dans la
+// table `jobs` : le back-office affichait « Confirmée » et l'inscrite ne
+// recevait jamais son QR. L'ordonnanceur s'en charge, donc le cron
+// `schedule:run` déjà en place suffit : aucune tâche supplémentaire à créer.
+//
+// `--stop-when-empty` rend la main dès la file vidée, `--max-time` borne la
+// durée pour ne jamais chevaucher la minute suivante.
+Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3 --quiet')
+    ->everyMinute()
+    // Expiration courte du verrou : un processus tué par l'hébergeur laisse
+    // sinon un verrou de 24 h, et plus aucun email ne part jusqu'au lendemain.
+    ->withoutOverlapping(2)
+    ->when(fn () => config('queue.default') !== 'sync');

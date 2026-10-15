@@ -27,6 +27,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TrackingController;
 use App\Models\ActivityLog;
 use App\Models\Event;
@@ -80,6 +81,14 @@ Route::get('/ebooks/telechargement/{payment:reference}', [EbookPurchaseControlle
 Route::get('/ebooks-mes-achats', [EbookPurchaseController::class, 'resendForm'])->name('ebooks.resend');
 Route::post('/ebooks-mes-achats', [EbookPurchaseController::class, 'resend'])
     ->middleware('throttle:5,1')->name('ebooks.resend.store');
+
+// Billet d'accès : le QR ne doit pas dépendre de la bonne réception d'un email.
+// Le jeton est celui du QR — connaître l'URL équivaut à détenir le billet.
+Route::get('/billet/{token}', [TicketController::class, 'show'])->name('tickets.show');
+Route::get('/billet/{token}/qr', [TicketController::class, 'download'])->name('tickets.download');
+Route::get('/mon-billet', [TicketController::class, 'findForm'])->name('tickets.find');
+Route::post('/mon-billet', [TicketController::class, 'send'])
+    ->middleware('throttle:5,1')->name('tickets.find.store');
 
 // Webhook GeniusPay (signé HMAC, exempté de CSRF)
 Route::post('/webhooks/geniuspay', [GeniusPayWebhookController::class, 'handle'])->name('webhooks.geniuspay');
