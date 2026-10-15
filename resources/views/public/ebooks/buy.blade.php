@@ -29,7 +29,7 @@
                 @endif
 
                 <p class="text-sm mb-5" style="color:var(--gray);">
-                    Renseigne tes coordonnées : tu seras redirigée vers le paiement sécurisé (Wave, Orange Money, MTN, Moov ou carte). Ton ebook te sera envoyé par email juste après.
+                    Renseigne tes coordonnées : tu seras redirigée vers le paiement sécurisé. Ton ebook te sera envoyé par email juste après.
                 </p>
 
                 <form method="POST" action="{{ route('ebooks.buy.store', $ebook->slug) }}" class="space-y-4"
@@ -60,7 +60,7 @@
                 </form>
             </div>
         </div>
-        <p class="text-center text-xs mt-4" style="color:var(--gray);">🔒 Paiement sécurisé via GeniusPay</p>
+        <x-payment-methods class="mt-5 flex flex-col items-center" label="Paiement sécurisé via GeniusPay — livraison immédiate par email." />
     </div>
 </section>
 @endsection

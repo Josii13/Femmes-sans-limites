@@ -88,10 +88,8 @@
     @endforeach
 </div>
 
-<p class="text-xs text-center mt-6 leading-relaxed" style="color:var(--gray);">
-    🔒 Paiement sécurisé — Wave, Orange Money, MTN, Moov ou carte bancaire.<br>
-    Votre carte de membre est mise à jour automatiquement après le règlement.
-</p>
+<x-payment-methods class="mt-6 flex flex-col items-center text-center"
+                   label="Paiement sécurisé — votre carte de membre est mise à jour automatiquement après le règlement." />
 @endif
 
 @endsection

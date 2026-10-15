@@ -120,7 +120,7 @@
                 </a>
 
                 @if($event->is_paid && $canRegister)
-                <p class="text-xs mt-4" style="color:var(--gray);">🔒 Paiement en ligne sécurisé (Wave, Orange Money, MTN, Moov, carte).</p>
+                <x-payment-methods class="mt-4" label="Paiement en ligne sécurisé — ton QR arrive par email juste après." />
                 @endif
             </div>
         </div>
