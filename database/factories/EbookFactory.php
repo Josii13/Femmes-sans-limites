@@ -25,7 +25,9 @@ class EbookFactory extends Factory
             'author_note' => null,
             'image' => null,
             'cta_label' => 'Télécharger',
-            'cta_url' => 'https://charriow.com/ebook-test',
+            // Pas de lien externe par défaut : renseigné, il prendrait la main
+            // sur le paiement FSL et changerait le sens de chaque test.
+            'cta_url' => null,
             'status' => 'published',
             'sort_order' => 0,
         ];
@@ -36,7 +38,9 @@ class EbookFactory extends Factory
         return $this->state(fn () => ['status' => 'draft']);
     }
 
-    /** Ebook vendu sur le site : prix + PDF (le fichier lui-même reste à créer). */
+    /**
+     * Ebook vendu PAR LE SITE : prix + PDF (le fichier lui-même reste à créer).
+     */
     public function sellable(int $price = 5000): static
     {
         return $this->state(fn () => [
@@ -45,6 +49,12 @@ class EbookFactory extends Factory
             'currency' => 'XOF',
             'file_path' => 'ebooks/files/'.Str::random(8).'.pdf',
         ]);
+    }
+
+    /** Ebook dont la vente part sur une plateforme externe (Chariow…). */
+    public function soldExternally(string $url = 'https://chariow.com/ebook-test'): static
+    {
+        return $this->state(fn () => ['cta_url' => $url]);
     }
 
     /** Promotion en cours. */

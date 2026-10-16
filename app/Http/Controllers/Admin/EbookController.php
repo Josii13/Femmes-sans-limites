@@ -52,14 +52,16 @@ class EbookController extends Controller
             // Promotion : prix réduit + fenêtre. Voir promoRules() pour le détail.
             ...$this->promoRules($request),
             'currency' => 'nullable|string|max:10',
-            // Un prix sans PDF donnerait une fiche publique invendable, sans le dire à l'admin.
-            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request))],
+            // Un prix sans PDF donnerait une fiche publique invendable, sans le dire
+            // à l'admin — sauf si la vente part sur une plateforme externe, auquel
+            // cas le fichier est livré là-bas et n'a rien à faire ici.
+            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->needsPdf($request))],
             'cta_label' => 'nullable|string|max:60',
             'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ], [
-            'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
+            'pdf.required' => 'Un ebook vendu sur le site doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré. Pour vendre ailleurs, renseignez plutôt le lien externe.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
             ...self::PROMO_MESSAGES,
@@ -105,13 +107,13 @@ class EbookController extends Controller
             ...$this->promoRules($request),
             'currency' => 'nullable|string|max:10',
             // Idem à l'édition, sauf si un PDF est déjà en place (on le conserve).
-            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->isPriced($request) && ! $ebook->file_path)],
+            'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:30720', Rule::requiredIf($this->needsPdf($request) && ! $ebook->file_path)],
             'cta_label' => 'nullable|string|max:60',
             'cta_url' => 'nullable|url|max:500|starts_with:https://,http://',
             'status' => 'required|in:draft,published',
             'sort_order' => 'nullable|integer|min:0',
         ], [
-            'pdf.required' => 'Un ebook avec un prix doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré.',
+            'pdf.required' => 'Un ebook vendu sur le site doit avoir son fichier PDF, sinon il ne peut être ni vendu ni livré. Pour vendre ailleurs, renseignez plutôt le lien externe.',
             'pdf.mimes' => 'Le fichier de l\'ebook doit être un PDF.',
             'pdf.max' => 'Le PDF ne doit pas dépasser 30 Mo.',
             ...self::PROMO_MESSAGES,
@@ -159,6 +161,15 @@ class EbookController extends Controller
     private function isPriced(Request $request): bool
     {
         return (float) $request->input('price', 0) > 0;
+    }
+
+    /**
+     * Le PDF n'est indispensable que si le site encaisse et livre lui-même.
+     * Un lien externe renseigné déplace les deux ailleurs.
+     */
+    private function needsPdf(Request $request): bool
+    {
+        return $this->isPriced($request) && ! filled($request->input('cta_url'));
     }
 
     /**

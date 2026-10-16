@@ -25,6 +25,8 @@ class EbookShowPageTest extends TestCase
         $ebook = Ebook::factory()->create([
             'status' => 'published', 'price' => 5000, 'currency' => 'XOF',
             'file_path' => 'ebooks/files/a.pdf', 'author_note' => 'Une note de l’autrice.',
+            // Vendu par le site : un lien externe prendrait la main sur le paiement.
+            'cta_url' => null,
         ]);
         Storage::disk('local')->put($ebook->file_path, '%PDF-1.4');
 

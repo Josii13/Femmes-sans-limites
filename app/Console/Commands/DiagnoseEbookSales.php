@@ -110,6 +110,14 @@ class DiagnoseEbookSales extends Command
             $this->assert($ebook->status === 'published',
                 'publié', 'en brouillon : la fiche est introuvable pour le public', 4);
 
+            if ($ebook->usesExternalCheckout()) {
+                $this->line('    vente externe : '.$ebook->cta_url);
+                $this->line('    (ni PDF ni paiement FSL requis — tout se passe chez le partenaire)');
+                $this->line('    URL : '.route('ebooks.show', $ebook->slug));
+
+                continue;
+            }
+
             $hasPath = ! empty($ebook->file_path);
             $this->assert($hasPath, 'fichier PDF renseigné',
                 'AUCUN PDF : le bouton « Acheter » ne s\'affiche pas (isPurchasable = false)', 4);

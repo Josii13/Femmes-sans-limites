@@ -106,8 +106,8 @@
             {{-- CTA externe (optionnel) --}}
             <div class="rounded-xl border border-gray-100 p-5 space-y-4">
                 <div>
-                    <p class="font-semibold text-sm mb-1" style="color:var(--dark);">Lien externe (optionnel)</p>
-                    <p class="text-xs text-gray-400">Utilisé si l'ebook n'est PAS en vente directe (ex : page produit Charriow).</p>
+                    <p class="font-semibold text-sm mb-1" style="color:var(--dark);">Vendre sur une plateforme externe (optionnel)</p>
+                    <p class="text-xs text-gray-400">Renseigné, ce lien <strong>remplace le paiement FSL</strong> : le bouton « Acheter » y conduit directement, et le PDF n'est plus nécessaire ici. Laissez vide pour vendre sur le site.</p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>

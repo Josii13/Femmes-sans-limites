@@ -97,7 +97,8 @@
 
             {{-- CTA externe (optionnel) --}}
             <div class="rounded-xl border border-gray-100 p-5 space-y-4">
-                <p class="font-semibold text-sm" style="color:var(--dark);">Lien externe (optionnel)</p>
+                <p class="font-semibold text-sm mb-1" style="color:var(--dark);">Vendre sur une plateforme externe (optionnel)</p>
+                <p class="text-xs text-gray-400">Renseigné, ce lien <strong>remplace le paiement FSL</strong> : le bouton « Acheter » y conduit directement, et le PDF n'est plus nécessaire ici. Laissez vide pour vendre sur le site.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">Label du bouton</label>
@@ -110,7 +111,7 @@
                     </div>
                     <div>
                         <label class="form-label">Lien externe</label>
-                        <input type="url" name="cta_url" value="{{ old('cta_url', $ebook->cta_url) }}" class="form-input @error('cta_url') border-red-400 @enderror">
+                        <input type="url" name="cta_url" value="{{ old('cta_url', $ebook->cta_url) }}" class="form-input @error('cta_url') border-red-400 @enderror" placeholder="https://chariow.com/produit/...">
                         @error('cta_url')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>

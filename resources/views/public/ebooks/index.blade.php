@@ -105,7 +105,8 @@
                     <h3 class="text-sm font-bold leading-snug line-clamp-2" style="color:var(--dark);font-family:'Playfair Display',serif;">
                         {{ $ebook->title }}
                     </h3>
-                    @if($ebook->isPurchasable())
+                    {{-- Le prix compte quel que soit l'endroit où l'on encaisse. --}}
+                    @if($ebook->hasPrice())
                     <x-ebook-price :ebook="$ebook" variant="card" />
                     @elseif($ebook->cta_label)
                     <p class="text-xs font-medium" style="color:var(--rose);">{{ $ebook->cta_label }}</p>

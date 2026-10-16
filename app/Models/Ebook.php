@@ -27,9 +27,34 @@ class Ebook extends Model
     ];
 
     /** Vendable sur le site : a un prix > 0 ET un fichier PDF à livrer. */
+    /**
+     * Vente déléguée à une plateforme externe (Chariow…).
+     *
+     * Dès qu'un lien est renseigné, il prime sur le circuit FSL : le paiement
+     * et la livraison sortent du site. Auparavant le lien était simplement
+     * ignoré quand l'ebook avait un prix et un PDF — donnée morte dans la
+     * fiche, et aucun moyen de vendre ailleurs sans renoncer à afficher le prix.
+     */
+    public function usesExternalCheckout(): bool
+    {
+        return filled($this->cta_url);
+    }
+
+    /** Un prix à afficher, quel que soit l'endroit où l'on encaisse. */
+    public function hasPrice(): bool
+    {
+        return $this->price !== null && (float) $this->price > 0;
+    }
+
+    /**
+     * Vendu par le site lui-même : il faut un prix ET le PDF à livrer.
+     * Un lien externe court-circuite ce circuit, route d'achat comprise.
+     */
     public function isPurchasable(): bool
     {
-        return $this->price !== null && (float) $this->price > 0 && ! empty($this->file_path);
+        return ! $this->usesExternalCheckout()
+            && $this->hasPrice()
+            && ! empty($this->file_path);
     }
 
     /**

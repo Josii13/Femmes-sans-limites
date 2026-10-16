@@ -31,7 +31,11 @@
     // dans la page doivent toujours proposer la même action.
     $isSale = $ebook->isPurchasable();
     $ctaUrl = $isSale ? route('ebooks.buy', $ebook->slug) : ($ebook->cta_url ?: null);
-    $ctaLabel = $isSale ? 'Acheter et télécharger' : ($ebook->cta_label ?: 'Accéder à l’ebook');
+    // Un ebook payant vendu ailleurs s'« achète » : « Accéder » ne conviendrait
+    // qu'à un ebook gratuit hébergé chez un partenaire.
+    $ctaLabel = $isSale
+        ? 'Acheter et télécharger'
+        : ($ebook->cta_label ?: ($ebook->hasPrice() ? 'Acheter l’ebook' : 'Accéder à l’ebook'));
 @endphp
 
 <section class="pt-20 pb-14 lg:pb-16 bg-white relative overflow-hidden">
@@ -126,7 +130,20 @@
                 </div>
 
                 @elseif($ctaUrl)
-                {{-- Lien externe (partenaire) --}}
+                {{-- Vente externe (Chariow…) : le prix reste affiché ici, c'est
+                     lui qui décide l'achat. Seul l'encaissement part ailleurs. --}}
+                @if($ebook->hasPrice())
+                <div class="rounded-2xl border p-5 mb-4 bg-[var(--rose-pale)] border-[var(--rose-mid)] lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:mb-3">
+                    <x-ebook-price :ebook="$ebook" variant="page" />
+                    @if($ebook->hasActivePromo())
+                    <p class="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold" style="color:var(--rose);">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Offre valable jusqu'au {{ $ebook->promo_ends_at->translatedFormat('d F Y à H:i') }}
+                    </p>
+                    @endif
+                </div>
+                @endif
+
                 <a href="{{ $ctaUrl }}" target="_blank" rel="noopener noreferrer"
                    class="btn-rose w-full lg:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
